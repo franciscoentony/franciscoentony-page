@@ -1,0 +1,51 @@
+import React from 'react'
+import ContactCard from '../Contact/ContactCard'
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+
+import Button02 from '../buttons/Button02'
+
+export default function Contact() {
+  return (
+    <section className="w-full h-auto p-30 flex items-center justify-center">
+      <div className="w-250 flex flex-col gap-18 items-center">
+      <div className="">
+          <h1 className="text-4xl font-semibold bg-linear-to-r to-neutral-900 from-slate-50 bg-clip-text text-transparent">
+          Vamos Trabalhar Juntos
+          </h1>
+          <div className="bg-linear-to-r to-transparent from-stone-400  rounded-full w-50 h-1 absolute mt-1"></div>
+        </div>
+        <div className="flex flex-col gap-5 md:flex-row w-full justify-between">
+            <div className="flex flex-col gap-5">
+            <ContactCard contact='Email' method='franciscoentonydev@gmail.com'/>
+            <ContactCard contact='Localização' method='Natal-RN'/>
+            <ContactCard contact='GitHub' method='github.com/franciscoentony'/>
+            <ContactCard contact='LinkedIn' method='linkedin.com/franciscoentony'/>
+            </div>
+            <div className="">
+                <form action="" className='w-100 p-[.05rem] rounded-3xl bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%'>
+                  <div className="w-full rounded-3xl bg-radial-[at_25%_25%] from-stone-800 to-stone-950 to-100% p-5 flex flex-col gap-5 items-center">
+                    <div className="w-full flex flex-col gap-2">
+                        <label htmlFor="">Nome</label>
+                        <input type="text" placeholder='Seu nome completo' className='w-full h-11 p-4 border-2 duration-200 border-transparent hover:border-white rounded-[.5rem] outline-transparent focus:outline-white focus:outline-2 bg-black'/>
+                    </div>
+                    <div className="w-full flex flex-col">
+                        <label htmlFor="">Email</label>
+                        <input type="email" placeholder='seu@email.com' className='w-full h-11 p-4 border-2 duration-200 border-transparent hover:border-white rounded-[.5rem] outline-transparent focus:outline-white focus:outline-2 bg-black'/>
+                    </div>
+                    <div className="w-full flex flex-col">
+                        <label htmlFor="">Mensagem</label>
+                        <textarea name="" id="" placeholder='Sua mensagem...' className='w-full text-start flex justify-start p-4 border-2 duration-200 border-transparent hover:border-white rounded-[.5rem] outline-transparent focus:outline-white focus:outline-2 bg-black'></textarea>
+                    </div>
+                    <button className=''>
+                    </button>
+                    <Button02/>
+                  </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </section>
+  )
+}

@@ -1,0 +1,144 @@
+"use client"
+import React, { useRef, useEffect, useState } from "react";
+import ProjectsCard from "../Projects/ProjectsCard";
+import {
+  animate,
+  motion,
+  MotionValue,
+  useMotionValue,
+  useMotionValueEvent,
+  useScroll,
+} from "motion/react";
+
+const left = "0%";
+const right = "100%";
+const leftInset = "20%";
+const rightInset = "80%";
+const transparent = "#0000";
+const opaque = "#000";
+
+function useScrollOverflowMask(scrollXProgress: MotionValue<number>) {
+  const maskImage = useMotionValue(
+    `linear-gradient(90deg, ${opaque}, ${opaque} ${left}, ${opaque} ${rightInset}, ${transparent})`
+  );
+
+  useMotionValueEvent(scrollXProgress, "change", (value) => {
+    if (value === 0) {
+      animate(maskImage, `linear-gradient(90deg, ${opaque}, ${opaque} ${left}, ${opaque} ${rightInset}, ${transparent})`);
+    } else if (value === 1) {
+      animate(maskImage, `linear-gradient(90deg, ${transparent}, ${opaque} ${leftInset}, ${opaque} ${right}, ${opaque})`);
+    } else {
+      animate(maskImage, `linear-gradient(90deg, ${transparent}, ${opaque} ${leftInset}, ${opaque} ${rightInset}, ${transparent})`);
+    }
+  });
+
+  return maskImage;
+}
+
+function StyleSheet() {
+  return (
+    <style>{`
+          #projects-container {
+            width: 100%;
+            position: relative;
+          }
+
+          #projects-container > ul {
+              display: flex;
+              list-style: none;
+              height: auto;
+              overflow-x: auto;
+              padding: 40px 0;
+              margin: 0 auto;
+              gap: 32px; 
+              scrollbar-width: thin;
+              scrollbar-color: var(--accent, #10b981) #00000033;
+              scroll-snap-type: x mandatory;
+              /* Padding lateral no ul ajuda o primeiro e último card a não colarem na borda */
+              padding-left: 20px;
+              padding-right: 20px;
+          }
+
+          #projects-container > ul > li {
+            flex: 0 0 85vw;
+            max-width: 400px;
+            height: auto;
+            background: transparent;
+            scroll-snap-align: center;
+          }
+
+          @media (min-width: 1024px) {
+            #projects-container > ul {
+              overflow-x: visible;
+              flex-wrap: wrap;
+              justify-content: center;
+              mask-image: none !important;
+              -webkit-mask-image: none !important;
+              scroll-snap-type: none;
+              padding-left: 0;
+              padding-right: 0;
+              /* No desktop podemos aumentar o gap para dar mais ar ao layout */
+              gap: 48px;
+            }
+            
+            #projects-container > ul > li {
+              flex: 0 1 auto;
+              width: 100%;
+              max-width: 400px;
+            }
+          }
+
+          #projects-container > ul::-webkit-scrollbar { height: 6px; background: #fff1; }
+          #projects-container > ul::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
+  `}</style>
+  );
+}
+
+export default function Projects() {
+  const ref = useRef(null);
+  const { scrollXProgress } = useScroll({ container: ref });
+  const maskImage = useScrollOverflowMask(scrollXProgress);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const checkSize = () => setIsDesktop(window.innerWidth >= 1024);
+    checkSize();
+    window.addEventListener("resize", checkSize);
+    return () => window.removeEventListener("resize", checkSize);
+  }, []);
+
+  const technologiesProject1 = [{name: "React"}, {name: "Node"}, {name: "PostgreSQL"}, {name: "Tailwindcss"}];
+  const technologiesProject2 = [{name: "NextJS"}, {name: "TypeScript"}, {name: "Supabase"}, {name: "Tailwindcss"}];
+  const technologiesProject3 = [{name: "React"}, {name: "Python"}, {name: "MySQL"}, {name: "Tailwindcss"}];
+
+  return (
+    <section className="w-full h-auto py-20 lg:py-30 overflow-hidden flex items-center justify-center bg-stone-950">
+      <StyleSheet />
+      <div className="w-full max-w-7xl flex flex-col gap-12 lg:gap-18 items-center">
+        <div className="relative text-center">
+          <h1 className="text-4xl font-semibold bg-linear-to-r to-neutral-900 from-slate-50 bg-clip-text text-transparent">
+            Projetos
+          </h1>
+          <div className="bg-linear-to-r to-transparent from-stone-400 rounded-full w-30 h-1 mx-auto mt-1"></div>
+        </div>
+
+        <div id="projects-container" className="w-full">
+          <motion.ul 
+            ref={ref} 
+            style={{ maskImage: isDesktop ? "none" : maskImage }}
+          >
+            <li>
+              <ProjectsCard title="E-commerce Platform" image="https://picsum.photos/400/600" description="Plataforma completa de e-commerce com painel administrativo, carrinho de compras e integração de pagamento." technologies={technologiesProject1}/>
+            </li>
+            <li>
+              <ProjectsCard title="Task Management App" image="https://picsum.photos/400/601" description="Aplicativo de gerenciamento de tarefas com funcionalidades de colaboração em tempo real e notificações." technologies={technologiesProject2}/>
+            </li>
+            <li>
+             <ProjectsCard title="Analytics Dashboard" image="https://picsum.photos/400/602" description="Dashboard analítico com visualizações de dados em tempo real, gráficos interativos e relatórios customizáveis." technologies={technologiesProject3}/> 
+            </li>
+          </motion.ul>
+        </div>
+      </div>
+    </section>
+  );
+}

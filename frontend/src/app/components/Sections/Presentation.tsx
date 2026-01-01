@@ -77,7 +77,7 @@ export default function Presentation() {
         </div>
         <div className="relative top-5 w-full max-w-md lg:max-w-lg h-[400px] lg:h-[550px] overflow-hidden rounded-[2rem] shadow-2xl order-1 lg:order-2">
           <Image
-            src="/images/avatar.JPG"
+            src="./images/avatar.JPG"
             alt="Foto"
             fill
             className="object-cover"

@@ -12,7 +12,7 @@ interface SkillCardProps {
 
 export default function SkillCard({ title, skills }: SkillCardProps) {
   return (
-    <div className="w-100 p-[.05rem] rounded-3xl bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%">
+    <div className="w-80 p-[.05rem] hover:scale-105  hover:shadow-[0_0_0_0.1rem_#0ada98] duration-400 ease-in-out  rounded-3xl bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%">
       <div className="w-full h-full rounded-3xl bg-radial-[at_25%_25%] from-stone-800 to-stone-950 to-100% p-5 flex flex-col items-center gap-5">
         <h1 className="text-[17pt] font-semibold text-start w-full text-stone-300">{title}</h1>
         <ul className="w-full flex flex-col gap-5">

@@ -27,7 +27,7 @@ export default function Presentation() {
 
   return (
     <section className="w-full h-auto bg-linear-to-bl from-stone-800 to-stone-950 p-30 flex items-center justify-center rounded-b-[3rem] lg:p-32 py-12 px-6">
-      <div className="w-full max-w-7xl flex flex-col lg:flex-row lg:gap-20 justify-between items-center gap-12">
+      <div className="w-full max-w-7xl mt-10 lg:mt-0 flex flex-col lg:flex-row lg:gap-20 justify-between items-center gap-12">
         <div className="">
           <div className="flex flex-col gap-5 lg:text-left flex-1 order-2 lg:order-1">
             <div className="p-[0.05rem] w-70 lg:w-65 bg-linear-to-t from-blue-950 to-stone-400 rounded-full shadow-2xl">

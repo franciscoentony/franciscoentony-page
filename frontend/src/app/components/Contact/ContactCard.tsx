@@ -18,8 +18,8 @@ const ICON_MAP: Record<string, any> = {
 export default function ContactCard({contact, method} : ContactProps) {
     const icon = ICON_MAP[contact] || faEnvelope
   return (
-    <div className="w-100 p-[.05rem] rounded-[1.5rem] bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%">
-        <div className='w-full h-full rounded-[1.5rem] bg-radial-[at_25%_25%] from-stone-800 to-stone-950 to-100% p-5 flex gap-5 items-center'>
+    <div className="w-auto lg:w-100 p-[.05rem] hover:scale-105  hover:shadow-[0_0_0_0.1rem_#0ada98] duration-400 ease-in-out  rounded-3xl bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%">
+        <div className='w-full h-full rounded-3xl bg-radial-[at_25%_25%] from-stone-800 to-stone-950 to-100% p-5 flex gap-5 items-center'>
             <div className="w-10 h-10 p-7 rounded-2xl bg-emerald-900 flex items-center justify-center">
                 <FontAwesomeIcon icon={icon} className='w-7'/>
             </div>

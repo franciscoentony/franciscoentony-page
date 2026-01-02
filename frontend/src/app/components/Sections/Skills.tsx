@@ -12,10 +12,10 @@ import {
 
 const left = "0%";
 const right = "100%";
-const leftInset = "20%";
-const rightInset = "80%";
-const transparent = "#0000";
-const opaque = "#000";
+const leftInset = "10%";
+const rightInset = "90%";
+const transparent = "#00000027";
+const opaque = "#000000";
 
 function useScrollOverflowMask(scrollXProgress: MotionValue<number>) {
   const maskImage = useMotionValue(
@@ -122,7 +122,7 @@ export default function Skills() {
           <h1 className="text-3xl lg:text-4xl font-semibold bg-linear-to-r to-neutral-900 from-slate-50 bg-clip-text text-transparent text-center">
             Habilidades
           </h1>
-          <div className="bg-linear-to-r to-transparent from-stone-400 rounded-full w-20 lg:w-30 h-1 mx-auto mt-2"></div>
+          <div className="bg-linear-to-r to-transparent from-stone-400  rounded-full w-30 h-1 relative mt-1"></div>
         </div>
 
         <div id="example">

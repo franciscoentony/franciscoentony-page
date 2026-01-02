@@ -17,10 +17,10 @@ interface Project{
 
 export default function ProjectsCard({ title, description, technologies, image } : Project) {
   return (
-    <div className="w-100 p-[.05rem] rounded-[1.5rem] bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%">
-        <div className='w-full h-full rounded-[1.5rem] bg-radial-[at_25%_25%] from-stone-800 to-stone-950 to-100% p-5 flex flex-col justify-end items-center'>
-            <div className="overflow-hidden rounded-t-[1.5rem] relative bottom-5 w-100 h-60 flex justify-center items-center">
-                <Image src={image} alt='Foto' width={400} height={400} className='relative'/>
+    <div className="w-80 lg:w-100 p-[.05rem] hover:scale-105  hover:shadow-[0_0_0_0.1rem_#0ada98] duration-400 ease-in-out  rounded-3xl bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%">
+        <div className='w-full h-full rounded-3xl bg-radial-[at_25%_25%] from-stone-800 overflow-hidden to-stone-950 to-100% p-5 flex flex-col justify-end items-center'>
+            <div className="overflow-hidden rounded-t-3xl relative bottom-5 w-80 lg:w-100 h-60 flex justify-center items-center">
+                <Image src={image} alt='Foto' width={700} height={400} className='relative'/>
             </div>
             <div className="h-[55%] flex flex-col gap-3 justify-between">
                 <div className="flex flex-col gap-5">

@@ -11,7 +11,7 @@ interface InfoJobs {
 
 export default function ExperienceCard({title, date, enterprise, description} : InfoJobs) {
   return (
-    <div className="w-full p-[.05rem] shadow-2xl  rounded-3xl bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%">
+    <div className="w-full p-[.05rem] hover:scale-105  hover:shadow-[0_0_0_0.1rem_#0ada98] duration-400 ease-in-out shadow-2xl rounded-3xl bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%">
       <div className='flex items-center w-full p-10 gap-10 rounded-3xl bg-radial-[at_25%_25%] from-stone-800 to-stone-950 to-100%'>
           <div className="w-10 h-10 p-8 rounded-2xl bg-emerald-800 flex items-center justify-center">
             <FontAwesomeIcon icon={faBriefcase} size='xl'/>

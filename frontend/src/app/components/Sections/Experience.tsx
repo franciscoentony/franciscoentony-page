@@ -9,9 +9,9 @@ export default function Experience() {
           <h1 className="text-4xl font-semibold bg-linear-to-r to-neutral-900 from-slate-50 bg-clip-text text-transparent">
           Experiência 
           </h1>
-          <div className="bg-linear-to-r to-transparent from-stone-400  rounded-full w-30 h-1 absolute mt-1"></div>
+          <div className="bg-linear-to-r to-transparent from-stone-400  rounded-full w-30 h-1 relative mt-1"></div>
         </div>
-      <div className="flex flex-col w-full gap-5">
+      <div className="flex flex-col w-full lg:w-auto gap-5">
         <ExperienceCard title='Desenvolvedor Full Stack Sênior' date={"2022 - presente"} enterprise='Tech Solutions' description='Liderança técnica de equipe, desenvolvimento de arquiteturas escaláveis e mentoria de desenvolvedores juniores.'/>
         <ExperienceCard title='Desenvolvedor Full Stack Sênior' date={"2022 - presente"} enterprise='Tech Solutions' description='Liderança técnica de equipe, desenvolvimento de arquiteturas escaláveis e mentoria de desenvolvedores juniores.'/>
         <ExperienceCard title='Desenvolvedor Full Stack Sênior' date={"2022 - presente"} enterprise='Tech Solutions' description='Liderança técnica de equipe, desenvolvimento de arquiteturas escaláveis e mentoria de desenvolvedores juniores.'/>

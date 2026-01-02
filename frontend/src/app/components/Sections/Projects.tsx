@@ -12,10 +12,10 @@ import {
 
 const left = "0%";
 const right = "100%";
-const leftInset = "20%";
-const rightInset = "80%";
-const transparent = "#0000";
-const opaque = "#000";
+const leftInset = "10%";
+const rightInset = "90%";
+const transparent = "#00000027";
+const opaque = "#000000";
 
 function useScrollOverflowMask(scrollXProgress: MotionValue<number>) {
   const maskImage = useMotionValue(
@@ -50,7 +50,7 @@ function StyleSheet() {
               overflow-x: auto;
               padding: 40px 0;
               margin: 0 auto;
-              gap: 32px; 
+              gap: 1rem; 
               scrollbar-width: thin;
               scrollbar-color: var(--accent, #10b981) #00000033;
               scroll-snap-type: x mandatory;
@@ -60,11 +60,13 @@ function StyleSheet() {
           }
 
           #projects-container > ul > li {
-            flex: 0 0 85vw;
+            flex: 0 0;
             max-width: 400px;
             height: auto;
             background: transparent;
             scroll-snap-align: center;
+            display: flex;
+            justify-content: start;
           }
 
           @media (min-width: 1024px) {
@@ -112,14 +114,14 @@ export default function Projects() {
   const technologiesProject3 = [{name: "React"}, {name: "Python"}, {name: "MySQL"}, {name: "Tailwindcss"}];
 
   return (
-    <section className="w-full h-auto py-20 lg:py-30 overflow-hidden flex items-center justify-center bg-stone-950">
+    <section className="w-full h-auto py-20 px-0 lg:py-30 overflow-hidden flex items-center justify-center bg-stone-950">
       <StyleSheet />
       <div className="w-full max-w-7xl flex flex-col gap-12 lg:gap-18 items-center">
         <div className="relative text-center">
           <h1 className="text-4xl font-semibold bg-linear-to-r to-neutral-900 from-slate-50 bg-clip-text text-transparent">
             Projetos
           </h1>
-          <div className="bg-linear-to-r to-transparent from-stone-400 rounded-full w-30 h-1 mx-auto mt-1"></div>
+          <div className="bg-linear-to-r to-transparent from-stone-400  rounded-full w-30 h-1 relative mt-1"></div>
         </div>
 
         <div id="projects-container" className="w-full">

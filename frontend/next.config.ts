@@ -6,14 +6,7 @@ const nextConfig: NextConfig = {
   //basePath: '/franciscoentony-page', 
   //assetPrefix: '/franciscoentony-page',
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-        port: '',
-        pathname: '/**',
-      },
-    ],
+    unoptimized: true,    
   },
 };
 

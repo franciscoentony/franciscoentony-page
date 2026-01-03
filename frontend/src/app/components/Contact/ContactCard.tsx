@@ -25,7 +25,7 @@ export default function ContactCard({contact, method} : ContactProps) {
             </div>
             <div className="">
                 <p className='text-stone-400 text-sm'>{contact}</p>
-                <p>{method}</p>
+                <p className='break-all'>{method}</p>
             </div>
         </div>
     </div>

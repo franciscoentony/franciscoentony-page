@@ -26,10 +26,10 @@ export default function Presentation() {
   };
 
   return (
-    <section className="w-full h-auto bg-linear-to-bl from-stone-800 to-stone-950 p-30 flex items-center justify-center rounded-b-[3rem] lg:p-32 py-12 px-6">
-      <div className="w-full max-w-7xl mt-10 lg:mt-0 flex flex-col lg:flex-row lg:gap-20 justify-between items-center gap-12">
+<section className="w-full h-auto bg-linear-to-bl from-stone-800 to-stone-950 flex items-center justify-center rounded-b-[3rem] py-12 px-4 md:px-10 lg:p-32">
+      <div className="w-full max-w-7xl mt-7 lg:mt-0 flex flex-col lg:flex-row lg:gap-20 justify-between items-center gap-12">
         <div className="">
-          <div className="flex flex-col gap-5 lg:text-left flex-1 order-2 lg:order-1">
+          <div className="w-full max-w-[450px] lg:max-w-none mx-auto md:p-8 lg:p-0 lg:border-none rounded-3xl flex flex-col gap-5 lg:text-left flex-1 order-2 lg:order-1">
             <div className="p-[0.05rem] w-70 lg:w-65 bg-linear-to-t from-blue-950 to-stone-400 rounded-full shadow-2xl">
               <span className="w-full flex items-center px-4 py-2 gap-2 bg-blue-950 rounded-full text-2x md:text-sm whitespace-nowrap">
                 <FontAwesomeIcon icon={faStar} className="w-4" />
@@ -38,11 +38,11 @@ export default function Presentation() {
             </div>
             <p className="text-emerald-400">Hello World, eu sou</p>
             <h1 className="text-6xl font-bold">Entony!</h1>
-            <h2 className="text-[16pt] text-neutral-400">
-              Desenvolvedor de Software
+            <h2 className="w-full text-[16pt] text-neutral-400">
+              Desenvolvedor de Software & Estudante de Sistemas para Internet no IFRN
             </h2>
             <p className="max-w-lg text-base md:text-[14pt] leading-relaxed text-stone-300">
-              Especializado em criar aplicações modernas e que tragam impacto.
+              Construindo sistemas hoje, projetando o futuro da tecnologia amanhã.
             </p>
             <div className="flex flex-col lg:flex-row justify-center lg:justify-start gap-4 w-full">
               <Button01 />
@@ -63,13 +63,13 @@ export default function Presentation() {
               </button>
             </div>
             <div className="w-auto mt-10 lg:mt-0 flex gap-4 items-center justify-start">
-              <Link href={"https://github.com"} target="_blank" className="hover:text-emerald-500 relative bottom-0 hover:bottom-1 duration-200 ease-in-out">
+              <Link href={"https://github.com/franciscoentony"} target="_blank" className="hover:text-emerald-500 relative bottom-0 hover:bottom-1 duration-200 ease-in-out">
                 <FontAwesomeIcon icon={faGithub} size="2xl" />
               </Link>
-              <Link href={"https://github.com"} target="_blank" className="hover:text-emerald-500 relative bottom-0 hover:bottom-1 duration-200 ease-in-out">
+              <Link href={"https://www.linkedin.com/in/franciscoentony/"} target="_blank" className="hover:text-emerald-500 relative bottom-0 hover:bottom-1 duration-200 ease-in-out">
                 <FontAwesomeIcon icon={faLinkedinIn} size="2xl" />
               </Link>
-              <Link href={"https://github.com"} target="_blank" className="hover:text-emerald-500 relative bottom-0 hover:bottom-1 duration-200 ease-in-out">
+              <Link href={"mailto:francisoentonydev@gmail.com"} target="_blank" className="hover:text-emerald-500 relative bottom-0 hover:bottom-1 duration-200 ease-in-out">
                 <FontAwesomeIcon icon={faEnvelope} size="2xl" />
               </Link>
             </div>

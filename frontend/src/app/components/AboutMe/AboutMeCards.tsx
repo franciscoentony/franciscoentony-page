@@ -24,7 +24,7 @@ export default function AboutMeCards({ title, description, icon }: AboutMeProps)
             <div className="w-30 h-13 lg:w-16 lg:h-16 flex justify-center items-center rounded-2xl bg-[#003024]">
                 <FontAwesomeIcon icon={selectedIcon} className="p-1 w-5 h-5 text-emerald-500" size="xl"/>
             </div>
-            <div className="w-auto flex flex-col gap-1">
+            <div className="w-auto max-w-60 lg:max-w-115 flex flex-col gap-1">
                 <h1 className="text-[15pt] font-semibold">{title}</h1>
                 <p className="text-stone-400 w-full lg:w-auto h-auto">
                     {description}

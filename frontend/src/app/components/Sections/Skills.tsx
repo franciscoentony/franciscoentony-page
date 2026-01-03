@@ -50,7 +50,7 @@ function StyleSheet() {
               overflow-x: scroll;
               padding: 20px 0;
               margin: 0 auto;
-              gap: 20px;
+              gap: 1rem;
               scrollbar-width: thin;
               scrollbar-color: var(--accent, #10b981) #00000033;
           }
@@ -58,7 +58,6 @@ function StyleSheet() {
           #example li {
             flex: 0 0 4rem;
             height: auto;
-            background: transparent;
           }
 
           /* COMPORTAMENTO LG (DESKTOP) */
@@ -111,7 +110,13 @@ export default function Skills() {
   const backendSkills = [
     { name: "Node.JS", level: 87 },
     { name: "Python", level: 56 },
-    { name: "Java", level: 75 },
+    //{ name: "Java", level: 75 },
+  ];
+  const othersSkills = [
+    { name: "MySQL", level: 87 },
+    { name: "Git e GitHub", level: 75 },
+    { name: "Bibliotecas", level: 56 },
+    { name: "Frameworks", level: 56 },
   ];
 
   return (
@@ -137,7 +142,7 @@ export default function Skills() {
               <SkillCard title="Backend" skills={backendSkills} />
             </li>
             <li>
-              <SkillCard title="Outros" skills={backendSkills} />
+              <SkillCard title="Outros" skills={othersSkills} />
             </li>
           </motion.ul>
         </div>

@@ -39,7 +39,7 @@ export default function ProjectsCard({
         </div>
         <div className="h-[55%] flex flex-col gap-3 justify-between">
           <div className="flex flex-col gap-5">
-            <p className="text-[15pt] w-full text-start text-semibold">{title}</p>
+            <p className="text-[15pt] w-full text-start font-semibold">{title}</p>
             <span className="text-stone-400">{description}</span>
             <ul className="flex flex-wrap gap-x-3 gap-y-3 w-full h-auto">
               {technologies.map((technologie, index) => (

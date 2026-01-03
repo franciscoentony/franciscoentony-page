@@ -124,7 +124,7 @@ export default function Skills() {
       <StyleSheet />
       <div className="w-full max-w-7xl flex flex-col gap-12 lg:gap-18 items-center justify-center">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-semibold bg-linear-to-r to-neutral-900 from-slate-50 bg-clip-text text-transparent text-center">
+          <h1 className="text-3xl lg:text-4xl font-semibold bg-linear-to-r to-neutral-600 from-slate-50 bg-clip-text text-transparent text-center">
             Habilidades
           </h1>
           <div className="bg-linear-to-r to-transparent from-stone-400  rounded-full w-30 h-1 relative mt-1"></div>

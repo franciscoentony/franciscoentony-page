@@ -9,7 +9,7 @@ export default function Contact() {
     <section className="w-full h-auto p-5 lg:p-30 flex items-center justify-center">
       <div className="w-full lg:w-250 mt-10 lg:mt-0 flex flex-col gap-18 items-center justify-center">
       <div className="w-auto lg:w-120 flex flex-col justify-center items-center">
-          <h1 className=" text-4xl font-semibold bg-linear-to-r to-neutral-900 from-slate-50 bg-clip-text text-transparent w-[90%] text-center">
+          <h1 className=" text-4xl font-semibold bg-linear-to-r to-neutral-600 from-slate-50 bg-clip-text text-transparent w-[90%] text-center">
           Vamos Trabalhar Juntos
           </h1>
           <div className="bg-linear-to-r to-transparent from-stone-400  rounded-full w-50 h-1 mt-2 lg:mr-55"></div>

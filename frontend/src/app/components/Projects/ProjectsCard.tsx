@@ -26,9 +26,9 @@ export default function ProjectsCard({
   image,
 }: Project) {
   return (
-    <div className="w-80 lg:w-100 p-[.05rem] hover:scale-105  hover:shadow-[0_0_0_0.1rem_#0ada98] duration-400 ease-in-out  rounded-3xl bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%">
+    <div className="w-80 lg:w-100 h-auto p-[.05rem] hover:scale-105  hover:shadow-[0_0_0_0.1rem_#0ada98] duration-400 ease-in-out  rounded-3xl bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%">
       <div className="w-full h-full rounded-3xl bg-radial-[at_25%_25%] from-stone-800 overflow-hidden to-stone-950 to-100% p-5 flex flex-col justify-end items-center">
-        <div className="overflow-hidden rounded-t-3xl relative bottom-6 w-80 lg:w-100 h-60 flex justify-center items-center">
+        <div className="overflow-hidden rounded-t-3xl relative bottom-9 lg:bottom-6 w-80 lg:w-100 h-60 flex justify-center items-center">
           <Image
             src={image}
             alt="Foto"
@@ -38,7 +38,7 @@ export default function ProjectsCard({
           />
         </div>
         <div className="h-[55%] flex flex-col gap-3 justify-between">
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
             <p className="text-[15pt] w-full text-start font-semibold">{title}</p>
             <span className="text-stone-400">{description}</span>
             <ul className="flex flex-wrap gap-x-3 gap-y-3 w-full h-auto">

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGithub, faLinkedinIn } from "@fortawesome/free-brands-svg-icons";
+import { faGithub, faLinkedin, faLinkedinIn } from "@fortawesome/free-brands-svg-icons";
 import {
   faEnvelope,
   faFileDownload,
@@ -45,8 +45,8 @@ export default function Presentation() {
               Construindo sistemas hoje, projetando o futuro da tecnologia amanhã.
             </p>
             <div className="flex flex-col lg:flex-row justify-center lg:justify-start gap-4 w-full">
-              <Button01 />
-              <button
+              <Button01 Link="#projects"/>
+              <Link href={"https://www.linkedin.com/in/franciscoentony/"} target="_blank"
                 className="bg-white hover:bg-neutral-300 h-14 lg:h-auto hover:-translate-y-1 group relative duration-200 focus:shadow-[0px_0px_0px_6px_#ffffff5d] text-neutral-900 py-3 px-6 rounded-[0.9rem] flex items-center justify-center gap-2 cursor-pointer font-semibold text-sm md:text-[11pt] transition-all"
                 onClick={handleDownload}
               >
@@ -55,14 +55,14 @@ export default function Presentation() {
                 ) : (
                   <>
                     <div className="opacity-0 -translate-x-2 w-0 group-hover:w-6 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ">
-                      <FontAwesomeIcon icon={faFileDownload} className="w-4" />
+                      <FontAwesomeIcon icon={faLinkedin} size="xl" />
                     </div>
-                    <span>Baixar CV</span>
+                    <span>Acessar LinkedIn</span>
                   </>
                 )}
-              </button>
+              </Link>
             </div>
-            <div className="w-auto mt-10 lg:mt-0 flex gap-4 items-center justify-start">
+            <div className="w-auto mt-5 lg:mt-0 flex gap-4 items-center justify-start">
               <Link href={"https://github.com/franciscoentony"} target="_blank" className="hover:text-emerald-500 relative bottom-0 hover:bottom-1 duration-200 ease-in-out">
                 <FontAwesomeIcon icon={faGithub} size="2xl" />
               </Link>
@@ -75,7 +75,7 @@ export default function Presentation() {
             </div>
           </div>
         </div>
-        <div className="relative top-5 w-full max-w-md lg:max-w-lg h-[400px] lg:h-[550px] overflow-hidden rounded-[2rem] shadow-2xl order-1 lg:order-2">
+        <div className="relative top-7 w-full max-w-md lg:max-w-lg h-[400px] lg:h-[550px] overflow-hidden rounded-4xl shadow-2xl order-1 lg:order-2">
           <Image
             src="./images/avatar.JPG"
             alt="Foto"

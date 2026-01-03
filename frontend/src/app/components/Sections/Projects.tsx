@@ -114,11 +114,11 @@ export default function Projects() {
   const technologiesProject3 = [{name: "HTML"}, {name: "CSS"}, {name: "Javascript"}];
 
   return (
-    <section className="w-full h-auto py-20 px-0 lg:py-30 overflow-hidden flex items-center justify-center bg-stone-950">
+    <section id="projects" className="w-full h-auto py-20 px-0 lg:py-30 overflow-hidden flex items-center justify-center bg-stone-950">
       <StyleSheet />
       <div className="w-full max-w-7xl flex flex-col gap-12 lg:gap-18 items-center">
         <div className="relative text-center">
-          <h1 className="text-4xl font-semibold bg-linear-to-r to-neutral-900 from-slate-50 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-semibold bg-linear-to-r to-neutral-600 from-slate-50 bg-clip-text text-transparent">
             Projetos
           </h1>
           <div className="bg-linear-to-r to-transparent from-stone-400  rounded-full w-30 h-1 relative mt-1"></div>

@@ -1,24 +1,29 @@
 "use client";
 import React from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
 
-const Button01 = () => {
+const Button01 = (props: {Link: string}) => {
+  const handleClick = (e: React.MouseEvent) => {
+    if(props.Link.startsWith('#')) {
+      e.preventDefault();
+      const targetId = props.Link.replace('#', '');
+      const elem = document.getElementById(targetId);
+      elem?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
   return (
     <StyledWrapper>
-      <div className="button-container">
+      <Link href={props.Link} className="button-container" onClick={handleClick}>
         <div className="button">
           <span>Ver Projetos</span>
         </div>
-      </div>
+      </Link>
     </StyledWrapper>
   );
 }
 
 const StyledWrapper = styled.div`
-  /* Container to enable 3D perspective */
-  .button-container {
-    perspective: 1000px;
-  }
 
   /* Base button styles with capsule shape and glass effect */
   .button {

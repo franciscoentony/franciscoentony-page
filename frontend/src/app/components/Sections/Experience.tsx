@@ -6,7 +6,7 @@ export default function Experience() {
     <section className="w-full h-auto bg-linear-to-b from-transparent to-stone-900 p-5 lg:p-30 flex items-center justify-center">
     <div className="w-full flex flex-col gap-18 justify-between items-center">
       <div className="">
-          <h1 className="text-4xl font-semibold bg-linear-to-r to-neutral-900 from-slate-50 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-semibold bg-linear-to-r to-neutral-600 from-slate-50 bg-clip-text text-transparent">
           Experiência 
           </h1>
           <div className="bg-linear-to-r to-transparent from-stone-400  rounded-full w-30 h-1 relative mt-1"></div>

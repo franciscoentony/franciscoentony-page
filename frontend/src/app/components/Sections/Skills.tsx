@@ -56,7 +56,7 @@ function StyleSheet() {
           }
 
           #example li {
-            flex: 0 0 4rem;
+            
             height: auto;
           }
 

@@ -3,7 +3,7 @@ import AboutMeCards from "../AboutMe/AboutMeCards";
 
 export default function AboutMe() {
   return (
-    <section className="w-full h-auto p-30 flex items-center justify-centers lg:p-32 py-12 px-6">
+    <section className="w-full h-auto p-30 flex items-center justify-center lg:p-32 py-12 px-6">
       <div className="w-full max-w-7xl flex flex-col lg:gap-20 justify-between items-center gap-12">
         <div className="">
           <h1 className="text-4xl font-semibold bg-linear-to-r to-neutral-600 from-slate-50 bg-clip-text text-transparent">

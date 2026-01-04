@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faLinkedin, faLinkedinIn } from "@fortawesome/free-brands-svg-icons";
+import { motion } from "motion/react";
 import {
   faEnvelope,
   faFileDownload,
@@ -26,8 +27,8 @@ export default function Presentation() {
   };
 
   return (
-<section className="w-full h-auto bg-linear-to-bl from-stone-800 to-stone-950 flex items-center justify-center rounded-b-[3rem] py-12 px-4 md:px-10 lg:p-32">
-      <div className="w-full max-w-7xl mt-7 lg:mt-0 flex flex-col lg:flex-row lg:gap-20 justify-between items-center gap-12">
+<section className="w-full h-auto bg-linear-to-bl from-stone-800 to-stone-950 flex items-center justify-center overflow-hidden rounded-b-[3rem] py-12 px-4 md:px-10 lg:p-32">
+      <div className="w-full max-w-7xl mt-7 lg:mt-0 flex flex-col lg:flex-row lg:gap-20 justify-between items-center gap-12 ">
         <div className="">
           <div className="w-full max-w-[450px] lg:max-w-none mx-auto md:p-8 lg:p-0 lg:border-none rounded-3xl flex flex-col gap-5 lg:text-left flex-1 order-2 lg:order-1">
             <div className="p-[0.05rem] w-70 lg:w-65 bg-linear-to-t from-blue-950 to-stone-400 rounded-full shadow-2xl">
@@ -75,7 +76,11 @@ export default function Presentation() {
             </div>
           </div>
         </div>
-        <div className="relative top-7 w-full max-w-md lg:max-w-lg h-[400px] lg:h-[550px] overflow-hidden rounded-4xl shadow-2xl order-1 lg:order-2">
+        <motion.div 
+        initial={{ right: "-40rem", opacity: 0 }}
+        animate={{ right: "0", opacity: 1 }}
+        transition={{ duration: 2 }}
+        className="relative top-7 w-full max-w-md lg:max-w-lg h-[400px] lg:h-[550px] overflow-hidden rounded-4xl shadow-2xl order-1 lg:order-2">
           <Image
             src="./images/avatar.JPG"
             alt="Foto"
@@ -83,7 +88,7 @@ export default function Presentation() {
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 500px"
           />
-        </div>
+        </motion.div>
       </div>
     </section>
   );

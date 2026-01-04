@@ -22,22 +22,23 @@ export default function Contact() {
             <ContactCard contact='LinkedIn' method='linkedin.com/in/franciscoentony/'/>
             </div>
             <div className="">
-                <form action="" className='w-full lg:w-100 p-[.05rem] rounded-3xl bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%'>
+                <form action="https://formsubmit.co/franciscoentonydev@gmail.com" method='POST' className='w-full lg:w-100 p-[.05rem] rounded-3xl bg-radial-[at_25%_25%] from-stone-100 to-stone-950 to-100%'>
                   <div className="w-full rounded-3xl bg-radial-[at_25%_25%] from-stone-800 to-stone-950 to-100% p-5 flex flex-col gap-5 items-center">
                     <div className="w-full flex flex-col gap-2">
                         <label htmlFor="">Nome</label>
-                        <input type="text" placeholder='Seu nome completo' className='w-full h-11 p-4 border-2 duration-200 border-transparent hover:border-white rounded-[.5rem] outline-transparent focus:outline-white focus:outline-2 bg-black'/>
+                        <input type="text" placeholder='Seu nome completo' className='w-full h-11 p-4 border-2 duration-200 border-transparent hover:border-white rounded-[.5rem] outline-transparent focus:outline-white focus:outline-2 bg-black' required name='name'/>
                     </div>
                     <div className="w-full flex flex-col gap-2">
                         <label htmlFor="">Email</label>
-                        <input type="email" placeholder='seu@email.com' className='w-full h-11 p-4 border-2 duration-200 border-transparent hover:border-white rounded-[.5rem] outline-transparent focus:outline-white focus:outline-2 bg-black'/>
+                        <input type="email" placeholder='seu@email.com' className='w-full h-11 p-4 border-2 duration-200 border-transparent hover:border-white rounded-[.5rem] outline-transparent focus:outline-white focus:outline-2 bg-black'required name='email'/>
                     </div>
                     <div className="w-full flex flex-col gap-2">
                         <label htmlFor="">Mensagem</label>
-                        <textarea name="" id="" placeholder='Sua mensagem...' className='w-full text-start flex justify-start p-4 border-2 duration-200 border-transparent hover:border-white rounded-[.5rem] outline-transparent focus:outline-white focus:outline-2 bg-black'></textarea>
+                        <textarea name="message" id="message" placeholder='Sua mensagem...' className='w-full text-start flex justify-start p-4 border-2 duration-200 border-transparent hover:border-white rounded-[.5rem] outline-transparent focus:outline-white focus:outline-2 bg-black' required></textarea>
                     </div>
-                    <button className=''>
-                    </button>
+                    <input type="hidden" name="_subject" value="Novo contato do Portfólio!" />
+                    <input type="hidden" name="_captcha" value="false" />
+                    <input type="hidden" name="_next" value="http://localhost:3000/thankyou"></input>
                     <Button02/>
                   </div>
                 </form>

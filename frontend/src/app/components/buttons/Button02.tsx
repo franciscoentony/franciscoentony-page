@@ -4,7 +4,7 @@ import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 const Button02 = () => {
   return (
-    <button className="w-50 bg-emerald-700 hover:bg-emerald-500 cursor-pointer group/button relative inline-flex items-center justify-center overflow-hidden rounded-[1rem] backdrop-blur-lg px-10 py-2 text-base text-white transition-all duration-300 ease-in-out hover:scale-110 hover:shadow-[0px_0px_3rem_#00ffae7f] border border-white/20 duration-300">
+    <button className="w-50 bg-emerald-700 hover:bg-emerald-500 cursor-pointer group/button relative inline-flex items-center justify-center overflow-hidden rounded-2xl backdrop-blur-lg px-10 py-2 text-base text-white transition-all ease-in-out hover:scale-110 hover:shadow-[0px_0px_3rem_#00ffae7f] border border-white/20 duration-300" type='submit'>
       <span className="text-[12pt]">Enviar</span>
       <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-13deg)_translateX(-100%)] group-hover/button:duration-1000 group-hover/button:[transform:skew(-13deg)_translateX(100%)]">
         <div className="relative h-full w-10 bg-white/20" />

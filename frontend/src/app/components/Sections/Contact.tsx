@@ -38,7 +38,7 @@ export default function Contact() {
                     </div>
                     <input type="hidden" name="_subject" value="Novo contato do Portfólio!" />
                     <input type="hidden" name="_captcha" value="false" />
-                    <input type="hidden" name="_next" value="http://localhost:3000/thankyou"></input>
+                    <input type="hidden" name="_next" value="https://franciscoentony.com/thankyou"></input>
                     <Button02/>
                   </div>
                 </form>

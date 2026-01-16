@@ -109,9 +109,10 @@ export default function Projects() {
     return () => window.removeEventListener("resize", checkSize);
   }, []);
 
-  const technologiesProject1 = [{name: "React"}, {name: "Javascript"}, {name: "Next.JS"}, {name: "Tailwindcss"}];
-  const technologiesProject2 = [{name: "React"}, {name: "Next.JS"}, {name: "Node.JS"}, {name: "TypeScript"}, {name: "MySQL"}, {name: "Tailwindcss"}];
-  const technologiesProject3 = [{name: "HTML"}, {name: "CSS"}, {name: "Javascript"}];
+  const sei = [{name: "React"}, {name: "Javascript"}, {name: "Next.JS"}, {name: "Tailwindcss"}];
+  const TheHeroesJourney = [{name: "React"}, {name: "Next.JS"}, {name: "Node.JS"}, {name: "TypeScript"}, {name: "MySQL"}, {name: "Tailwindcss"}];
+  const ToDoList = [{name: "React"}, {name: "Next.JS"}, {name: "Django"}, {name: "TypeScript"}, {name: "PostgreSQL"}, {name: "Tailwindcss"}];
+  const SolarSystem = [{name: "HTML"}, {name: "CSS"}, {name: "Javascript"}];
 
   return (
     <section id="projects" className="w-full h-auto py-20 px-0 lg:py-30 overflow-hidden flex items-center justify-center bg-stone-950">
@@ -130,13 +131,16 @@ export default function Projects() {
             style={{ maskImage: isDesktop ? "none" : maskImage }}
           >
             <li>
-              <ProjectsCard title="Sistema de Gerenciamento de Eventos Insitucionais do IFRN" image="./images/SEI.png" description="Frontend da plataforma de gerenciamento de eventos da rede do IFRN com Dashboard, Tela de Cadastro/Login, Cadastro e Monitoramento de eventos." github="github.com" demo="" technologies={technologiesProject1}/>
+              <ProjectsCard title="Sistema de Gerenciamento de Eventos Insitucionais do IFRN" image="./images/SEI.png" description="Frontend da plataforma de gerenciamento de eventos da rede do IFRN com Dashboard, Tela de Cadastro/Login, Cadastro e Monitoramento de eventos." github="github.com" demo="" technologies={sei}/>
             </li>
             <li>
-              <ProjectsCard title="The Heroe's Journey" image="./images/the-heroes-journey.png" description="Plataforma de gameficação de skills e metas pessoas para evolução pessoal." github="https://github.com/franciscoentony/the-heroes-journey" demo="" technologies={technologiesProject2}/>
+              <ProjectsCard title="The Heroe's Journey" image="./images/the-heroes-journey.png" description="Plataforma de gameficação de skills e metas pessoas para evolução pessoal." github="https://github.com/franciscoentony/the-heroes-journey" demo="" technologies={TheHeroesJourney}/>
             </li>
             <li>
-             <ProjectsCard title="Apresentação do Sistema Solar" image="./images/solar-system.png" description="Desenvolvido para estudo, esta aplicação frontend apresenta informações sobre o sistema solar." github="github.com" demo="" technologies={technologiesProject3}/> 
+             <ProjectsCard title="To-Do List" image="./images/to-do-list.png" description="Plataforma FullStack de checagem de tarefas online." github="https://github.com/franciscoentony/to-do-list" demo="https://franciscoentony.github.io/to-do-list/" technologies={ToDoList}/> 
+            </li>
+            <li>
+             <ProjectsCard title="Apresentação do Sistema Solar" image="./images/solar-system.png" description="Desenvolvido para estudo, esta aplicação frontend apresenta informações sobre o sistema solar." github="github.com" demo="" technologies={SolarSystem}/> 
             </li>
           </motion.ul>
         </div>

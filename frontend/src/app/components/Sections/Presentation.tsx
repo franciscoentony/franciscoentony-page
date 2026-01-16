@@ -8,7 +8,6 @@ import { faGithub, faLinkedin, faLinkedinIn } from "@fortawesome/free-brands-svg
 import { motion } from "motion/react";
 import {
   faEnvelope,
-  faFileDownload,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import Loader from "../Loader";
@@ -29,8 +28,12 @@ export default function Presentation() {
   return (
 <section className="w-full h-auto bg-linear-to-bl from-stone-800 to-stone-950 flex items-center justify-center overflow-hidden rounded-b-[3rem] py-12 px-4 md:px-10 lg:p-32">
       <div className="w-full max-w-7xl mt-7 lg:mt-0 flex flex-col lg:flex-row lg:gap-20 justify-between items-center gap-12 ">
-        <div className="">
-          <div className="w-full max-w-[450px] lg:max-w-none mx-auto md:p-8 lg:p-0 lg:border-none rounded-3xl flex flex-col gap-5 lg:text-left flex-1 order-2 lg:order-1">
+        <motion.div 
+        initial={{ top: "-10rem", opacity: 0 }}
+        animate={{ top: "0rem", opacity: 1 }}
+        transition={{ duration: 1 }}
+        className="relative">
+          <div className="w-full max-w-[450px] lg:max-w-none relative mx-auto md:p-8 lg:p-0 lg:border-none rounded-3xl flex flex-col gap-5 lg:text-left flex-1 order-2 lg:order-1">
             <div className="p-[0.05rem] w-70 lg:w-65 bg-linear-to-t from-blue-950 to-stone-400 rounded-full shadow-2xl">
               <span className="w-full flex items-center px-4 py-2 gap-2 bg-blue-950 rounded-full text-2x md:text-sm whitespace-nowrap">
                 <FontAwesomeIcon icon={faStar} className="w-4" />
@@ -75,11 +78,11 @@ export default function Presentation() {
               </Link>
             </div>
           </div>
-        </div>
+        </motion.div>
         <motion.div 
         initial={{ right: "-40rem", opacity: 0 }}
         animate={{ right: "0", opacity: 1 }}
-        transition={{ duration: 2 }}
+        transition={{ duration: 1, ease: "easeOut" }}
         className="relative top-7 w-full max-w-md lg:max-w-lg h-[400px] lg:h-[550px] overflow-hidden rounded-4xl shadow-2xl order-1 lg:order-2">
           <Image
             src="./images/avatar.JPG"

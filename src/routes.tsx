@@ -23,6 +23,4 @@ export const router = createBrowserRouter([
       },
     ],
   },
-], {
-  basename: "/franciscoentony-page", // 💡 O lugar correto é aqui, como segundo argumento!
-});
+]);

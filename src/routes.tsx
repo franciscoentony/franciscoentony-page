@@ -10,29 +10,19 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        path: "/",
+        index: true, // Define a Home como a página principal do "/"
         element: <Home />,
       },
-    ],
-  },
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
       {
-        path: "/blog",
+        path: "blog", // Caminho relativo, vira "/blog"
         element: <Blog />,
       },
-    ],
-  },
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
       {
-        path: "/blog/:slug",
+        path: "blog/:slug", // Caminho relativo, vira "/blog/:slug"
         element: <BlogPost />,
       },
     ],
   },
-]);
+], {
+  basename: "/franciscoentony-page", // 💡 O lugar correto é aqui, como segundo argumento!
+});

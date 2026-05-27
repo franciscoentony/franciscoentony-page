@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 export default function Post() {
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);

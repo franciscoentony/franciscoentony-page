@@ -12,7 +12,6 @@ import Loader from "../Loader";
 
 import Button01 from "../buttons/Button01";
 
-import Foto from "/home/avatar.JPG"
 
 export default function Presentation() {
   const [loading, setLoading] = useState(false);
@@ -93,7 +92,7 @@ export default function Presentation() {
         </div>
         <div className="relative top-7 w-full max-w-md lg:max-w-lg h-100 lg:h-137.5 overflow-hidden rounded-4xl shadow-2xl order-1 lg:order-2">
           <img
-            src={Foto}
+            src="/home/avatar.JPG"
             alt="Foto"
             className="object-cover relative bottom-45"
             sizes="(max-width: 768px) 100vw, 500px"

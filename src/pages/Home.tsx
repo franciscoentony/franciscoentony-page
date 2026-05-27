@@ -9,11 +9,11 @@ import Contact from "../components/Sections/Contact";
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen items-center">
-      <Presentation />
+      <Presentation/>
       <AboutMe/>
      <Skills/>
      <Projects/>
-     <Experience/>
+     <Experience/>x
      <Contact/>
     </div>
   );

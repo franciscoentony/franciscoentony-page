@@ -1,0 +1,14 @@
+[
+  {{- $posts := where .Site.RegularPages "Section" "posts" -}}
+  {{- range $index, $page := $posts }}
+  {{- if $index }},{{ end }}
+  {
+    "title": {{ $page.Title | jsonify }},
+    "slug": {{ $page.File.BaseFileName | jsonify }},
+    "date": {{ $page.Date.Format "2006-01-02" | jsonify }},
+    "summary": {{ $page.Summary | plainify | jsonify }},
+    "cover": {{ $page.Params.cover | default "" | jsonify }},
+    "content": {{ $page.Content | jsonify }}
+  }
+  {{- end }}
+]

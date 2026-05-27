@@ -1,0 +1,6 @@
+baseURL = '/'
+languageCode = 'pt-br'
+title = 'Blog Data'
+
+[outputs]
+  home = ["JSON"]

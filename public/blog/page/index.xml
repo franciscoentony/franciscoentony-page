@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pages on Blog Data</title>
+    <link>/page/</link>
+    <description>Recent content in Pages on Blog Data</description>
+    <generator>Hugo</generator>
+    <language>pt-br</language>
+    <atom:link href="/page/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

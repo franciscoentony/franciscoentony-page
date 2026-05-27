@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+* {
+  font-family: "Google Sans", sans-serif;
+}
+
+body {
+  background-color: black;
+  color: white;
+}
+
+
+.conteudo-blog img {
+  width: 100%;
+  height: auto;
+    border-radius: 1.5rem;
+    /* rounded-xl */
+    margin: 2rem auto;
+    border: 1px solid #2e2a24;
+    /* borda sutil para destacar do fundo */
+}
+
+/* Modifica o estilo quando a tela for maior que 768px (ex: tablets e desktops) */
+@media (min-width: 768px) {
+  .conteudo-blog img {
+    max-width: 80%;
+    
+  }
+}

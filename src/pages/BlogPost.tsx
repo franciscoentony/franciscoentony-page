@@ -18,14 +18,10 @@ export default function BlogPost() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/blog-data/${slug}/index.json`)
+    fetch("/blog-data/index.json")
       .then((res) => res.json())
-      .then((data) => {
-        // 💡 Se o Hugo retornar um array, faz o find. Se for objeto direto, usa ele mesmo!
-        const foundPost = Array.isArray(data)
-          ? data.find((p) => p.slug === slug)
-          : data;
-
+      .then((data: Post[]) => {
+        const foundPost = data.find((p) => p.slug === slug);
         setPost(foundPost || null);
         setLoading(false);
       })
@@ -73,6 +69,7 @@ export default function BlogPost() {
             })}
           </time>
         </header>
+
         {post.cover && (
           <div className="w-full h-64 lg:h-96 overflow-hidden rounded-3xl border border-stone-800">
             <img
@@ -82,6 +79,7 @@ export default function BlogPost() {
             />
           </div>
         )}
+
         <div
           className="conteudo-blog prose prose-invert max-w-none text-stone-300 leading-relaxed space-y-4 pb-20"
           dangerouslySetInnerHTML={{ __html: post.content }}

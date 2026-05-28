@@ -20,8 +20,12 @@ export default function BlogPost() {
   useEffect(() => {
     fetch(`/blog-data/${slug}/index.json`)
       .then((res) => res.json())
-      .then((data: Post[]) => {
-        const foundPost = data.find((p) => p.slug === slug);
+      .then((data) => {
+        // 💡 Se o Hugo retornar um array, faz o find. Se for objeto direto, usa ele mesmo!
+        const foundPost = Array.isArray(data)
+          ? data.find((p) => p.slug === slug)
+          : data;
+
         setPost(foundPost || null);
         setLoading(false);
       })
@@ -56,7 +60,6 @@ export default function BlogPost() {
         <Link to="/blog" className="text-xl mb-4 inline-block">
           <FontAwesomeIcon icon={faArrowLeft} />
         </Link>
-
 
         <header className="flex flex-col gap-2 border-b border-stone-800 pb-6">
           <h1 className="text-3xl lg:text-5xl font-bold text-white tracking-tight">

@@ -8,7 +8,7 @@
     "dev:hugo": "hugo -s blog-cms -d ../public/blog-data -w",
     "build:hugo": "hugo -s blog-cms -d ../public/blog-data",
     "build:react": "vite build && cp dist/index.html dist/404.html",
-    "build": "bun run build:hugo && bun run build:react",
+    "build": "bun run build:hugo && rm -rf public/blog && bun run build:react",
     "lint": "eslint .",
     "preview": "vite preview"
   },

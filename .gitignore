@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Hugo gera public/blog/ como efeito colateral; isso conflita com a rota SPA /blog
+public/blog/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

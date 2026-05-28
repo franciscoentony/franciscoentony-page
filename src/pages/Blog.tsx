@@ -12,7 +12,7 @@ export default function Blog() {
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}blog/index.json`)
+    fetch('/blog-data/index.json')
       .then((res) => res.json())
       .then((data) => setPosts(data))
       .catch((err) => console.error(err));

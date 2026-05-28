@@ -18,7 +18,7 @@ export default function BlogPost() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}blog/index.json`)
+    fetch(`/blog-data/${slug}/index.json`)
       .then((res) => res.json())
       .then((data: Post[]) => {
         const foundPost = data.find((p) => p.slug === slug);

@@ -9,8 +9,8 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope, faStar } from "@fortawesome/free-solid-svg-icons";
 import Loader from "../Loader";
-
 import Button01 from "../buttons/Button01";
+import { resolveAssetPath } from "../../utils/resolvePath";
 
 
 export default function Presentation() {
@@ -92,7 +92,7 @@ export default function Presentation() {
         </div>
         <div className="relative top-7 w-full max-w-md lg:max-w-lg h-100 lg:h-137.5 overflow-hidden rounded-4xl shadow-2xl order-1 lg:order-2">
           <img
-            src="/home/avatar.JPG"
+            src={resolveAssetPath("/home/avatar.JPG")}
             alt="Foto"
             className="object-cover relative bottom-45"
             sizes="(max-width: 768px) 100vw, 500px"

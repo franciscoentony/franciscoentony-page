@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
+import { resolveAssetPath } from "../../utils/resolvePath";
 
 interface Techonologies {
   name: string;
@@ -29,7 +30,7 @@ export default function ProjectsCard({
         <div className="overflow-hidden rounded-t-3xl relative bottom-9 lg:bottom-6 w-80 lg:w-100 h-60 flex justify-center items-center">
           {/* Foto do Projeto */}
           <img
-            src={image}
+            src={resolveAssetPath(image)}
             alt="Foto"
             className="object-cover object-top"
             sizes="(max-width: 768px) 100vw, 500px"

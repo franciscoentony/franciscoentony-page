@@ -18,7 +18,7 @@ export default function BlogPost() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/blog-data/index.json")
+    fetch(`${import.meta.env.BASE_URL}blog-data/index.json`)
       .then((res) => res.json())
       .then((data: Post[]) => {
         const foundPost = data.find((p) => p.slug === slug);
@@ -30,6 +30,20 @@ export default function BlogPost() {
         setLoading(false);
       });
   }, [slug]);
+
+  const getResolvedCover = (coverPath: string) => {
+    if (!coverPath) return "";
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    return coverPath.replace(/^\/(blog|blog-data)\//, `${base}/blog-data/`);
+  };
+
+  const getResolvedContent = (contentHtml: string) => {
+    if (!contentHtml) return "";
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    return contentHtml
+      .replace(/src="\/blog\//g, `src="${base}/blog-data/`)
+      .replace(/src="\/blog-data\//g, `src="${base}/blog-data/`);
+  };
 
   if (loading) {
     return (
@@ -73,7 +87,7 @@ export default function BlogPost() {
         {post.cover && (
           <div className="w-full h-64 lg:h-96 overflow-hidden rounded-3xl border border-stone-800">
             <img
-              src={post.cover}
+              src={getResolvedCover(post.cover)}
               alt={`Capa do post: ${post.title}`}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
@@ -82,7 +96,7 @@ export default function BlogPost() {
 
         <div
           className="conteudo-blog prose prose-invert max-w-none text-stone-300 leading-relaxed space-y-4 pb-20"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          dangerouslySetInnerHTML={{ __html: getResolvedContent(post.content) }}
         />
       </article>
     </main>

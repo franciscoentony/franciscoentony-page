@@ -113,7 +113,7 @@ export default function Projects() {
             //style={{ maskImage: isDesktop ? "none" : maskImage }}
           >
             <li>
-              <ProjectsCard title="Sistema de Gerenciamento de Eventos Insitucionais do IFRN" image="/home/SEI.png" description="Frontend da plataforma de gerenciamento de eventos da rede do IFRN com Dashboard, Tela de Cadastro/Login, Cadastro e Monitoramento de eventos." github="github.com" demo="" technologies={sei}/>
+              <ProjectsCard title="Sistema de Gerenciamento de Eventos Insitucionais do IFRN" image="/home/SEI.png" description="Frontend da plataforma de gerenciamento de eventos da rede do IFRN com Dashboard, Tela de Cadastro/Login, Cadastro e Monitoramento de eventos." github="https://github.com/franciscoentony/" demo="" technologies={sei}/>
             </li>
             <li>
               <ProjectsCard title="The Heroe's Journey" image="/home/the-heroes-journey.png" description="Plataforma de gameficação de skills e metas pessoas para evolução pessoal." github="https://github.com/franciscoentony/the-heroes-journey" demo="" technologies={TheHeroesJourney}/>
@@ -122,7 +122,7 @@ export default function Projects() {
              <ProjectsCard title="To-Do List" image="/home/to-do-list.png" description="Plataforma FullStack de checagem de tarefas online." github="https://github.com/franciscoentony/to-do-list" demo="https://franciscoentony.github.io/to-do-list/" technologies={ToDoList}/> 
             </li>
             <li>
-             <ProjectsCard title="Apresentação do Sistema Solar" image="/home/solar-system.png" description="Desenvolvido para estudo, esta aplicação frontend apresenta informações sobre o sistema solar." github="github.com" demo="" technologies={SolarSystem}/> 
+             <ProjectsCard title="Apresentação do Sistema Solar" image="/home/solar-system.png" description="Desenvolvido para estudo, esta aplicação frontend apresenta informações sobre o sistema solar." github="https://github.com/franciscoentony/" demo="" technologies={SolarSystem}/> 
             </li>
           </ul>
         </div>

@@ -44,7 +44,7 @@ export default function Blog() {
                   <span className="text-zinc-500 text-sm block mt-1">
                     {post.date}
                   </span>
-                  <p className="mt-3 text-zinc-300 line-clamp-2">
+                  <p className="mt-3 text-stone-400 line-clamp-2">
                     {post.summary}
                   </p>
                 </Link>

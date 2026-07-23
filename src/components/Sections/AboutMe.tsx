@@ -29,8 +29,8 @@ export default function AboutMe() {
             </p>
 
             <p className="text-stone-300 mt-4">
-              Hoje, aos 19 anos e cursando Sistemas para Internet no IFRN
-              Canguaretama, sigo expandindo meus horizontes e liderando futuros
+              Hoje, aos 19 anos e cursando Análise e Desenvolvimento de Sistemas no IFRN
+              Natal-Central, sigo expandindo meus horizontes e liderando futuros
               cientistas. Atualmente, ministro minicursos para jovens que
               desejam ingressar na área, oferecendo o apoio e o incentivo que
               muitas vezes faltam no início da carreira tecnológica.
@@ -50,7 +50,7 @@ export default function AboutMe() {
             <AboutMeCards
               title={"Aprendizado"}
               icon="graduation"
-              description="Graduando em Sistemas para Internet pelo IFRN e Técnico em Informática para Internet pelo IMD/UFRN"
+              description="Graduando em Análise e Desenvolvimento de Sistemas pelo IFRN Natal-Central e Técnico em Informática para Internet pelo IMD/UFRN"
             />
           </div>
         </div>

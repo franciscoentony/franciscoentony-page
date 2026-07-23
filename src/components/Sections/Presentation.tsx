@@ -38,7 +38,7 @@ export default function Presentation() {
             <p className="text-emerald-400">Hello World, eu sou</p>
             <h1 className="text-6xl font-bold">Entony!</h1>
             <h2 className="w-full text-[16pt] text-neutral-400">
-              Desenvolvedor de Software & Estudante de Sistemas para Internet no
+              Engenheiro de Software & Estudante de Análise e Desenvolvimento de Sistemas no
               IFRN
             </h2>
             <p className="max-w-lg text-base md:text-[14pt] leading-relaxed text-stone-300">

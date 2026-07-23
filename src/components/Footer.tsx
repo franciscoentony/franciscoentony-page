@@ -3,7 +3,7 @@ import React from 'react'
 export default function Footer() {
   return (
     <footer className='w-full h-auto text-center py-10 lg:py-15 lg:px-30 flex items-center justify-center bg-blackz'>
-        <p>&copy; 2025 Feito com ❤️ por <strong>Francisco Entony</strong></p>
+        <p>2026 &copy; Feito com ❤️ por <strong>Francisco Entony</strong></p>
     </footer>
   )
 }

@@ -1,30 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 
-* {
-  font-family: "Google Sans", sans-serif;
+@theme {
+  --color-ink: #000000;
+  --color-raised: #0C0C0E;
+  --color-line: #1E1E22;
+  --color-line-strong: #2C2C32;
+  --color-accent: #4F8CFF;
+  --color-paper: #F5F5F7;
+  --color-secondary: #8B8B93;
+  --color-muted: #55555C;
+
+  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background-color: black;
-  color: white;
+  @apply bg-ink text-paper font-sans;
 }
 
-
-.conteudo-blog img {
-  max-width: 100%;
-  width: auto;
-  height: auto;
-    border-radius: 1.5rem;
-    /* rounded-xl */
-    margin: 2rem auto;
-    border: 1px solid #2e2a24;
-    /* borda sutil para destacar do fundo */
-}
-
-/* Modifica o estilo quando a tela for maior que 768px (ex: tablets e desktops) */
-@media (min-width: 768px) {
-  .conteudo-blog img {
-    max-width: 80%;
-    
-  }
+h1, h2, h3 {
+  @apply font-display tracking-tight;
 }

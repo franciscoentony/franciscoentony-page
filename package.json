@@ -20,9 +20,10 @@
     "@fortawesome/free-solid-svg-icons": "^7.2.0",
     "@fortawesome/react-fontawesome": "^3.3.1",
     "@tailwindcss/vite": "^4.3.0",
+    "lucide-react": "^1.27.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-router-dom": "^7.15.1",
+    "react-router-dom": "^7.18.1",
     "styled-components": "^6.4.2",
     "tailwindcss": "^4.3.0"
   },

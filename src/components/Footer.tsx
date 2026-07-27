@@ -1,9 +1,12 @@
-import React from 'react'
-
 export default function Footer() {
   return (
-    <footer className='w-full h-auto text-center py-10 lg:py-15 lg:px-30 flex items-center justify-center bg-blackz'>
-        <p>2026 &copy; Feito com ❤️ por <strong>Francisco Entony</strong></p>
+    <footer className="border-t border-line py-8">
+      <div className="mx-auto flex max-w-220 items-center justify-between px-7 font-mono text-xs text-muted">
+        <p>© 2026 — feito por Francisco Entony</p>
+        <a href="#top" className="hover:text-secondary">
+          voltar ao topo ↑
+        </a>
+      </div>
     </footer>
-  )
+  );
 }

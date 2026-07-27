@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import BlogPostCard from "../components/BlogPostCard";
-import type { Post } from "../data/posts"; // Importa diretamente daqui
+import type { Post } from "../data/posts";
 
 export default function Blog() {
   const [posts, setPosts] = useState<Post[]>([]);

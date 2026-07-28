@@ -31,6 +31,8 @@ export function resolveContentHtml(html: string): string {
   const base = getBase();
 
   let out = html
+    .replace(/src="\/blog\/images\//g, `src="${base}/blog-data/images/`)
+    .replace(/src="\/blog-data\/images\//g, `src="${base}/blog-data/images/`)
     .replace(/src="\/blog\//g, `src="${base}/blog-data/`)
     .replace(/src="\/blog-data\//g, `src="${base}/blog-data/`);
 

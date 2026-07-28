@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Blog Data</title>
+    <link>/tags/</link>
+    <description>Recent content in Tags on Blog Data</description>
+    <generator>Hugo</generator>
+    <language>pt-br</language>
+    <lastBuildDate>Sat, 06 Jun 2026 10:00:00 -0300</lastBuildDate>
+    <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Google I/O</title>
+      <link>/tags/google-i/o/</link>
+      <pubDate>Sat, 06 Jun 2026 10:00:00 -0300</pubDate>
+      <guid>/tags/google-i/o/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>IFRN</title>
+      <link>/tags/ifrn/</link>
+      <pubDate>Sat, 06 Jun 2026 10:00:00 -0300</pubDate>
+      <guid>/tags/ifrn/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Palestras</title>
+      <link>/tags/palestras/</link>
+      <pubDate>Sat, 06 Jun 2026 10:00:00 -0300</pubDate>
+      <guid>/tags/palestras/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Viagens</title>
+      <link>/tags/viagens/</link>
+      <pubDate>Sat, 30 May 2026 09:46:02 -0300</pubDate>
+      <guid>/tags/viagens/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

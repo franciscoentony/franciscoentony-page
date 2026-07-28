@@ -6,8 +6,15 @@
     <description>Recent content in Posts on Blog Data</description>
     <generator>Hugo</generator>
     <language>pt-br</language>
-    <lastBuildDate>Sat, 30 May 2026 09:46:02 -0300</lastBuildDate>
+    <lastBuildDate>Sat, 06 Jun 2026 10:00:00 -0300</lastBuildDate>
     <atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Minha Estreia aos Palcos: Como Foi Palestrar no Google I/O Extended &#43; Build with AI 2026 – Natal</title>
+      <link>/posts/palestra-google-io-extended-natal-2026/</link>
+      <pubDate>Sat, 06 Jun 2026 10:00:00 -0300</pubDate>
+      <guid>/posts/palestra-google-io-extended-natal-2026/</guid>
+      <description>&lt;p&gt;&lt;img src=&#34;/blog/images/posts/palestra-google-io-extended/drone.jpg&#34; alt=&#34;Imagem-GDG&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;No sábado, dia 06 de junho de 2026, tive a oportunidade de palestrar no Google I/O Extended + Build with AI 2026 – Natal, evento realizado pela comunidade do Google Developer Groups (GDG) Natal.&lt;/p&gt;&#xA;&lt;p&gt;Com o título &amp;ldquo;Como a Tecnologia Pode Mudar o Amanhã: Explorando o Cosmos das Oportunidades e do Conhecimento&amp;rdquo;, usei minha palestra pra falar sobre temas pouco abordados no mundo da tecnologia — os desafios que enfrentei ao longo da minha trajetória e como transformei essas dificuldades em estratégia pra potencializar meus estudos e me destacar como estudante e futuro profissional.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Visita ao Ministério Público do RN (MPRN) e a VENX</title>
       <link>/posts/visita-mprn-venx/</link>

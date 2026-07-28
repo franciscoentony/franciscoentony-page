@@ -1,0 +1,18 @@
+[
+  {{- $posts := where .Site.RegularPages "Section" "posts" -}}
+  {{- range $index, $page := $posts }}
+  {{- if $index }},{{ end }}
+  {
+    "hash": {{ $page.Params.hash | default (substr ($page.File.BaseFileName | md5) 0 7) | jsonify }},
+    "title": {{ $page.Title | jsonify }},
+    "slug": {{ $page.File.BaseFileName | jsonify }},
+    "excerpt": {{ $page.Params.excerpt | default ($page.Summary | plainify) | jsonify }},
+    "date": {{ $page.Date.Format "2006-01-02" | jsonify }},
+    "readTime": {{ $page.Params.readTime | default (printf "%d min de leitura" (math.Max 1 (div (countwords $page.Plain) 200))) | jsonify }},
+    "tags": {{ $page.Params.tags | default (slice) | jsonify }},
+    "summary": {{ $page.Summary | plainify | jsonify }},
+    "cover": {{ $page.Params.cover | default "" | jsonify }},
+    "content": {{ $page.Content | jsonify }}
+  }
+  {{- end }}
+]

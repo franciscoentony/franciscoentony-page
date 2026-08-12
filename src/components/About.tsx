@@ -5,7 +5,7 @@ const facts = [
   },
   {
     k: "Formação",
-    v: "Tecnólogo em Sistemas para Internet (IFRN)",
+    v: "Tecnólogo em Análise e Desenvolvimento de Sistemas (IFRN)",
   },
   {
     k: "Base técnica",
@@ -28,9 +28,9 @@ export default function About() {
             curiosidade em uma jornada acadêmica e profissional.
           </p>
           <p className="text-[15px] text-secondary">
-            Hoje, aos 19 anos, curso Tecnologia em Sistemas para Internet no
-            IFRN e oriento futuros cientistas da computação — ministro
-            minicursos para jovens que desejam ingressar na área.
+            Hoje, aos 19 anos, curso Tecnologia em Análise e Desenvolvimento de
+            Sistemas no IFRN e oriento futuros cientistas da computação —
+            ministro minicursos para jovens que desejam ingressar na área.
           </p>
         </div>
         <div className="flex flex-col">

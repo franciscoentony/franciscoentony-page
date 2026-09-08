@@ -7,6 +7,13 @@ export interface ExperienceItem {
 
 export const experience: ExperienceItem[] = [
   {
+    dates: "ago 2026 — atual",
+    role: "Desenvolvedor de Software Junior",
+    org: "Grupo Strategi",
+    description:
+      "Desenvolvendo e mantendo soluções escaláveis. Com as tecnologias frontend: Next.js, React e Typescript; backend: Django Rest Framework; e banco de dados SQL Server; monitoro e mantenho sistemas corporativos robustos.",
+  },
+  {
     dates: "ago 2025 — atual",
     role: "Engenheiro de Software",
     org: "Núcleo de Inovação em Computação (NIC) · IFRN Campus Canguaretama",

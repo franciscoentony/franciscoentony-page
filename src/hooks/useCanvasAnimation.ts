@@ -13,6 +13,44 @@ export interface CanvasFrame {
   isStatic: boolean;
 }
 
+// ---------- Início escalonado dos canvases (BL1) ----------
+// Se todos os canvases começassem no mesmo frame, o navegador travaria por
+// algumas centenas de ms (TBT alto no Lighthouse). Por isso:
+// - canvases VISÍVEIS entram numa fila e começam um por frame;
+// - canvases FORA DA TELA só começam quando o navegador estiver ocioso.
+
+const startQueue: (() => void)[] = [];
+let queueIsRunning = false;
+
+function runStartQueue() {
+  const nextStart = startQueue.shift();
+  nextStart?.();
+
+  if (startQueue.length > 0) {
+    requestAnimationFrame(runStartQueue);
+  } else {
+    queueIsRunning = false;
+  }
+}
+
+/** Começa no próximo frame livre (no máximo 1 canvas por frame). */
+function startOnNextFrame(start: () => void) {
+  startQueue.push(start);
+  if (!queueIsRunning) {
+    queueIsRunning = true;
+    requestAnimationFrame(runStartQueue);
+  }
+}
+
+/** Começa quando o navegador estiver ocioso (Safari não tem requestIdleCallback). */
+function startWhenIdle(start: () => void) {
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(start, { timeout: 3000 });
+  } else {
+    setTimeout(start, 300);
+  }
+}
+
 interface CanvasAnimationOptions {
   /** Intervalo mínimo entre quadros em ms. 0 = todo frame (60fps). */
   frameInterval?: number;
@@ -24,6 +62,7 @@ interface CanvasAnimationOptions {
  * O que ele já resolve para você:
  * - ajusta o tamanho do canvas ao elemento, com DPR limitado a 2 (D9);
  * - só começa depois das fontes carregadas e do primeiro paint (D9);
+ * - começa escalonado: 1 canvas por frame, e os fora da tela só no ócio (BL1);
  * - pausa quando o canvas sai da tela (IntersectionObserver) (D9);
  * - com prefers-reduced-motion desenha um único quadro parado (D8).
  *
@@ -56,7 +95,12 @@ export function useCanvasAnimation(
     let width = 0;
     let height = 0;
     let started = false;
-    let isVisible = true;
+    let scheduled = false;
+    let fontsReady = false;
+    let visibilityKnown = false;
+    // Começa como "fora da tela": nada é desenhado antes de o
+    // IntersectionObserver responder (BL1).
+    let isVisible = false;
     let frameId = 0;
     let lastDrawTime = -Infinity;
     let cancelled = false;
@@ -86,7 +130,7 @@ export function useCanvasAnimation(
     }
 
     function start() {
-      if (cancelled) return;
+      if (cancelled || started) return;
       started = true;
       resize();
       if (isStatic) {
@@ -96,10 +140,25 @@ export function useCanvasAnimation(
       }
     }
 
+    /** Agenda o início quando já sabemos das fontes E da visibilidade. */
+    function scheduleStart() {
+      if (scheduled || !fontsReady || !visibilityKnown) return;
+      scheduled = true;
+      if (isVisible) {
+        startOnNextFrame(start);
+      } else {
+        startWhenIdle(start);
+      }
+    }
+
     // Pausa quando o canvas sai da tela
     const visibilityObserver = new IntersectionObserver(
       ([entry]) => {
         isVisible = entry.isIntersecting;
+        visibilityKnown = true;
+        scheduleStart();
+        // Ficou visível antes do ócio chegar? Começa já no próximo frame livre.
+        if (isVisible && scheduled && !started) startOnNextFrame(start);
       },
       { rootMargin: "100px" },
     );
@@ -113,9 +172,10 @@ export function useCanvasAnimation(
     });
     resizeObserver.observe(canvas);
 
-    // Espera as fontes e o primeiro paint antes de começar
+    // Espera as fontes antes de começar
     document.fonts.ready.then(() => {
-      frameId = requestAnimationFrame(start);
+      fontsReady = true;
+      scheduleStart();
     });
 
     return () => {

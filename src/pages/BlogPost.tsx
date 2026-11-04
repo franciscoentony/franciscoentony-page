@@ -15,17 +15,18 @@ import type { Post } from "../data/posts";
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<Post | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Guarda de qual slug é o post carregado. Enquanto não for o slug atual, está carregando.
+  const [loadedSlug, setLoadedSlug] = useState<string | undefined>(undefined);
+  const loading = loadedSlug !== slug;
 
   useEffect(() => {
-    setLoading(true);
     fetchPosts()
       .then((data) => setPost(data.find((p) => p.slug === slug) ?? null))
       .catch((err) => {
         console.error("Erro ao carregar o post:", err);
         setPost(null);
       })
-      .finally(() => setLoading(false));
+      .finally(() => setLoadedSlug(slug));
   }, [slug]);
 
   if (loading) {

@@ -99,7 +99,11 @@ Ordem de implementação: **tokens → componentes base (Navbar, Footer, botões
 - **D13. Ícones em `src/data/skills.ts`:** os campos `icon` e `color` são apresentação, não conteúdo. Na fase 3 o Front-End pode removê-los, junto com o tipo e os imports do Font Awesome, e depois tirar `@fortawesome/*` do `package.json` (D5). Os textos (`title` e descrições) **não** mudam.
 - **D14. `src/lib/blog.ts`:** o estilo inline das imagens dos posts (`#1E1E22`, `0.75rem`) é substituído na fase 4 (Blog e Post) pelos tokens do HANDOFF §7.
 
-**Pendência com o Entony:** aprovar o restante da copy nova (D3).
+- **D15. Rotas estáticas no build:** no GitHub Pages, `/blog` e `/blog/:slug` hoje respondem HTTP 404 (o fallback do `404.html`), o que impede o Lighthouse e atrapalha SEO e previews de link. Na Fase 4, o build passa a gerar `dist/blog/index.html` e `dist/blog/<slug>/index.html` (cópias do `index.html`) para cada post de `index.json`. Isso acontece só no `dist/`, sem conflito com o `.gitignore` de `public/blog/`. O `404.html` continua existindo.
+- **D16. Artefatos de QA:** são versionados o código de teste e os relatórios em texto (`qa/baseline/RELATORIO.md`, `playwright-summary.md`). Screenshots, Lighthouse bruto e `results.json` ficam só locais.
+- **D17. Contraste:** texto em estado final nunca usa `muted`. Datas, labels, hash e footer usam `secondary` (#86868B). O `muted` fica restrito a estados transitórios e decoração.
+
+**Pendências com o Entony:** aprovar o restante da copy nova (D3); autorizar a limpeza de arquivos soltos em `public/blog-data` (imagens `WhatsApp*.jpeg` e `*.mp`); dizer se os `alt` genéricos das imagens dos posts (conteúdo) podem ser reescritos.
 
 ### Critérios de aceite (Definition of Done)
 

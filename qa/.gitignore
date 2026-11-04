@@ -1,0 +1,11 @@
+node_modules/
+reports/
+test-results/
+# baseline/: só os relatórios em texto são versionados (decisão D16 do Tech Lead).
+# Screenshots, Lighthouse bruto e results.json ficam apenas locais (~38 MB).
+baseline/html/
+baseline/test-results/
+playwright-report/
+baseline/screenshots/
+baseline/lighthouse/
+baseline/results.json

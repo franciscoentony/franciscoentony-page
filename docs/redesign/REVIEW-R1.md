@@ -37,3 +37,23 @@ Estes itens afetam o código novo da Fase 3.
 |---|---|
 | 5 | Preload real das fontes: `rel=preload as=font` do woff2 de Geist 400/600, ou fontes auto-hospedadas (preferível para o Lighthouse) |
 | 6 | SEO: meta description, og:title/description/image (foto nova), twitter:card, `document.title` por rota (título do post no BlogPost) |
+
+## Achados do baseline do QA (produção atual): destino
+
+O relatório completo está em `qa/baseline/RELATORIO.md`.
+
+| Achado | Destino |
+|---|---|
+| B1: `/blog` e `/blog/:slug` respondem 404 no GitHub Pages | Fase 4 (D15) |
+| B2: contraste do `muted` | Fase 3 e R1 (D17) |
+| B3: sem landmark `<main>` | R1, em todas as páginas |
+| B4: Hero ignora reduced-motion | Já resolvido pela Universe; o QA confirma |
+| B6: salto de heading h1→h3 no Blog | Fase 4 |
+| B7: NavLink marca Início e Contato ativos ao mesmo tempo | R1 |
+| B8: `BlogPostCard` usa `<a>` puro e recarrega a SPA | Fase 3 (teaser) e Fase 4 |
+| B9: alts genéricos nos posts | Depende do Entony (conteúdo) |
+| B10: "View on GitHub" ×4 sem contexto | Fase 3 (cards de projeto com `aria-label` por projeto) |
+| B11: type do favicon | R1 (#13) |
+| B12: meta description | Fase 4 (#6) |
+| B13: arquivos soltos em `public/blog-data` | Depende do Entony |
+| B14: lint e Prettier na `main` | Lint já corrigido (501af91); Prettier na R1 (#4) |

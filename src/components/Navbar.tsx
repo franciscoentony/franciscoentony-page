@@ -72,10 +72,11 @@ export default function Navbar() {
     <header
       ref={headerRef}
       onBlur={handleBlur}
-      // focus-within: com foco do teclado dentro, a navbar volta a aparecer (WCAG 2.4.11)
+      // Com foco de TECLADO (:focus-visible) dentro, a navbar volta a aparecer (WCAG 2.4.11).
+      // Foco de clique de mouse não conta, senão ela nunca mais sumiria (R2 I-1).
       className={`fixed inset-x-0 top-0 z-50 h-nav border-b border-line bg-ink/55 backdrop-blur-[20px] backdrop-saturate-180 transition-transform duration-500 ${
         hidden
-          ? "-translate-y-full focus-within:translate-y-0"
+          ? "-translate-y-full has-[:focus-visible]:translate-y-0"
           : "translate-y-0"
       }`}
     >

@@ -22,7 +22,8 @@ export default function ScrollToHash() {
         const id = decodeURIComponent(location.hash.slice(1));
         document.getElementById(id)?.scrollIntoView();
       } else {
-        window.scrollTo(0, 0);
+        // "instant": sem herdar o scroll-behavior: smooth do <html> (QA I3)
+        window.scrollTo({ top: 0, behavior: "instant" });
       }
     });
 

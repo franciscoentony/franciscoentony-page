@@ -92,7 +92,7 @@ export default function Navbar() {
         <nav
           id="menu-mobile"
           aria-label="Principal"
-          className="absolute inset-x-0 top-full border-b border-line bg-ink/90 backdrop-blur-[20px] tab:hidden"
+          className="absolute inset-x-0 top-full border-b border-line bg-ink/95 backdrop-blur-[20px] tab:hidden"
         >
           <Container>
             <ul className="flex flex-col py-3">

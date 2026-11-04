@@ -29,7 +29,9 @@ export default function WordReveal({ text, className = "" }: WordRevealProps) {
       const rect = ref.current.getBoundingClientRect();
       const vh = window.innerHeight;
       // progress = clamp((0.85·vh − top) / (altura + 0.35·vh))
-      const progress = clamp((vh * WORDS.startAt - rect.top) / (rect.height + vh * WORDS.extra));
+      const progress = clamp(
+        (vh * WORDS.startAt - rect.top) / (rect.height + vh * WORDS.extra),
+      );
       setLitCount(Math.floor(progress * words.length * 1.05));
     }
 

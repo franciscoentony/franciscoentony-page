@@ -1,10 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { player } from "../../content/ui";
-import { useCanvasAnimation, type CanvasFrame } from "../../hooks/useCanvasAnimation";
+import {
+  useCanvasAnimation,
+  type CanvasFrame,
+} from "../../hooks/useCanvasAnimation";
 import { useInView } from "../../hooks/useInView";
 import { usePointer } from "../../hooks/usePointer";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
-import { ASCII_FRAME_INTERVAL, ASCII_RAMP, PORTRAIT, clamp } from "../../lib/motion";
+import {
+  ASCII_FRAME_INTERVAL,
+  ASCII_RAMP,
+  PORTRAIT,
+  clamp,
+} from "../../lib/motion";
 import { resolveAssetPath } from "../../utils/resolvePath";
 
 const PHOTO_JPG = resolveAssetPath("/home/foto-entony.jpg");
@@ -23,7 +31,10 @@ interface PhotoSample {
  * Reduz a foto para ~120 colunas, recortando como object-fit: cover
  * com object-position: center 25% (o mesmo enquadramento da <img>).
  */
-function samplePhoto(image: HTMLImageElement, ratio: number): PhotoSample | null {
+function samplePhoto(
+  image: HTMLImageElement,
+  ratio: number,
+): PhotoSample | null {
   const width = 120;
   const height = Math.max(40, Math.round(width / ratio));
   const canvas = document.createElement("canvas");
@@ -47,7 +58,12 @@ function samplePhoto(image: HTMLImageElement, ratio: number): PhotoSample | null
   }
 
   ctx.drawImage(image, sourceX, sourceY, sourceW, sourceH, 0, 0, width, height);
-  return { data: ctx.getImageData(0, 0, width, height).data, width, height, ratio };
+  return {
+    data: ctx.getImageData(0, 0, width, height).data,
+    width,
+    height,
+    ratio,
+  };
 }
 
 interface PortraitProps {
@@ -64,7 +80,10 @@ export default function Portrait({ cardActive }: PortraitProps) {
   const boxRef = useRef<HTMLDivElement>(null);
   const pointer = usePointer();
   const reducedMotion = usePrefersReducedMotion();
-  const inView = useInView(boxRef, { threshold: PORTRAIT.revealThreshold, once: true });
+  const inView = useInView(boxRef, {
+    threshold: PORTRAIT.revealThreshold,
+    once: true,
+  });
   const [revealed, setRevealed] = useState(false);
 
   const image = useRef<HTMLImageElement | null>(null);
@@ -82,7 +101,10 @@ export default function Portrait({ cardActive }: PortraitProps) {
   // Foto real entra 1100ms depois da moldura ficar 55% visível
   useEffect(() => {
     if (!inView) return;
-    const timeoutId = window.setTimeout(() => setRevealed(true), PORTRAIT.revealDelay);
+    const timeoutId = window.setTimeout(
+      () => setRevealed(true),
+      PORTRAIT.revealDelay,
+    );
     return () => window.clearTimeout(timeoutId);
   }, [inView]);
 
@@ -120,7 +142,11 @@ export default function Portrait({ cardActive }: PortraitProps) {
         const px = Math.min(photo.width - 1, Math.floor(u * photo.width));
         const py = Math.min(photo.height - 1, Math.floor(v * photo.height));
         const o = (py * photo.width + px) * 4;
-        const luminance = (photo.data[o] * 0.3 + photo.data[o + 1] * 0.59 + photo.data[o + 2] * 0.11) / 255;
+        const luminance =
+          (photo.data[o] * 0.3 +
+            photo.data[o + 1] * 0.59 +
+            photo.data[o + 2] * 0.11) /
+          255;
         let bright = Math.pow(luminance, 0.85) * 1.1;
 
         // Fica mais claro perto do mouse
@@ -132,12 +158,18 @@ export default function Portrait({ cardActive }: PortraitProps) {
 
         const hue = 250 + u * 40 + Math.sin(wave * 0.001) * 20;
         ctx.fillStyle = `hsla(${hue},90%,${55 + bright * 35}%,${0.4 + bright * 0.6})`;
-        ctx.fillText(ASCII_RAMP[Math.round(bright * (ASCII_RAMP.length - 1))], i * cellWidth, j * cellHeight);
+        ctx.fillText(
+          ASCII_RAMP[Math.round(bright * (ASCII_RAMP.length - 1))],
+          i * cellWidth,
+          j * cellHeight,
+        );
       }
     }
   }
 
-  const canvasRef = useCanvasAnimation(draw, { frameInterval: ASCII_FRAME_INTERVAL });
+  const canvasRef = useCanvasAnimation(draw, {
+    frameInterval: ASCII_FRAME_INTERVAL,
+  });
   const showPhoto = revealed || reducedMotion;
 
   return (
@@ -145,7 +177,11 @@ export default function Portrait({ cardActive }: PortraitProps) {
       ref={boxRef}
       className="relative my-4 flex-1 overflow-hidden rounded-portrait border border-line bg-void"
     >
-      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 size-full" />
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        className="absolute inset-0 size-full"
+      />
 
       <picture>
         <source srcSet={PHOTO_WEBP} type="image/webp" />

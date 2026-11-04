@@ -124,7 +124,12 @@ export function drawPlanet(
         const diffuse = Math.max(0, px * Lx + py * Ly + pz * Lz);
         const rim = Math.pow(1 - pz, 2.5); // borda iridescente (fresnel)
 
-        bright = clamp(diffuse * 0.85 + 0.08 + land * 0.14 * diffuse + rim * 0.5 * (0.6 + diffuse * 0.4));
+        bright = clamp(
+          diffuse * 0.85 +
+            0.08 +
+            land * 0.14 * diffuse +
+            rim * 0.5 * (0.6 + diffuse * 0.4),
+        );
         hue = hueBase + rim * 110 - land * 25 + px * 20;
         sat = 70 + rim * 30;
         char = ASCII_RAMP[Math.round(bright * (ASCII_RAMP.length - 1))];
@@ -145,8 +150,13 @@ export function drawPlanet(
 
         if (band > 0.2 && !isGap) {
           const shadow = ringDepth < 0 && Math.abs(ux) < 1 ? 0.35 : 1;
-          const lit = clamp((0.28 + band * 0.4) * shadow * (0.6 + 0.4 * Math.max(0, ux * Lx + 0.5)));
-          char = ASCII_RAMP[Math.max(1, Math.round(lit * (ASCII_RAMP.length - 1)))];
+          const lit = clamp(
+            (0.28 + band * 0.4) *
+              shadow *
+              (0.6 + 0.4 * Math.max(0, ux * Lx + 0.5)),
+          );
+          char =
+            ASCII_RAMP[Math.max(1, Math.round(lit * (ASCII_RAMP.length - 1)))];
           bright = lit;
           hue = hueBase + 20 + (ringRadius - 1.45) * 60;
           sat = 75;
@@ -162,7 +172,8 @@ export function drawPlanet(
       // Cada caractere se espalha e some na dissolução
       if (dissolve > 0) {
         x += SEEDS[index % 40000] * dissolve * width * 0.7;
-        y += SEEDS[(index * 7) % 40000] * dissolve * height * 0.7 - dissolve * 60;
+        y +=
+          SEEDS[(index * 7) % 40000] * dissolve * height * 0.7 - dissolve * 60;
         alpha *= (1 - dissolve) * (1 - dissolve);
       }
 

@@ -43,7 +43,10 @@ export default function HoloCard({
     card.style.setProperty("--my", `${y * 100}%`);
     card.style.setProperty("--rx", `${(0.5 - y) * HOLO.tiltX}deg`);
     card.style.setProperty("--ry", `${(x - 0.5) * HOLO.tiltY}deg`);
-    card.style.setProperty("--o", `${Math.min(1, distanceFromCenter * 1.6 + 0.3)}`);
+    card.style.setProperty(
+      "--o",
+      `${Math.min(1, distanceFromCenter * 1.6 + 0.3)}`,
+    );
 
     if (!active) {
       setActive(true);
@@ -83,9 +86,18 @@ export default function HoloCard({
         {children}
 
         {/* Camadas de efeito (decorativas) */}
-        <div aria-hidden="true" className="holo-foil pointer-events-none absolute inset-0" />
-        <div aria-hidden="true" className="holo-lines pointer-events-none absolute inset-0" />
-        <div aria-hidden="true" className="holo-glare pointer-events-none absolute inset-0" />
+        <div
+          aria-hidden="true"
+          className="holo-foil pointer-events-none absolute inset-0"
+        />
+        <div
+          aria-hidden="true"
+          className="holo-lines pointer-events-none absolute inset-0"
+        />
+        <div
+          aria-hidden="true"
+          className="holo-glare pointer-events-none absolute inset-0"
+        />
       </div>
     </div>
   );

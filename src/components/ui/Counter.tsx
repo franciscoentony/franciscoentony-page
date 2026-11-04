@@ -13,7 +13,11 @@ interface CounterProps {
  * Número que conta de 0 até `value` quando aparece na tela (1400ms).
  * O leitor de tela lê só o valor final (texto sr-only).
  */
-export default function Counter({ value, suffix = "", className = "" }: CounterProps) {
+export default function Counter({
+  value,
+  suffix = "",
+  className = "",
+}: CounterProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { threshold: COUNTER.threshold, once: true });
   const reducedMotion = usePrefersReducedMotion();

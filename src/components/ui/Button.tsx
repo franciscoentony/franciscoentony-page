@@ -60,7 +60,12 @@ export default function Button({
 
   if (to) {
     return (
-      <Link to={to} onClick={onClick} className={classes} aria-label={ariaLabel}>
+      <Link
+        to={to}
+        onClick={onClick}
+        className={classes}
+        aria-label={ariaLabel}
+      >
         {children}
       </Link>
     );

@@ -1,5 +1,8 @@
 import { useRef, type RefObject } from "react";
-import { useCanvasAnimation, type CanvasFrame } from "../../hooks/useCanvasAnimation";
+import {
+  useCanvasAnimation,
+  type CanvasFrame,
+} from "../../hooks/useCanvasAnimation";
 import { usePointer } from "../../hooks/usePointer";
 import { ASCII_FRAME_INTERVAL, getScrollProgress } from "../../lib/motion";
 import { drawPlanet, type PlanetLight } from "../../lib/planet";
@@ -24,12 +27,26 @@ export default function PlanetCanvas({ sectionRef }: PlanetCanvasProps) {
       return;
     }
 
-    drawPlanet(ctx, width, height, time, progress, pointer.current, light.current);
+    drawPlanet(
+      ctx,
+      width,
+      height,
+      time,
+      progress,
+      pointer.current,
+      light.current,
+    );
   }
 
-  const canvasRef = useCanvasAnimation(draw, { frameInterval: ASCII_FRAME_INTERVAL });
+  const canvasRef = useCanvasAnimation(draw, {
+    frameInterval: ASCII_FRAME_INTERVAL,
+  });
 
   return (
-    <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 size-full" />
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="absolute inset-0 size-full"
+    />
   );
 }

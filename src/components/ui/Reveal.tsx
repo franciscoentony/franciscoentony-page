@@ -14,7 +14,11 @@ interface RevealProps {
  * Faz o conteúdo surgir de baixo para cima quando entra na tela (.rv do protótipo).
  * Acontece uma vez só. Com reduced motion, o conteúdo já aparece visível.
  */
-export default function Reveal({ children, delay = 0, className = "" }: RevealProps) {
+export default function Reveal({
+  children,
+  delay = 0,
+  className = "",
+}: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { threshold: REVEAL.threshold, once: true });
   const reducedMotion = usePrefersReducedMotion();

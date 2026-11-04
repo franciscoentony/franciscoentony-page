@@ -7,7 +7,9 @@ export interface ToastMessage {
 }
 
 /** Guarda a função que mostra o toast. Quem fornece é o <ToastProvider>. */
-export const ToastContext = createContext<(message: ToastMessage) => void>(() => {});
+export const ToastContext = createContext<(message: ToastMessage) => void>(
+  () => {},
+);
 
 /**
  * Mostra um toast de qualquer componente (precisa estar dentro do <ToastProvider>).

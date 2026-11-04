@@ -18,26 +18,28 @@ export default function Blog() {
     <div id="top">
       <Navbar />
 
-      <section className="mx-auto max-w-220 px-7 pt-44 pb-16 text-center">
-        <span className="mb-4 block text-[13px] uppercase tracking-[0.08em] text-muted">
-          Blog
-        </span>
-        <h1 className="mb-4 text-4xl font-bold leading-[1.1] sm:text-5xl">
-          Anotações sobre código, dados e aprendizado.
-        </h1>
-        <p className="mx-auto max-w-115 text-[17px] text-secondary">
-          Registros do que vou construindo e aprendendo — de projetos pessoais a
-          bastidores dos sistemas que desenvolvo no IFRN.
-        </p>
-      </section>
+      <main>
+        <section className="mx-auto max-w-220 px-7 pt-44 pb-16 text-center">
+          <span className="mb-4 block text-[13px] uppercase tracking-[0.08em] text-secondary">
+            Blog
+          </span>
+          <h1 className="mb-4 text-4xl font-bold leading-[1.1] sm:text-5xl">
+            Anotações sobre código, dados e aprendizado.
+          </h1>
+          <p className="mx-auto max-w-115 text-[17px] text-secondary">
+            Registros do que vou construindo e aprendendo — de projetos pessoais
+            a bastidores dos sistemas que desenvolvo no IFRN.
+          </p>
+        </section>
 
-      <section className="mx-auto max-w-220 px-7 pb-24">
-        <div className="flex flex-col gap-3.5 text-left">
-          {posts.map((post) => (
-            <BlogPostCard key={post.slug} post={post} />
-          ))}
-        </div>
-      </section>
+        <section className="mx-auto max-w-220 px-7 pb-24">
+          <div className="flex flex-col gap-3.5 text-left">
+            {posts.map((post) => (
+              <BlogPostCard key={post.slug} post={post} />
+            ))}
+          </div>
+        </section>
+      </main>
 
       <Footer />
     </div>

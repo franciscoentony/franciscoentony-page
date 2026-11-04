@@ -20,6 +20,7 @@ export default function Footer() {
                 className={linkClass}
               >
                 {footer.github}
+                <span className="sr-only"> {links.newTabLabel}</span>
               </a>
             </li>
             <li>
@@ -30,6 +31,7 @@ export default function Footer() {
                 className={linkClass}
               >
                 {footer.linkedin}
+                <span className="sr-only"> {links.newTabLabel}</span>
               </a>
             </li>
             <li>

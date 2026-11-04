@@ -12,10 +12,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setMessage(newMessage);
     setVisible(true);
     window.clearTimeout(timeoutRef.current);
-    timeoutRef.current = window.setTimeout(
-      () => setVisible(false),
-      TOAST.duration,
-    );
+    timeoutRef.current = window.setTimeout(() => {
+      setVisible(false);
+      // Depois do fade (500ms) limpa o texto. Assim, se a mesma mensagem
+      // aparecer de novo, o leitor de tela anuncia outra vez.
+      timeoutRef.current = window.setTimeout(() => setMessage(null), 500);
+    }, TOAST.duration);
   }
 
   // Limpa o timer se o componente sair da tela

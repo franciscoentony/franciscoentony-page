@@ -42,16 +42,15 @@ function createStars(width: number, height: number): Star[] {
 export default function Starfield() {
   const pointer = usePointer();
   const stars = useRef<Star[]>([]);
-  const lastSize = useRef({ width: 0, height: 0 });
+  const lastWidth = useRef(0);
 
   function draw({ ctx, width, height, time, isStatic }: CanvasFrame) {
-    // Recria as estrelas quando o tamanho da tela muda
-    if (
-      width !== lastSize.current.width ||
-      height !== lastSize.current.height
-    ) {
+    // Recria as estrelas só quando a LARGURA muda. No celular a altura muda
+    // o tempo todo (barra do navegador aparecendo/sumindo) e isso faria as
+    // estrelas "pularem".
+    if (width !== lastWidth.current) {
       stars.current = createStars(width, height);
-      lastSize.current = { width, height };
+      lastWidth.current = width;
     }
 
     ctx.clearRect(0, 0, width, height);

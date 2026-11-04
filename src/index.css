@@ -16,6 +16,7 @@
   --color-line-strong: rgba(255, 255, 255, 0.18); /* borda no hover */
   --color-paper: #f5f5f7; /* texto principal */
   --color-nav: #d2d2d7; /* links da navbar */
+  --color-prose: #d2d2d7; /* texto corrido dos posts (menos "duro" que paper) */
   --color-secondary: #86868b; /* texto secundário */
   --color-muted: #48484d; /* texto apagado (só decorativo, contraste baixo) */
   --color-accent: #8b6cff; /* violeta */
@@ -259,6 +260,112 @@
     transparent 96%,
     #000 100%
   );
+}
+
+/* ---------- Corpo dos posts do blog, HANDOFF §7 ----------
+ * O HTML do post vem pronto do Hugo, então estilizamos as tags de dentro
+ * (p, h2, a, img, code...) a partir desta classe. Uso: <div className="post-content">.
+ */
+@utility post-content {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--color-prose);
+
+  & > * + * {
+    margin-top: 1.25em;
+  }
+
+  & h2,
+  & h3 {
+    margin-top: 2em;
+    color: var(--color-paper);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+
+  & h2 {
+    font-size: 28px;
+  }
+
+  & h3 {
+    font-size: 22px;
+  }
+
+  & a {
+    color: var(--color-accent-soft);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  & strong {
+    color: var(--color-paper);
+    font-weight: 600;
+  }
+
+  & ul,
+  & ol {
+    padding-left: 1.4em;
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li + li {
+    margin-top: 0.4em;
+  }
+
+  & blockquote {
+    border-left: 2px solid var(--color-accent-soft);
+    padding-left: 1em;
+    color: var(--color-secondary);
+  }
+
+  & hr {
+    border-color: var(--color-line);
+  }
+
+  /* Código inline */
+  & code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    background: var(--color-raised);
+    border: 1px solid var(--color-line);
+    border-radius: 6px;
+    padding: 0.1em 0.35em;
+  }
+
+  /* Código em bloco */
+  & pre {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.6;
+    background: var(--color-raised);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    overflow-x: auto;
+  }
+
+  & pre code {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  & img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+  }
 }
 
 /* ---------- Cursor custom, HANDOFF §4 ---------- */

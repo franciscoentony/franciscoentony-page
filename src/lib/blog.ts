@@ -30,38 +30,13 @@ export function resolveContentHtml(html: string): string {
   if (!html) return "";
   const base = getBase();
 
-  let out = html
+  const out = html
     .replace(/src="\/blog\/images\//g, `src="${base}/blog-data/images/`)
     .replace(/src="\/blog-data\/images\//g, `src="${base}/blog-data/images/`)
     .replace(/src="\/blog\//g, `src="${base}/blog-data/`)
     .replace(/src="\/blog-data\//g, `src="${base}/blog-data/`);
 
-  // Aplica o arredondamento direto como inline style no <img>. Isso evita
-  // depender da cascata do CSS — se o tema do Hugo carregar alguma folha de
-  // estilo depois do Tailwind com regra pra <img>, ela venceria mesmo com
-  // "!important" nas classes do prose. Inline style sempre tem prioridade.
-  const imgStyle =
-    "border-radius:0.75rem;border:1px solid #1E1E22;display:block;";
-  out = out.replace(/<img\b([^>]*)>/gi, (match, attrs) => {
-    if (/style\s*=\s*"/i.test(attrs)) {
-      return match.replace(
-        /style\s*=\s*"([^"]*)"/i,
-        (_m: string, existing: string) => `style="${existing};${imgStyle}"`,
-      );
-    }
-    return `<img${attrs} style="${imgStyle}">`;
-  });
-
+  // O visual das imagens (raio, borda) vem da classe post-content em
+  // src/index.css (D14), não mais de estilo inline.
   return out;
-}
-
-/** Formata uma data ISO (front matter do Hugo) no padrão pt-BR. */
-export function formatDate(iso: string): string {
-  const date = new Date(iso);
-  if (isNaN(date.getTime())) return iso;
-  return date.toLocaleDateString("pt-BR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 }

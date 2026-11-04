@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { blog } from "../../content/ui";
 import type { Post } from "../../data/posts";
 import { formatShortDate } from "../../lib/date";
+import { decodeHtmlEntities } from "../../lib/text";
 
 interface PostCardProps {
   post: Post;
@@ -25,7 +26,9 @@ export default function PostCard({
       className="flex h-full min-h-[250px] flex-col gap-3 rounded-lg border border-line bg-raised p-6.5 transition duration-500 hover:-translate-y-1.5 hover:border-line-strong"
     >
       <span className="font-mono text-label text-gold">#{post.hash}</span>
-      <Heading className="text-title-sm">{post.title}</Heading>
+      <Heading className="text-title-sm">
+        {decodeHtmlEntities(post.title)}
+      </Heading>
 
       {showTags && post.tags?.length > 0 && (
         <ul aria-label={blog.tagsLabel} className="flex flex-wrap gap-1.5">

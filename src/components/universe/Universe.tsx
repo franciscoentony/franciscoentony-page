@@ -22,14 +22,22 @@ export default function Universe() {
 
 // ---------- Partes reutilizadas nas duas versões ----------
 
-function HeroCopy() {
+/**
+ * Eyebrow, h1 e CTAs do hero.
+ * ctaHidden: quando o hero já sumiu no scroll, os CTAs ficam "inert" (não
+ * recebem foco nem clique). O h1 continua na árvore de acessibilidade.
+ */
+function HeroCopy({ ctaHidden = false }: { ctaHidden?: boolean }) {
   return (
     <>
       <p className="mb-3.5 text-eyebrow text-secondary">{hero.eyebrow}</p>
       <h1 className="mx-auto max-w-[14ch] text-h1">
         <GradientText title={hero.title} />
       </h1>
-      <div className="mt-6.5 flex items-center justify-center gap-3.5">
+      <div
+        inert={ctaHidden}
+        className="mt-6.5 flex items-center justify-center gap-3.5"
+      >
         <Button to={`/#${sectionIds.projects}`}>{hero.primaryCta}</Button>
         <Button variant="link" to={`/#${sectionIds.contact}`}>
           {hero.secondaryCta}
@@ -118,11 +126,12 @@ function UniverseAnimated() {
           style={{
             opacity: 1 - heroFade,
             transform: `translateY(${-heroFade * UNIVERSE.heroShift}px) scale(${1 - heroFade * 0.04})`,
-            // Some de vez quando terminou o fade (e sai da ordem do Tab)
-            visibility: heroFade >= 1 ? "hidden" : "visible",
+            // Só opacity (sem visibility: hidden), para o h1 continuar
+            // existindo para leitores de tela (QA I1)
+            pointerEvents: heroFade >= 1 ? "none" : "auto",
           }}
         >
-          <HeroCopy />
+          <HeroCopy ctaHidden={heroFade >= 1} />
         </div>
 
         {/* Dica "Role para explorar" */}

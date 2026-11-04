@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FocusEvent } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { navbar } from "../content/ui";
@@ -10,6 +10,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const scrolledDown = useHideOnScroll();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
 
   // Com o menu mobile aberto a navbar nunca some.
   const hidden = scrolledDown && !menuOpen;
@@ -33,10 +34,49 @@ export default function Navbar() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [menuOpen]);
 
+  // Fecha o menu ao clicar fora da navbar.
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!headerRef.current?.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [menuOpen]);
+
+  // Fecha o menu quando a tela passa a ter 860px ou mais (o menu mobile some).
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 860px)");
+
+    function handleChange() {
+      if (media.matches) setMenuOpen(false);
+    }
+
+    media.addEventListener("change", handleChange);
+    return () => media.removeEventListener("change", handleChange);
+  }, []);
+
+  // Fecha o menu quando o foco do teclado sai da navbar (Tab para fora).
+  function handleBlur(event: FocusEvent<HTMLElement>) {
+    const nextFocused = event.relatedTarget as Node | null;
+    if (menuOpen && !event.currentTarget.contains(nextFocused)) {
+      setMenuOpen(false);
+    }
+  }
+
   return (
     <header
+      ref={headerRef}
+      onBlur={handleBlur}
+      // focus-within: com foco do teclado dentro, a navbar volta a aparecer (WCAG 2.4.11)
       className={`fixed inset-x-0 top-0 z-50 h-nav border-b border-line bg-ink/55 backdrop-blur-[20px] backdrop-saturate-180 transition-transform duration-500 ${
-        hidden ? "-translate-y-full" : "translate-y-0"
+        hidden
+          ? "-translate-y-full focus-within:translate-y-0"
+          : "translate-y-0"
       }`}
     >
       <Container className="flex h-full items-center justify-between">
@@ -95,7 +135,7 @@ export default function Navbar() {
         <nav
           id="menu-mobile"
           aria-label="Principal"
-          className="absolute inset-x-0 top-full border-b border-line bg-ink/95 backdrop-blur-[20px] tab:hidden"
+          className="absolute inset-x-0 top-full border-b border-line bg-ink tab:hidden"
         >
           <Container>
             <ul className="flex flex-col py-3">

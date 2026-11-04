@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Button from "../components/ui/Button";
-import { blog } from "../content/ui";
+import { blog, seo } from "../content/ui";
+import { usePageMeta } from "../hooks/usePageMeta";
 import type { Post } from "../data/posts";
 import {
   fetchPosts,
@@ -12,7 +13,7 @@ import {
   resolveContentHtml,
 } from "../lib/blog";
 import { formatShortDate } from "../lib/date";
-import { decodeHtmlEntities } from "../lib/text";
+import { decodeHtmlEntities, toMetaDescription } from "../lib/text";
 
 /** Coluna de leitura de 680px (HANDOFF §7), com 24px de respiro no celular. */
 const readingColumn = "mx-auto w-[min(680px,calc(100%-48px))]";
@@ -39,6 +40,16 @@ export default function BlogPost() {
     cached ? slug : undefined,
   );
   const loading = loadedSlug !== slug;
+
+  // Título da aba: o do post (ou "Post não encontrado")
+  let pageTitle = seo.blogTitle;
+  if (!loading && post)
+    pageTitle = decodeHtmlEntities(post.title) + seo.titleSuffix;
+  if (!loading && !post) pageTitle = seo.notFoundTitle;
+  usePageMeta(
+    pageTitle,
+    post ? toMetaDescription(post.summary || post.excerpt) : undefined,
+  );
 
   useEffect(() => {
     // Se o slug mudar antes do fetch terminar, ignoramos a resposta antiga

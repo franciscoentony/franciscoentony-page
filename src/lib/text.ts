@@ -10,3 +10,13 @@ export function decodeHtmlEntities(text: string): string {
   textarea.innerHTML = text;
   return textarea.value;
 }
+
+/**
+ * Prepara um texto para a meta description: troca entidades, junta
+ * espaços/quebras de linha e corta em ~160 caracteres sem partir palavra.
+ */
+export function toMetaDescription(text: string, max = 160): string {
+  const clean = decodeHtmlEntities(text).replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  return clean.slice(0, clean.lastIndexOf(" ", max)) + "…";
+}

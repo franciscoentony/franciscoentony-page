@@ -10,10 +10,13 @@
  *   dist/blog/index.html
  *   dist/blog/<slug>/index.html   (um para cada post de blog-data/index.json)
  *
+ * Cada cópia recebe título, descrição e og:url/og:title/og:description
+ * próprios, para os previews de link (WhatsApp, LinkedIn...) que não rodam JS.
+ *
  * Roda depois do "vite build" (veja build:react no package.json).
  * Só usa módulos nativos do Node/Bun, sem dependências.
  */
-import { copyFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const distDir = "dist";
@@ -27,15 +30,81 @@ if (!existsSync(indexHtml)) {
   process.exit(1);
 }
 
-/** Copia o index.html para dist/<pasta>/index.html */
-function createRoute(folder) {
+const siteUrl = "https://franciscoentony.com";
+const titleSuffix = " · Francisco Entony"; // igual a seo.titleSuffix em src/content/ui.ts
+const baseHtml = readFileSync(indexHtml, "utf8");
+
+/** Escapa texto para usar dentro de atributos HTML. */
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/** Converte entidades que o Hugo já deixa no texto (ex.: &ldquo;) de volta. */
+function decodeEntities(text) {
+  const named = {
+    amp: "&",
+    quot: '"',
+    lt: "<",
+    gt: ">",
+    ldquo: "“",
+    rdquo: "”",
+    lsquo: "‘",
+    rsquo: "’",
+    ndash: "–",
+    mdash: "—",
+    hellip: "…",
+    nbsp: " ",
+  };
+  return text
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+    .replace(/&(\w+);/g, (match, name) => named[name] ?? match);
+}
+
+/** Junta espaços/quebras de linha e corta em ~160 caracteres sem partir palavra. */
+function shorten(text, max = 160) {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  return clean.slice(0, clean.lastIndexOf(" ", max)) + "…";
+}
+
+/** Troca o content de uma <meta name|property="..."> do HTML. */
+function setMeta(html, key, value) {
+  const pattern = new RegExp(
+    `(<meta\\s+(?:name|property)="${key}"\\s+content=")[^"]*(")`,
+  );
+  return html.replace(pattern, `$1${escapeHtml(value)}$2`);
+}
+
+/** Cria dist/<pasta>/index.html com o título e a descrição da página. */
+function createRoute(folder, title, description, type = "website") {
+  let html = baseHtml.replace(
+    /<title>[^<]*<\/title>/,
+    `<title>${escapeHtml(title)}</title>`,
+  );
+  html = setMeta(html, "description", description);
+  html = setMeta(html, "og:type", type);
+  html = setMeta(html, "og:url", `${siteUrl}/${folder}/`);
+  html = setMeta(html, "og:title", title);
+  html = setMeta(html, "og:description", description);
+  html = setMeta(html, "twitter:title", title);
+  html = setMeta(html, "twitter:description", description);
+
   const targetDir = join(distDir, folder);
   mkdirSync(targetDir, { recursive: true });
-  copyFileSync(indexHtml, join(targetDir, "index.html"));
+  writeFileSync(join(targetDir, "index.html"), html);
   console.log(`[static-routes] /${folder}/`);
 }
 
-createRoute("blog");
+// /blog (textos iguais a seo.blogTitle e blog.lead em src/content/ui.ts)
+createRoute(
+  "blog",
+  `Blog${titleSuffix}`,
+  "Registros do que vou construindo e aprendendo — de projetos pessoais a bastidores dos sistemas que desenvolvo no IFRN.",
+);
 
 const posts = existsSync(postsJson)
   ? JSON.parse(readFileSync(postsJson, "utf8"))
@@ -48,7 +117,16 @@ for (const post of posts) {
     console.warn(`[static-routes] slug ignorado: ${JSON.stringify(post.slug)}`);
     continue;
   }
-  createRoute(`blog/${post.slug}`);
+  const title = decodeEntities(post.title ?? "");
+  const description = shorten(
+    decodeEntities(post.summary || post.excerpt || ""),
+  );
+  createRoute(
+    `blog/${post.slug}`,
+    `${title}${titleSuffix}`,
+    description,
+    "article",
+  );
 }
 
 console.log(`[static-routes] ${posts.length} post(s) + /blog/ gerados.`);

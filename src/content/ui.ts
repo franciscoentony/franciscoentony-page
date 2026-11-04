@@ -284,3 +284,17 @@ export const footer = {
   blog: "Blog",
   backToTop: "Topo ↑",
 };
+
+// ---------- SEO (título da aba e meta description por rota) ----------
+// Os valores da Home também estão fixos no index.html (para quem não roda JS,
+// como os previews de link). Se mudar aqui, mude lá também.
+
+export const seo = {
+  homeTitle: "Francisco Entony · Desenvolvedor Full-Stack",
+  homeDescription:
+    "Francisco Entony, desenvolvedor full-stack em Canguaretama, RN. Construo sistemas que resolvem problemas reais. Projetos, experiência e blog.",
+  blogTitle: "Blog · Francisco Entony",
+  /** Vai depois do título do post na aba (ex.: "Meu post · Francisco Entony"). */
+  titleSuffix: " · Francisco Entony",
+  notFoundTitle: "Post não encontrado · Francisco Entony",
+};

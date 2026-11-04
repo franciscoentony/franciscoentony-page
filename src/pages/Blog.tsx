@@ -3,7 +3,8 @@ import Navbar from "../components/Navbar";
 import PostGrid from "../components/blog/PostGrid";
 import Reveal from "../components/ui/Reveal";
 import Section from "../components/ui/Section";
-import { blog } from "../content/ui";
+import { blog, seo } from "../content/ui";
+import { usePageMeta } from "../hooks/usePageMeta";
 import { usePosts } from "../hooks/usePosts";
 
 /**
@@ -12,6 +13,7 @@ import { usePosts } from "../hooks/usePosts";
  */
 export default function Blog() {
   const { status, posts } = usePosts();
+  usePageMeta(seo.blogTitle, blog.lead);
 
   return (
     <div id="top">

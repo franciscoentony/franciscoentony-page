@@ -76,7 +76,7 @@ export default function ProjectThumb({ shape, activeRef }: ProjectThumbProps) {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="block h-[58%] w-full border-b border-line"
+      className="block h-[220px] w-full shrink-0 border-b border-line tab:h-[58%]"
     />
   );
 }

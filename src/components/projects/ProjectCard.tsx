@@ -17,7 +17,9 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
 
   return (
     <HoloCard
-      className="aspect-4/5 w-full"
+      // Abaixo de 860px a altura vem do conteúdo (texto não é cortado, R2 I-3);
+      // a partir de 860px o card é 4:5 como no protótipo.
+      className="w-full max-tab:h-full tab:aspect-4/5"
       innerClassName="flex flex-col"
       onActiveChange={(active) => {
         activeRef.current = active;

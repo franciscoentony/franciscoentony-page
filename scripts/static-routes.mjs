@@ -6,6 +6,8 @@
  * SEO, previews de link e o Lighthouse. Com um index.html em cada pasta,
  * o Pages responde 200 e o React Router cuida do resto.
  *
+ * Gera também dist/sitemap.xml (citado em public/robots.txt).
+ *
  * Gera:
  *   dist/blog/index.html
  *   dist/blog/<slug>/index.html   (um para cada post de blog-data/index.json)
@@ -129,4 +131,30 @@ for (const post of posts) {
   );
 }
 
-console.log(`[static-routes] ${posts.length} post(s) + /blog/ gerados.`);
+// sitemap.xml com as URLs reais do site (o sitemap do Hugo em blog-data
+// usa caminhos do Hugo, que não são as rotas do site). Citado no robots.txt.
+const urls = [
+  { loc: `${siteUrl}/` },
+  { loc: `${siteUrl}/blog/` },
+  ...posts
+    .filter((post) => /^[a-z0-9-]+$/i.test(post.slug ?? ""))
+    .map((post) => ({
+      loc: `${siteUrl}/blog/${post.slug}/`,
+      lastmod: String(post.date ?? "").slice(0, 10),
+    })),
+];
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls
+  .map(
+    (url) =>
+      `  <url><loc>${url.loc}</loc>${url.lastmod ? `<lastmod>${url.lastmod}</lastmod>` : ""}</url>`,
+  )
+  .join("\n")}
+</urlset>
+`;
+writeFileSync(join(distDir, "sitemap.xml"), sitemap);
+
+console.log(
+  `[static-routes] ${posts.length} post(s) + /blog/ gerados (+ sitemap.xml).`,
+);

@@ -95,6 +95,10 @@ Ordem de implementação: **tokens → componentes base (Navbar, Footer, botões
 
 - **D11. Decisões confirmadas pelo Entony em 04/11/2026:** o LinkedIn é `https://www.linkedin.com/in/franciscoentony` (usado no Footer e no Contato) e os atributos da ficha ficam como no protótipo (92/88/74/99).
 
+- **D12. Pasta `qa/`:** tem toolchain própria (o `package.json` dela) e fica fora do ESLint da raiz (`globalIgnores` em `eslint.config.js`). O lint dela é responsabilidade do QA.
+- **D13. Ícones em `src/data/skills.ts`:** os campos `icon` e `color` são apresentação, não conteúdo. Na fase 3 o Front-End pode removê-los, junto com o tipo e os imports do Font Awesome, e depois tirar `@fortawesome/*` do `package.json` (D5). Os textos (`title` e descrições) **não** mudam.
+- **D14. `src/lib/blog.ts`:** o estilo inline das imagens dos posts (`#1E1E22`, `0.75rem`) é substituído na fase 4 (Blog e Post) pelos tokens do HANDOFF §7.
+
 **Pendência com o Entony:** aprovar o restante da copy nova (D3).
 
 ### Critérios de aceite (Definition of Done)

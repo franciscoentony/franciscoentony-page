@@ -1,12 +1,40 @@
+import { Link } from "react-router-dom";
+import { footer, links } from "../content/ui";
+import Container from "./ui/Container";
+
+const linkClass = "transition-colors duration-200 hover:text-paper";
+
 export default function Footer() {
   return (
-    <footer className="border-t border-line py-8">
-      <div className="mx-auto flex max-w-220 items-center justify-between px-7 font-mono text-xs text-muted">
-        <p>© 2026 — feito por Francisco Entony</p>
-        <a href="#top" className="hover:text-secondary">
-          voltar ao topo ↑
-        </a>
-      </div>
+    <footer className="border-t border-line pt-5.5 pb-10 text-xs text-secondary">
+      <Container className="flex flex-wrap justify-between gap-4">
+        <p>{footer.copyright}</p>
+
+        <nav aria-label="Rodapé">
+          <ul className="flex flex-wrap gap-5.5">
+            <li>
+              <a href={links.github} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                {footer.github}
+              </a>
+            </li>
+            <li>
+              <a href={links.linkedin} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                {footer.linkedin}
+              </a>
+            </li>
+            <li>
+              <Link to="/blog" className={linkClass}>
+                {footer.blog}
+              </Link>
+            </li>
+            <li>
+              <a href="#top" className={linkClass}>
+                {footer.backToTop}
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </Container>
     </footer>
   );
 }

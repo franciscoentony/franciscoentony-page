@@ -1,15 +1,15 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCodeCommit } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
+import { GitCommitHorizontal } from "lucide-react";
 import type { Post } from "../data/posts";
 
 export default function BlogPostCard({ post }: { post: Post }) {
   return (
-    <a
-      href={`/blog/${post.slug}`}
+    <Link
+      to={`/blog/${post.slug}`}
       className="group block rounded-md border border-line bg-raised px-6 py-5 transition-colors hover:border-line-strong"
     >
       <div className="mb-2.5 flex items-center gap-2.5 font-mono text-xs text-muted">
-        <FontAwesomeIcon icon={faCodeCommit} className="h-3.5 w-3.5" />
+        <GitCommitHorizontal aria-hidden="true" className="h-3.5 w-3.5" />
         <span>{post.hash}</span>
         <span>·</span>
         <span>{post.date}</span>
@@ -30,6 +30,6 @@ export default function BlogPostCard({ post }: { post: Post }) {
           </span>
         ))}
       </div>
-    </a>
+    </Link>
   );
 }

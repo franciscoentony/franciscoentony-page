@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faCodeCommit } from "@fortawesome/free-solid-svg-icons";
+import { ArrowLeft, GitCommitHorizontal } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import {
@@ -57,7 +56,7 @@ export default function BlogPost() {
             to="/blog"
             className="inline-flex items-center gap-2 text-sm text-accent hover:underline"
           >
-            <FontAwesomeIcon icon={faArrowLeft} className="h-3.5 w-3.5" />
+            <ArrowLeft aria-hidden="true" className="h-3.5 w-3.5" />
             Voltar pro blog
           </Link>
         </section>
@@ -74,12 +73,12 @@ export default function BlogPost() {
           to="/blog"
           className="mb-10 inline-flex items-center gap-2 text-sm text-secondary transition-colors hover:text-paper"
         >
-          <FontAwesomeIcon icon={faArrowLeft} className="h-3.5 w-3.5" />
+          <ArrowLeft aria-hidden="true" className="h-3.5 w-3.5" />
           Voltar pro blog
         </Link>
 
         <div className="mb-5 flex flex-wrap items-center gap-2.5 font-mono text-xs text-muted">
-          <FontAwesomeIcon icon={faCodeCommit} className="h-3.5 w-3.5" />
+          <GitCommitHorizontal aria-hidden="true" className="h-3.5 w-3.5" />
           <span>{post.hash}</span>
           <span>·</span>
           <time>{formatDate(post.date)}</time>
@@ -128,7 +127,7 @@ export default function BlogPost() {
             to="/blog"
             className="inline-flex items-center gap-2 text-sm text-accent hover:underline"
           >
-            <FontAwesomeIcon icon={faArrowLeft} className="h-3.5 w-3.5" />
+            <ArrowLeft aria-hidden="true" className="h-3.5 w-3.5" />
             Voltar pro blog
           </Link>
         </div>

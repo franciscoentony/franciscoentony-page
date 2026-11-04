@@ -20,3 +20,20 @@ export function toMetaDescription(text: string, max = 160): string {
   if (clean.length <= max) return clean;
   return clean.slice(0, clean.lastIndexOf(" ", max)) + "…";
 }
+
+/** Texto "comparável": sem entidades, sem espaços extras e em minúsculas. */
+function normalizeForCompare(text: string): string {
+  return decodeHtmlEntities(text).replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+/**
+ * true quando o corpo do post já começa com o resumo (DF-5).
+ * Comparamos os primeiros ~120 caracteres do texto, ignorando as tags HTML.
+ */
+export function isSummaryRepeated(summary: string, contentHtml: string) {
+  const start = normalizeForCompare(summary).slice(0, 120);
+  if (!start) return false;
+  const doc = new DOMParser().parseFromString(contentHtml, "text/html");
+  const bodyText = normalizeForCompare(doc.body.textContent ?? "");
+  return bodyText.startsWith(start);
+}

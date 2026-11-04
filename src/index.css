@@ -147,6 +147,12 @@
   --text-h1-compact--letter-spacing: -0.045em;
   --text-h1-compact--font-weight: 600;
 
+  /* Título do post (D21): menor que o h1 da Home, para a coluna de leitura */
+  --text-post-title: clamp(32px, 4vw, 52px);
+  --text-post-title--line-height: 1.08;
+  --text-post-title--letter-spacing: -0.035em;
+  --text-post-title--font-weight: 600;
+
   --text-h2: clamp(34px, 4.6vw, 60px);
   --text-h2--line-height: 1.05;
   --text-h2--letter-spacing: -0.04em;
@@ -372,6 +378,11 @@
   line-height: 1.7;
   color: var(--color-prose);
 
+  /* A partir de 860px: 19px (DF-6) */
+  @media (width >= 53.75rem) {
+    font-size: 19px;
+  }
+
   & > * + * {
     margin-top: 1.25em;
   }
@@ -460,10 +471,15 @@
     font-size: inherit;
   }
 
+  /* Imagens: ocupam no máximo a coluna; as verticais ficam com no máximo
+     80% da tela (ou 720px) de altura, centralizadas (DF-7) */
   & img {
     display: block;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: min(80svh, 720px);
+    margin-inline: auto;
     border: 1px solid var(--color-line);
     border-radius: var(--radius-md);
   }

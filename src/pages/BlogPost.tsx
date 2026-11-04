@@ -13,10 +13,17 @@ import {
   resolveContentHtml,
 } from "../lib/blog";
 import { formatShortDate } from "../lib/date";
-import { decodeHtmlEntities, toMetaDescription } from "../lib/text";
+import {
+  decodeHtmlEntities,
+  isSummaryRepeated,
+  toMetaDescription,
+} from "../lib/text";
 
-/** Coluna de leitura de 680px (HANDOFF §7), com 24px de respiro no celular. */
-const readingColumn = "mx-auto w-[min(680px,calc(100%-48px))]";
+/**
+ * Coluna de leitura: 680px com 24px de respiro no celular e 640px a partir
+ * de 860px (cerca de 73 caracteres por linha com o corpo em 19px, DF-6).
+ */
+const readingColumn = "mx-auto w-[min(680px,calc(100%-48px))] tab:w-[640px]";
 
 /** Link "‹ Voltar pro blog" (o -ml compensa o padding do botão link). */
 function BackLink() {
@@ -108,10 +115,13 @@ export default function BlogPost() {
               <span>{post.readTime}</span>
             </p>
 
-            <h1 className="mt-4 text-h1">{decodeHtmlEntities(post.title)}</h1>
+            <h1 className="mt-4 text-post-title">
+              {decodeHtmlEntities(post.title)}
+            </h1>
 
-            {post.summary && (
-              <p className="mt-5 text-lead text-secondary">
+            {/* O resumo só aparece se o corpo não começar com o mesmo texto (DF-5) */}
+            {post.summary && !isSummaryRepeated(post.summary, post.content) && (
+              <p className="mt-5 line-clamp-3 text-lead text-secondary">
                 {decodeHtmlEntities(post.summary)}
               </p>
             )}
@@ -119,7 +129,7 @@ export default function BlogPost() {
             {post.tags?.length > 0 && (
               <ul
                 aria-label={blog.tagsLabel}
-                className="mt-6 flex flex-wrap gap-1.5"
+                className="mt-5 flex flex-wrap gap-1.5"
               >
                 {post.tags.map((tag) => (
                   <li

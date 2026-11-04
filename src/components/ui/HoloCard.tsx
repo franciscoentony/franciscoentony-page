@@ -81,7 +81,7 @@ export default function HoloCard({
       className={`perspective-[900px] ${className}`}
     >
       <div
-        className={`holo-tilt relative h-full overflow-hidden rounded-lg border border-white/9 bg-linear-160 from-holo-from to-holo-to to-60% ${
+        className={`holo-tilt relative h-full overflow-hidden rounded-lg border border-line-holo bg-linear-160 from-holo-from to-holo-to to-60% ${
           active
             ? "shadow-card-active [transition:transform_80ms_linear,box-shadow_400ms]"
             : "shadow-card [transition:transform_600ms_var(--ease-smooth),box-shadow_600ms_var(--ease-smooth)]"

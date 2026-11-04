@@ -23,7 +23,7 @@ export default function PostCard({
   return (
     <Link
       to={`/blog/${post.slug}`}
-      className="flex h-full min-h-[250px] flex-col gap-3 rounded-lg border border-line bg-raised p-6.5 transition duration-500 hover:-translate-y-1.5 hover:border-line-strong"
+      className="flex h-full min-h-[250px] flex-col gap-3 rounded-lg border border-line bg-raised p-6.5 transition-[translate,border-color] duration-500 hover:-translate-y-1.5 hover:border-line-strong"
     >
       <span className="font-mono text-label text-gold">#{post.hash}</span>
       <Heading className="text-title-sm">

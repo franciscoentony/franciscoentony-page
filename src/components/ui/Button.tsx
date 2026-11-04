@@ -19,7 +19,7 @@ interface ButtonProps {
 }
 
 const base =
-  "inline-flex items-center gap-1.5 rounded-full font-medium transition duration-300";
+  "inline-flex items-center gap-1.5 rounded-full font-medium transition-[color,background-color,box-shadow,scale] duration-300";
 
 const variants = {
   primary:

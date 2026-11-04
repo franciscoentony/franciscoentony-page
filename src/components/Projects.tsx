@@ -48,7 +48,10 @@ export default function Projects() {
         closest = index;
       }
     });
-    setActiveIndex(closest);
+    // No fim da rolagem o último card pode não chegar ao começo (telas largas):
+    // nesse caso, o último dot é o ativo (R2 S-2).
+    const atEnd = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+    setActiveIndex(atEnd ? track.children.length - 1 : closest);
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLUListElement>) {

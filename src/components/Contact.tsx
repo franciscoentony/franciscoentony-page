@@ -40,21 +40,24 @@ export default function Contact() {
           <p className="text-lead text-secondary">{contact.lead}</p>
         </Reveal>
         <Reveal delay={3}>
-          <div className="mt-7.5 flex flex-wrap items-center justify-center gap-3.5">
+          {/* Abaixo de 860px: e-mail numa linha, GitHub e LinkedIn juntos na seguinte (DS-19) */}
+          <div className="mt-7.5 flex flex-col items-center justify-center gap-3.5 tab:flex-row">
             <Button
               onClick={copyEmail}
               ariaLabel={`${contact.copyEmailLabel}: ${links.email}`}
             >
               {links.email}
             </Button>
-            <Button variant="link" href={links.github} external>
-              {contact.githubLink}
-              <span className="sr-only">{links.newTabLabel}</span>
-            </Button>
-            <Button variant="link" href={links.linkedin} external>
-              {contact.linkedinLink}
-              <span className="sr-only">{links.newTabLabel}</span>
-            </Button>
+            <div className="flex items-center gap-5 tab:gap-3.5">
+              <Button variant="link" href={links.github} external>
+                {contact.githubLink}
+                <span className="sr-only">{links.newTabLabel}</span>
+              </Button>
+              <Button variant="link" href={links.linkedin} external>
+                {contact.linkedinLink}
+                <span className="sr-only">{links.newTabLabel}</span>
+              </Button>
+            </div>
           </div>
         </Reveal>
       </Container>

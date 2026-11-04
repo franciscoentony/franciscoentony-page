@@ -31,7 +31,7 @@ function HeroCopy({ ctaHidden = false }: { ctaHidden?: boolean }) {
   return (
     <>
       <p className="mb-3.5 text-eyebrow text-secondary">{hero.eyebrow}</p>
-      <h1 className="mx-auto max-w-[14ch] text-h1">
+      <h1 className="mx-auto text-h1 max-[400px]:text-h1-compact tab:max-w-[14ch]">
         <GradientText title={hero.title} />
       </h1>
       <div
@@ -47,16 +47,28 @@ function HeroCopy({ ctaHidden = false }: { ctaHidden?: boolean }) {
   );
 }
 
+/**
+ * Número, título e subtítulo de um capítulo.
+ * align: "side" = alinhado à esquerda a partir de 860px (C1 e C2 na versão
+ * animada); "left"/"right" = blocos da versão reduced motion; "center" = C3.
+ */
 function ChapterCopy({
   index,
-  alignSide,
+  align,
 }: {
   index: number;
-  alignSide: boolean;
+  align: "side" | "left" | "right" | "center";
 }) {
   const chapter = chapters[index];
-  // Capítulos 1 e 2 ficam alinhados à esquerda no desktop (alignSide)
-  const margin = alignSide ? "mx-auto tab:mx-0" : "mx-auto";
+
+  // Margens para posicionar o título e o subtítulo (que têm largura máxima)
+  const margins = {
+    side: "mx-auto tab:mx-0",
+    left: "mx-auto tab:mr-auto tab:ml-0",
+    right: "mx-auto tab:mr-0 tab:ml-auto",
+    center: "mx-auto",
+  };
+  const margin = margins[align];
 
   return (
     <>
@@ -64,7 +76,9 @@ function ChapterCopy({
         {chapter.number}
       </p>
       <h2 className={`max-w-[16ch] text-h2 ${margin}`}>{chapter.title}</h2>
-      <p className={`mt-4.5 max-w-[36ch] text-lead text-secondary ${margin}`}>
+      <p
+        className={`mt-4.5 max-w-[36ch] text-lead text-balance text-secondary ${margin}`}
+      >
         <RichText parts={chapter.lead} />
       </p>
     </>
@@ -122,7 +136,7 @@ function UniverseAnimated() {
 
         {/* Headline + CTAs */}
         <div
-          className="absolute inset-x-0 top-[clamp(90px,15vh,150px)] px-6 text-center"
+          className="absolute inset-x-0 top-hero-top px-6 text-center"
           style={{
             opacity: 1 - heroFade,
             transform: `translateY(${-heroFade * UNIVERSE.heroShift}px) scale(${1 - heroFade * 0.04})`,
@@ -134,10 +148,10 @@ function UniverseAnimated() {
           <HeroCopy ctaHidden={heroFade >= 1} />
         </div>
 
-        {/* Dica "Role para explorar" */}
+        {/* Dica "Role para explorar" (sombra preta para ler sobre o planeta no mobile, QA S1) */}
         <div
           aria-hidden="true"
-          className="absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5 font-mono text-label tracking-label-wide text-secondary uppercase"
+          className="absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5 font-mono text-label tracking-label-wide text-secondary uppercase text-shadow-chapter"
           style={{ opacity: hintOpacity }}
         >
           {hero.scrollHint}
@@ -158,7 +172,10 @@ function UniverseAnimated() {
                 transform: `translateY(${(1 - opacity) * UNIVERSE.chapterShift}px)`,
               }}
             >
-              <ChapterCopy index={index} alignSide={index < 2} />
+              <ChapterCopy
+                index={index}
+                align={index < 2 ? "side" : "center"}
+              />
             </div>
           );
         })}
@@ -173,7 +190,7 @@ function UniverseStatic() {
   return (
     <section id="universe">
       {/* Hero com o planeta parado atrás */}
-      <div className="relative flex min-h-svh items-start overflow-hidden pt-[clamp(90px,15vh,150px)] text-center">
+      <div className="relative flex min-h-svh items-start overflow-hidden pt-hero-top text-center">
         <PlanetCanvas />
         <Container className="relative">
           <HeroCopy />
@@ -181,13 +198,22 @@ function UniverseStatic() {
       </div>
 
       {/* Os 3 capítulos como blocos normais */}
-      {chapters.map((chapter, index) => (
-        <div key={chapter.number} className="py-section text-center">
-          <Container>
-            <ChapterCopy index={index} alignSide={false} />
-          </Container>
-        </div>
-      ))}
+      {/* DS-7: blocos com ~120px entre si; C1 à esquerda, C2 à direita, C3 no centro */}
+      <Container className="flex flex-col gap-30 pb-section">
+        {chapters.map((chapter, index) => {
+          const align = (["left", "right", "center"] as const)[index];
+          const textAlign = {
+            left: "text-center tab:text-left",
+            right: "text-center tab:text-right",
+            center: "text-center",
+          }[align];
+          return (
+            <div key={chapter.number} className={textAlign}>
+              <ChapterCopy index={index} align={align} />
+            </div>
+          );
+        })}
+      </Container>
     </section>
   );
 }

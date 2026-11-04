@@ -16,9 +16,21 @@ const FINE_POINTER = "(hover: hover) and (pointer: fine)";
  */
 export default function CustomCursor() {
   const reducedMotion = usePrefersReducedMotion();
-  const [hasFinePointer] = useState(
+  const [hasFinePointer, setHasFinePointer] = useState(
     () => window.matchMedia(FINE_POINTER).matches,
   );
+
+  // Acompanha a troca de dispositivo (ex.: tablet com teclado/mouse) (R2 S-7)
+  useEffect(() => {
+    const media = window.matchMedia(FINE_POINTER);
+
+    function handleChange() {
+      setHasFinePointer(media.matches);
+    }
+
+    media.addEventListener("change", handleChange);
+    return () => media.removeEventListener("change", handleChange);
+  }, []);
 
   if (!hasFinePointer || reducedMotion) return null;
   return <CursorLayer />;

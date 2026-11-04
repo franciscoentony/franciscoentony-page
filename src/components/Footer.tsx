@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { footer, links } from "../content/ui";
 import Container from "./ui/Container";
 
-const linkClass = "transition-colors duration-200 hover:text-paper";
+const linkClass = "transition-[color] duration-200 hover:text-paper";
 
 export default function Footer() {
   return (

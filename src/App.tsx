@@ -6,6 +6,7 @@ import ScrollToHash from "./components/ScrollToHash";
 import Starfield from "./components/layers/Starfield";
 import Grain from "./components/layers/Grain";
 import { ToastProvider } from "./components/layers/Toast";
+import CustomCursor from "./components/layers/CustomCursor";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         {/* Camadas globais: estrelas atrás de tudo e grão por cima */}
         <Starfield />
         <Grain />
+        <CustomCursor />
 
         <Routes>
           <Route path="/" element={<Home />} />

@@ -101,6 +101,7 @@
   --text-level--font-weight: 900;
 
   /* Labels em mono (use junto com font-mono e um tracking-label-*) */
+  --text-label-2xs: 9px; /* texto do anel do cursor */
   --text-label-xs: 10px; /* atributos da ficha */
   --text-label-sm: 10.5px; /* raridade dos projetos */
   --text-label: 11px; /* metas, cabeçalho da ficha, dica de scroll */
@@ -112,6 +113,7 @@
   --tracking-label-md: 0.06em;
   --tracking-label-wide: 0.08em;
   --tracking-label-wider: 0.12em;
+  --tracking-label-widest: 0.14em;
 
   /* Raios */
   --radius-sm: 10px;

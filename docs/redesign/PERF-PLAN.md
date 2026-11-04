@@ -13,6 +13,8 @@
 | Overhead de agendamento | ~10 loops rAF | Cada canvas, a esfera, os contadores e o cursor têm o próprio `requestAnimationFrame`. Fora da tela, o loop **continua agendando** e só pula o desenho |
 | Re-render a cada scroll | — | `Experience.tsx` faz `setState` a cada frame de scroll em qualquer posição da página |
 
+**Confirmado pelo QA (Lighthouse mobile, f28ce72):** Performance da Home **85** (meta ≥ 90), **TBT 550ms** (produção v2: 30ms) e long tasks de até 406ms entre 2,0s e 2,9s, logo depois do LCP. Uma causa adicional: `useCanvasAnimation` começa com `isVisible = true`, então os 8 canvases desenham no 1º quadro, inclusive os que estão fora da tela. O lado bom: o peso da Home caiu de 4.768 KiB para 298 KiB, o LCP caiu de 2,3s para 1,6s no celular, e o desktop está em 99. O problema é **só CPU**, não rede.
+
 O "aparelho fraco" é o caso que mais pesa. Em Android de entrada (4 núcleos lentos, GPU fraca, 2–3 GB de RAM), os mesmos números ficam 4–6× piores.
 
 ## 2. Metas (viram critério de aceite e teste automatizado)

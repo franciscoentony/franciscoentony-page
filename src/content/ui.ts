@@ -229,6 +229,8 @@ export const blog = {
   error: "Não foi possível carregar os posts agora.",
   empty: "Nenhum post publicado ainda.",
   tagsLabel: "Tags",
+  /** Texto para leitor de tela na pill "+N" (ex.: "+2 mais tags") (D23). */
+  moreTagsLabel: "mais tags",
   // Página do post (/blog/:slug)
   loadingPost: "Carregando post...",
   notFoundEyebrow: "404",

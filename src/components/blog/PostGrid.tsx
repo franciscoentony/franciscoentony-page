@@ -10,6 +10,11 @@ interface PostGridProps {
   posts: Post[];
   headingLevel?: "h2" | "h3";
   showTags?: boolean;
+  /**
+   * Página /blog (DF-11): cards com capa e 2 colunas a partir de 640px;
+   * só com 5 posts ou mais passa a 3 colunas a partir de 860px.
+   */
+  pageLayout?: boolean;
   /** Teaser da Home: completa a 3ª posição com um card-convite (DS-14). */
   showInvite?: boolean;
 }
@@ -21,7 +26,14 @@ export default function PostGrid({
   headingLevel,
   showTags,
   showInvite = false,
+  pageLayout = false,
 }: PostGridProps) {
+  // Teaser: 1 → 2 (640px) → 3 colunas (860px). /blog com menos de 5 posts: fica em 2.
+  const columns =
+    pageLayout && posts.length < 5
+      ? "sm:grid-cols-2"
+      : "sm:grid-cols-2 tab:grid-cols-3";
+
   if (status === "loading") {
     return (
       <div role="status" className="grid gap-5 sm:grid-cols-2 tab:grid-cols-3">
@@ -50,7 +62,7 @@ export default function PostGrid({
   }
 
   return (
-    <ul className="grid gap-5 sm:grid-cols-2 tab:grid-cols-3">
+    <ul className={`grid gap-5 ${columns}`}>
       {posts.map((post, index) => (
         <li key={post.slug}>
           <Reveal delay={((index % 3) + 1) as 1 | 2 | 3} className="h-full">
@@ -58,6 +70,7 @@ export default function PostGrid({
               post={post}
               headingLevel={headingLevel}
               showTags={showTags}
+              showCover={pageLayout}
             />
           </Reveal>
         </li>

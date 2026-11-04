@@ -33,7 +33,13 @@ export default function Blog() {
             </Reveal>
           </header>
 
-          <PostGrid status={status} posts={posts} headingLevel="h2" showTags />
+          <PostGrid
+            status={status}
+            posts={posts}
+            headingLevel="h2"
+            showTags
+            pageLayout
+          />
         </Section>
       </main>
 

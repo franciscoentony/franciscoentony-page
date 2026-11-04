@@ -1,4 +1,5 @@
 import { useRef, useState, type PointerEvent, type ReactNode } from "react";
+import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { HOLO } from "../../lib/motion";
 
 interface HoloCardProps {
@@ -28,10 +29,13 @@ export default function HoloCard({
 }: HoloCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
     // Só com mouse: no toque o card fica parado
     if (event.pointerType !== "mouse" || !cardRef.current) return;
+    // Com reduced motion o card fica parado (R2 I-4)
+    if (reducedMotion) return;
 
     const card = cardRef.current;
     const rect = card.getBoundingClientRect();

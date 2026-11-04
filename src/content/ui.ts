@@ -220,11 +220,20 @@ export const experience = {
 export const blog = {
   eyebrow: "Diário de bordo",
   title: "Anotações sobre código, dados e aprendizado.",
+  /** Lead da página /blog (texto que já existia no site). */
+  lead: "Registros do que vou construindo e aprendendo — de projetos pessoais a bastidores dos sistemas que desenvolvo no IFRN.",
   allPostsLink: "Todos os posts ›",
   backLink: "‹ Voltar pro blog",
   loading: "Carregando posts...",
   error: "Não foi possível carregar os posts agora.",
   empty: "Nenhum post publicado ainda.",
+  tagsLabel: "Tags",
+  // Página do post (/blog/:slug)
+  loadingPost: "Carregando post...",
+  notFoundEyebrow: "404",
+  notFoundTitle: "Post não encontrado.",
+  notFoundText: "O link pode estar quebrado ou o post foi movido.",
+  coverAltPrefix: "Capa do post:",
   /** Meses abreviados para as datas dos cards (ex.: "06 jun 2026"). */
   monthsShort: [
     "jan",

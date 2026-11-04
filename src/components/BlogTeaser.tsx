@@ -1,41 +1,13 @@
-import { useEffect, useState } from "react";
 import { blog, sectionIds } from "../content/ui";
-import type { Post } from "../data/posts";
-import { fetchPosts } from "../lib/blog";
-import PostCard from "./blog/PostCard";
+import { usePosts } from "../hooks/usePosts";
+import PostGrid from "./blog/PostGrid";
 import Button from "./ui/Button";
 import Reveal from "./ui/Reveal";
 import Section from "./ui/Section";
 
-type Status = "loading" | "error" | "ready";
-
-/** Seção "Diário de bordo": os 3 posts mais recentes do blog. */
+/** Seção "Diário de bordo" da Home: os 3 posts mais recentes do blog. */
 export default function BlogTeaser() {
-  const [status, setStatus] = useState<Status>("loading");
-  const [posts, setPosts] = useState<Post[]>([]);
-
-  useEffect(() => {
-    // Se a seção sair da tela antes do fetch terminar, ignoramos a resposta
-    let ignore = false;
-
-    fetchPosts()
-      .then((data) => {
-        if (ignore) return;
-        // Mais recentes primeiro (datas "AAAA-MM-DD" podem ser comparadas como texto)
-        const newest = [...data].sort((a, b) => b.date.localeCompare(a.date));
-        setPosts(newest.slice(0, 3));
-        setStatus("ready");
-      })
-      .catch((error) => {
-        if (ignore) return;
-        console.error("Erro ao carregar os posts:", error);
-        setStatus("error");
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
+  const { status, posts } = usePosts();
 
   return (
     <Section id={sectionIds.blog}>
@@ -55,40 +27,7 @@ export default function BlogTeaser() {
         </Reveal>
       </div>
 
-      {status === "loading" && (
-        <div role="status" className="grid gap-5 tab:grid-cols-3">
-          <span className="sr-only">{blog.loading}</span>
-          {[0, 1, 2].map((item) => (
-            <div
-              key={item}
-              aria-hidden="true"
-              className="min-h-[250px] animate-pulse rounded-lg border border-line bg-raised"
-            />
-          ))}
-        </div>
-      )}
-
-      {status === "error" && (
-        <p role="status" className="text-secondary">
-          {blog.error}
-        </p>
-      )}
-
-      {status === "ready" && posts.length === 0 && (
-        <p className="text-secondary">{blog.empty}</p>
-      )}
-
-      {status === "ready" && posts.length > 0 && (
-        <ul className="grid gap-5 tab:grid-cols-3">
-          {posts.map((post, index) => (
-            <li key={post.slug}>
-              <Reveal delay={(index + 1) as 1 | 2 | 3} className="h-full">
-                <PostCard post={post} />
-              </Reveal>
-            </li>
-          ))}
-        </ul>
-      )}
+      <PostGrid status={status} posts={posts.slice(0, 3)} />
     </Section>
   );
 }

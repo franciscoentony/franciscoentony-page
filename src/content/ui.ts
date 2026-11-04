@@ -151,12 +151,9 @@ export const player = {
 export const skills = {
   eyebrow: "Inventário",
   title: { start: "O que eu trago ", gradient: "pra mesa." } as GradientTitle,
-  lead: [
-    {
-      text: "As ferramentas do dia a dia, independente do tamanho do projeto. ",
-    },
-    { text: "Arraste para girar.", bold: true },
-  ] as TextPart[],
+  lead: "As ferramentas do dia a dia, independente do tamanho do projeto.",
+  /** Dica em destaque no fim do lead. Some com reduced motion (a esfera fica parada). */
+  dragHint: "Arraste para girar.",
   /** Tags da esfera 3D (derivadas das descrições de src/data/skills.ts). */
   sphereTags: [
     "React",

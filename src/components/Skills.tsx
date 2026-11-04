@@ -1,12 +1,15 @@
 import { sectionIds, skills as skillsCopy } from "../content/ui";
 import { skills } from "../data/skills";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import SkillsSphere from "./skills/SkillsSphere";
 import Reveal from "./ui/Reveal";
-import { GradientText, RichText } from "./ui/RichText";
+import { GradientText } from "./ui/RichText";
 import Section from "./ui/Section";
 
 /** Seção "Inventário" (Habilidades): esfera 3D de tags + 4 colunas de skills.ts. */
 export default function Skills() {
+  const reducedMotion = usePrefersReducedMotion();
+
   return (
     <Section id={sectionIds.skills}>
       <div className="mx-auto max-w-[720px] text-center">
@@ -20,7 +23,11 @@ export default function Skills() {
         </Reveal>
         <Reveal delay={2}>
           <p className="text-lead text-secondary">
-            <RichText parts={skillsCopy.lead} />
+            {skillsCopy.lead}
+            {/* Com reduced motion a esfera não gira, então a dica sai */}
+            {!reducedMotion && (
+              <b className="font-medium text-paper"> {skillsCopy.dragHint}</b>
+            )}
           </p>
         </Reveal>
       </div>

@@ -5,11 +5,40 @@ function getBase(): string {
   return import.meta.env.BASE_URL.replace(/\/$/, "");
 }
 
-/** Busca o índice de posts gerado pelo Hugo. */
-export async function fetchPosts(): Promise<Post[]> {
-  const res = await fetch(`${getBase()}/blog-data/index.json`);
-  if (!res.ok) throw new Error(`Falha ao carregar posts (${res.status})`);
-  return res.json();
+/*
+ * Cache dos posts: o index.json é buscado UMA vez por visita.
+ * - postsPromise: evita dois fetch ao mesmo tempo (Home e /blog, por exemplo).
+ * - postsCache: os dados já carregados, para as páginas renderizarem na hora
+ *   (sem "Carregando...") ao voltar para /blog. Assim o navegador consegue
+ *   restaurar a rolagem inteira no botão Voltar (R2, I-2).
+ */
+let postsPromise: Promise<Post[]> | null = null;
+let postsCache: Post[] | null = null;
+
+/** Busca o índice de posts gerado pelo Hugo (com cache). */
+export function fetchPosts(): Promise<Post[]> {
+  if (!postsPromise) {
+    postsPromise = fetch(`${getBase()}/blog-data/index.json`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Falha ao carregar posts (${res.status})`);
+        return res.json() as Promise<Post[]>;
+      })
+      .then((posts) => {
+        postsCache = posts;
+        return posts;
+      })
+      .catch((error) => {
+        // Se falhar, limpa o cache para a próxima tentativa buscar de novo
+        postsPromise = null;
+        throw error;
+      });
+  }
+  return postsPromise;
+}
+
+/** Posts já carregados nesta visita, ou null se ainda não foram buscados. */
+export function getCachedPosts(): Post[] | null {
+  return postsCache;
 }
 
 /** Busca um post específico pelo slug. */

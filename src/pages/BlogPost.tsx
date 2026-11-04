@@ -5,7 +5,12 @@ import Navbar from "../components/Navbar";
 import Button from "../components/ui/Button";
 import { blog } from "../content/ui";
 import type { Post } from "../data/posts";
-import { fetchPosts, resolveAssetPath, resolveContentHtml } from "../lib/blog";
+import {
+  fetchPosts,
+  getCachedPosts,
+  resolveAssetPath,
+  resolveContentHtml,
+} from "../lib/blog";
 import { formatShortDate } from "../lib/date";
 import { decodeHtmlEntities } from "../lib/text";
 
@@ -24,9 +29,15 @@ function BackLink() {
 /** Página de um post: /blog/:slug */
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
-  const [post, setPost] = useState<Post | null>(null);
+  // Se os posts já estão em cache, a página começa pronta (sem "Carregando...")
+  const cached = getCachedPosts();
+  const [post, setPost] = useState<Post | null>(
+    cached?.find((p) => p.slug === slug) ?? null,
+  );
   // Guarda de qual slug é o post carregado. Enquanto não for o slug atual, está carregando.
-  const [loadedSlug, setLoadedSlug] = useState<string | undefined>(undefined);
+  const [loadedSlug, setLoadedSlug] = useState<string | undefined>(
+    cached ? slug : undefined,
+  );
   const loading = loadedSlug !== slug;
 
   useEffect(() => {

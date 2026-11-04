@@ -181,6 +181,8 @@ export const projects = {
   mainMissionCount: 2,
   rarityMain: "★ MISSÃO PRINCIPAL",
   raritySide: "◇ MISSÃO SECUNDÁRIA",
+  carouselLabel: "Projetos (use as setas para navegar)",
+  dotLabel: "Ir para o projeto",
 };
 
 // ---------- Experiência / Campanha ----------
@@ -206,6 +208,11 @@ export const blog = {
   title: "Anotações sobre código, dados e aprendizado.",
   allPostsLink: "Todos os posts ›",
   backLink: "‹ Voltar pro blog",
+  loading: "Carregando posts...",
+  error: "Não foi possível carregar os posts agora.",
+  empty: "Nenhum post publicado ainda.",
+  /** Meses abreviados para as datas dos cards (ex.: "06 jun 2026"). */
+  monthsShort: ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
 };
 
 // ---------- Contato ----------
@@ -215,7 +222,15 @@ export const contact = {
   title: { start: "Bora trocar ", gradient: "uma ideia?" } as GradientTitle,
   lead: "Seja pra falar de projetos, oportunidades ou só sobre tecnologia.",
   githubLink: "GitHub ›",
+  linkedinLink: "LinkedIn ›",
   copyEmailLabel: "Copiar e-mail",
+};
+
+// ---------- Cursor custom ----------
+
+export const cursor = {
+  holo: "INSPECIONAR",
+  drag: "ARRASTE",
 };
 
 // ---------- Toast ----------

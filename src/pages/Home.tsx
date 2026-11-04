@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar";
-import Hero from "../components/Hero";
+import Universe from "../components/universe/Universe";
 import About from "../components/About";
 import Skills from "../components/Skills";
 import Projects from "../components/Projects";
@@ -11,12 +11,14 @@ export default function Home() {
   return (
     <div id="top">
       <Navbar />
-      <Hero />
-      <About />
-      <Skills />
-      <Projects />
-      <Experience />
-      <Contact />
+      <main>
+        <Universe />
+        <About />
+        <Skills />
+        <Projects />
+        <Experience />
+        <Contact />
+      </main>
       <Footer />
     </div>
   );

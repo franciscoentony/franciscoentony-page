@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useCanvasAnimation, type CanvasFrame } from "../../hooks/useCanvasAnimation";
 import { usePointer } from "../../hooks/usePointer";
-import { STARS } from "../../lib/motion";
+import { STARS, warpState } from "../../lib/motion";
 
 interface Star {
   x: number;
@@ -33,8 +33,8 @@ function createStars(width: number, height: number): Star[] {
 
 /**
  * Fundo de estrelas com parallax (HANDOFF §4, "Fundo de estrelas").
- * Canvas fixo atrás de todo o conteúdo. O efeito "velocidade da luz" (warp)
- * entra na fase 3, junto com a seção Universe.
+ * Canvas fixo atrás de todo o conteúdo. No fim da seção Universe as estrelas
+ * viram linhas saindo do centro (efeito "velocidade da luz", warpState).
  */
 export default function Starfield() {
   const pointer = usePointer();
@@ -52,6 +52,7 @@ export default function Starfield() {
 
     const totalHeight = height * STARS.wrapScreens;
     const scrollY = window.scrollY;
+    const warp = isStatic ? 0 : warpState.value;
 
     for (const star of stars.current) {
       // Parallax vertical com "volta" (wrap) a cada 3 alturas de tela
@@ -65,6 +66,18 @@ export default function Starfield() {
       const twinkle = isStatic ? 1 : 0.7 + 0.3 * Math.sin(time * 0.002 + star.phase);
       const alpha = (0.35 + 0.6 * star.z) * twinkle;
       const size = STARS.sizeBase + star.z * STARS.sizeDepth;
+
+      // Velocidade da luz: cada estrela vira uma linha saindo do centro da tela
+      if (warp > 0.01) {
+        const length = warp * star.z * 0.6;
+        ctx.strokeStyle = `rgba(${STARS.color}, ${alpha})`;
+        ctx.lineWidth = 0.6 + star.z * 1.8;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + (x - width / 2) * length, y + (y - height / 2) * length);
+        ctx.stroke();
+        continue;
+      }
 
       // Halo lavanda nas estrelas mais próximas
       if (star.z > STARS.haloDepth) {

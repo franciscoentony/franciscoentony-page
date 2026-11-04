@@ -21,6 +21,15 @@
   --color-accent: #8b6cff; /* violeta */
   --color-accent-soft: #c9bcff; /* lavanda: links */
   --color-gold: #ffd25e; /* dourado: logo, checkpoints, raridade */
+  --color-void: #050508; /* fundo da moldura da foto */
+  --color-holo-from: #16131f; /* gradiente dos cards holográficos */
+  --color-holo-to: #0b0a10;
+  --color-checkpoint: #1b1b1f; /* checkpoint apagado da timeline */
+  --color-cursor-fill: rgba(10, 8, 20, 0.25); /* fundo do anel do cursor (modo holo) */
+
+  /* Sombras de texto */
+  --text-shadow-chapter: 0 0 40px #000000, 0 0 80px #000000;
+  --text-shadow-glow-gold: 0 0 18px rgba(255, 210, 94, 0.6);
 
   /* Fontes */
   --font-display: "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
@@ -60,6 +69,8 @@
   /* Sombras */
   --shadow-ring-soft: 0 0 0 6px rgba(255, 255, 255, 0.08); /* hover do botão primário */
   --shadow-glow-gold: 0 0 12px var(--color-gold);
+  --shadow-glow-gold-lg: 0 0 16px var(--color-gold); /* checkpoint ativo */
+  --shadow-cursor-dot: 0 0 10px var(--color-gold), 0 0 22px rgba(255, 210, 94, 0.5);
   --shadow-card: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
   --shadow-card-active: 0 40px 120px -30px rgba(139, 108, 255, 0.45);
 
@@ -76,6 +87,25 @@
 
   /* Animações */
   --animate-grain: grain 1.2s steps(4) infinite;
+  --animate-drip: drip 2s var(--ease-smooth) infinite;
+
+  @keyframes drip {
+    0% {
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+    50% {
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+    51% {
+      transform-origin: bottom;
+    }
+    100% {
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+  }
 
   @keyframes grain {
     25% {
@@ -101,6 +131,122 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Esconde a barra de rolagem (carrossel de projetos) */
+@utility scrollbar-hidden {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------- Card holográfico (ficha e projetos), HANDOFF §4 ----------
+ * O componente HoloCard atualiza as variáveis --mx, --my, --rx, --ry e --o
+ * conforme o mouse. Estas classes só leem essas variáveis.
+ */
+@utility holo-tilt {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+}
+
+@utility holo-foil {
+  mix-blend-mode: color-dodge;
+  opacity: calc(0.12 + var(--o, 0) * 0.5);
+  background: repeating-linear-gradient(
+    115deg,
+    #ff7ad9 0%,
+    #ffd25e 6%,
+    #7dffcf 12%,
+    #6ec3ff 18%,
+    #b38bff 24%,
+    #ff7ad9 30%
+  );
+  background-size: 300% 300%;
+  background-position: var(--mx, 50%) var(--my, 50%);
+  filter: saturate(1.3) brightness(0.75);
+  mask: radial-gradient(
+    farthest-corner circle at var(--mx, 50%) var(--my, 50%),
+    #000 0%,
+    rgba(0, 0, 0, 0.35) 45%,
+    rgba(0, 0, 0, 0.15) 100%
+  );
+  transition: opacity 0.4s;
+}
+
+@utility holo-lines {
+  mix-blend-mode: overlay;
+  opacity: calc(0.05 + var(--o, 0) * 0.18);
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.5) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+@utility holo-glare {
+  mix-blend-mode: overlay;
+  opacity: var(--o, 0);
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0) 45%
+  );
+  transition: opacity 0.4s;
+}
+
+/* Lente na foto da ficha: um furo de 74px na posição do mouse (--px, --py) */
+@utility portrait-lens {
+  mask: radial-gradient(
+    circle 74px at var(--px, 50%) var(--py, 50%),
+    transparent 96%,
+    #000 100%
+  );
+}
+
+/* ---------- Cursor custom, HANDOFF §4 ---------- */
+
+/* Borda iridescente girando (anel do cursor nos modos holo e arrastar) */
+@property --cursor-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes cursor-spin {
+  to {
+    --cursor-angle: 360deg;
+  }
+}
+
+@utility cursor-ring-iridescent {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--cursor-angle),
+      #ff7ad9,
+      #ffd25e,
+      #7dffcf,
+      #6ec3ff,
+      #b38bff,
+      #ff7ad9
+    );
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: cursor-spin 3s linear infinite;
+  }
+}
+
+/* Quando o cursor custom está ativo, o cursor do sistema some */
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
 }
 
 /*

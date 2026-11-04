@@ -83,6 +83,7 @@
   --text-title-xs--font-weight: 600;
 
   /* Textos menores */
+  --text-body-sm: 15px; /* descrição das fases */
   --text-small: 13px; /* legendas, toast, classe da ficha */
   --text-small--line-height: 1.4;
   --text-menu: 12.5px; /* links da navbar */

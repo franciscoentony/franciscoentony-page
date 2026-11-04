@@ -193,7 +193,6 @@ export const projects = {
   rarityMain: "★ MISSÃO PRINCIPAL",
   raritySide: "◇ MISSÃO SECUNDÁRIA",
   carouselLabel: "Projetos (use as setas para navegar)",
-  dotLabel: "Ir para o projeto",
 };
 
 // ---------- Experiência / Campanha ----------
@@ -223,6 +222,8 @@ export const blog = {
   /** Lead da página /blog (texto que já existia no site). */
   lead: "Registros do que vou construindo e aprendendo — de projetos pessoais a bastidores dos sistemas que desenvolvo no IFRN.",
   allPostsLink: "Todos os posts ›",
+  /** Card-convite do teaser quando há menos de 3 posts (DS-14). */
+  inviteTitle: "Mais registros no diário",
   backLink: "‹ Voltar pro blog",
   loading: "Carregando posts...",
   error: "Não foi possível carregar os posts agora.",

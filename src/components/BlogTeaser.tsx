@@ -27,7 +27,7 @@ export default function BlogTeaser() {
         </Reveal>
       </div>
 
-      <PostGrid status={status} posts={posts.slice(0, 3)} />
+      <PostGrid status={status} posts={posts.slice(0, 3)} showInvite />
     </Section>
   );
 }

@@ -29,6 +29,8 @@ export const links = {
   email: "franciscoentonydev@gmail.com",
   github: "https://github.com/franciscoentony",
   linkedin: "https://www.linkedin.com/in/franciscoentony", // confirmado pelo Entony (D11)
+  /** Texto só para leitor de tela em links que abrem em nova aba. */
+  newTabLabel: "(abre em nova aba)",
 };
 
 /** Ids das seções da Home (usados pela navbar e pelos links "#..."). */

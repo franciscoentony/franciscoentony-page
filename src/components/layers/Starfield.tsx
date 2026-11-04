@@ -1,7 +1,10 @@
 import { useRef } from "react";
-import { useCanvasAnimation, type CanvasFrame } from "../../hooks/useCanvasAnimation";
+import {
+  useCanvasAnimation,
+  type CanvasFrame,
+} from "../../hooks/useCanvasAnimation";
 import { usePointer } from "../../hooks/usePointer";
-import { STARS, warpState } from "../../lib/motion";
+import { ASCII_FRAME_INTERVAL, STARS, warpState } from "../../lib/motion";
 
 interface Star {
   x: number;
@@ -43,7 +46,10 @@ export default function Starfield() {
 
   function draw({ ctx, width, height, time, isStatic }: CanvasFrame) {
     // Recria as estrelas quando o tamanho da tela muda
-    if (width !== lastSize.current.width || height !== lastSize.current.height) {
+    if (
+      width !== lastSize.current.width ||
+      height !== lastSize.current.height
+    ) {
       stars.current = createStars(width, height);
       lastSize.current = { width, height };
     }
@@ -57,13 +63,16 @@ export default function Starfield() {
     for (const star of stars.current) {
       // Parallax vertical com "volta" (wrap) a cada 3 alturas de tela
       const shiftedY = star.y - scrollY * star.z * STARS.parallax;
-      const y = (((shiftedY % totalHeight) + totalHeight) % totalHeight) - height;
+      const y =
+        (((shiftedY % totalHeight) + totalHeight) % totalHeight) - height;
       if (y < -10 || y > height + 10) continue;
 
       const x = star.x + pointer.current.nx * STARS.mouseShift * star.z;
 
       // Cintilação (desligada com reduced motion)
-      const twinkle = isStatic ? 1 : 0.7 + 0.3 * Math.sin(time * 0.002 + star.phase);
+      const twinkle = isStatic
+        ? 1
+        : 0.7 + 0.3 * Math.sin(time * 0.002 + star.phase);
       const alpha = (0.35 + 0.6 * star.z) * twinkle;
       const size = STARS.sizeBase + star.z * STARS.sizeDepth;
 
@@ -99,7 +108,10 @@ export default function Starfield() {
     }
   }
 
-  const canvasRef = useCanvasAnimation(draw);
+  // ~30fps, como os outros canvases (D9 / R1 item 9)
+  const canvasRef = useCanvasAnimation(draw, {
+    frameInterval: ASCII_FRAME_INTERVAL,
+  });
 
   return (
     <canvas

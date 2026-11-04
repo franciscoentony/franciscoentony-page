@@ -39,14 +39,20 @@ function HeroCopy() {
   );
 }
 
-function ChapterCopy({ index, alignSide }: { index: number; alignSide: boolean }) {
+function ChapterCopy({
+  index,
+  alignSide,
+}: {
+  index: number;
+  alignSide: boolean;
+}) {
   const chapter = chapters[index];
   // Capítulos 1 e 2 ficam alinhados à esquerda no desktop (alignSide)
   const margin = alignSide ? "mx-auto tab:mx-0" : "mx-auto";
 
   return (
     <>
-      <p className="mb-4.5 font-dot text-[15px] font-extrabold tracking-[0.2em] text-accent-soft">
+      <p className="mb-4.5 font-dot text-chapter text-accent-soft">
         {chapter.number}
       </p>
       <h2 className={`max-w-[16ch] text-h2 ${margin}`}>{chapter.title}</h2>
@@ -60,7 +66,11 @@ function ChapterCopy({ index, alignSide }: { index: number; alignSide: boolean }
 // ---------- Versão animada ----------
 
 /** Opacidade de um capítulo: entra com fade, fica visível e sai com fade. */
-function getChapterOpacity(progress: number, start: number, end: number): number {
+function getChapterOpacity(
+  progress: number,
+  start: number,
+  end: number,
+): number {
   const fade = UNIVERSE.chapterFade;
   const fadeIn = clamp((progress - start) / fade);
   const fadeOut = 1 - clamp((progress - (end - fade)) / fade);
@@ -118,7 +128,7 @@ function UniverseAnimated() {
         {/* Dica "Role para explorar" */}
         <div
           aria-hidden="true"
-          className="absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5 font-mono text-[11px] tracking-[0.08em] text-secondary uppercase"
+          className="absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5 font-mono text-label tracking-label-wide text-secondary uppercase"
           style={{ opacity: hintOpacity }}
         >
           {hero.scrollHint}

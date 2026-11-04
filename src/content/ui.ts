@@ -9,6 +9,8 @@
  * Status: AGUARDANDO APROVAÇÃO DO ENTONY (o merge na main depende disso).
  */
 
+import { projects as projectList } from "../data/projects";
+
 /** Um pedaço de texto. Com bold: true aparece em destaque (cor paper, peso 500). */
 export interface TextPart {
   text: string;
@@ -114,9 +116,17 @@ export const player = {
   } as GradientTitle,
   lead: "Sou o Entony. Ajudo a conectar pessoas e organizações através de software bem construído, do front ao back-end. Curso Análise e Desenvolvimento de Sistemas no IFRN e ministro minicursos para jovens que querem entrar na área.",
   stats: [
-    { value: 19, suffix: "", label: "anos de idade, 11 deles programando no imaginário" },
+    {
+      value: 19,
+      suffix: "",
+      label: "anos de idade, 11 deles programando no imaginário",
+    },
     { value: 30, suffix: "+", label: "alunos orientados em Java e Python" },
-    { value: 4, suffix: "", label: "missões publicadas no GitHub" },
+    {
+      value: projectList.length,
+      suffix: "",
+      label: "missões publicadas no GitHub",
+    },
   ],
   card: {
     header: "FICHA · LV.",
@@ -140,7 +150,9 @@ export const skills = {
   eyebrow: "Inventário",
   title: { start: "O que eu trago ", gradient: "pra mesa." } as GradientTitle,
   lead: [
-    { text: "As ferramentas do dia a dia, independente do tamanho do projeto. " },
+    {
+      text: "As ferramentas do dia a dia, independente do tamanho do projeto. ",
+    },
     { text: "Arraste para girar.", bold: true },
   ] as TextPart[],
   /** Tags da esfera 3D (derivadas das descrições de src/data/skills.ts). */
@@ -189,7 +201,10 @@ export const projects = {
 
 export const experience = {
   eyebrow: "Campanha",
-  title: { start: "Onde já botei a mão ", gradient: "no código." } as GradientTitle,
+  title: {
+    start: "Onde já botei a mão ",
+    gradient: "no código.",
+  } as GradientTitle,
   lead: [
     { text: "Cada fase desbloqueou uma habilidade nova. " },
     { text: "A próxima pode ser com você.", bold: true },
@@ -212,7 +227,20 @@ export const blog = {
   error: "Não foi possível carregar os posts agora.",
   empty: "Nenhum post publicado ainda.",
   /** Meses abreviados para as datas dos cards (ex.: "06 jun 2026"). */
-  monthsShort: ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
+  monthsShort: [
+    "jan",
+    "fev",
+    "mar",
+    "abr",
+    "mai",
+    "jun",
+    "jul",
+    "ago",
+    "set",
+    "out",
+    "nov",
+    "dez",
+  ],
 };
 
 // ---------- Contato ----------

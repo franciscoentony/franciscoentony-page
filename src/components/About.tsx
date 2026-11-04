@@ -18,7 +18,7 @@ export default function About() {
           <p className="text-eyebrow text-secondary">{player.eyebrow}</p>
         </Reveal>
         <Reveal delay={1}>
-          <h2 className="mt-3 mb-5.5 text-h2">
+          <h2 className="mt-3 mb-gutter text-h2">
             <GradientText title={player.title} />
           </h2>
         </Reveal>
@@ -32,9 +32,9 @@ export default function About() {
               <Counter
                 value={stat.value}
                 suffix={stat.suffix}
-                className="block font-dot text-[clamp(40px,4.4vw,56px)] leading-none font-black tracking-[-0.02em] text-gradient"
+                className="block font-dot text-stat text-gradient"
               />
-              <p className="mt-2.5 text-[13px] leading-[1.4] text-secondary">{stat.label}</p>
+              <p className="mt-2.5 text-small text-secondary">{stat.label}</p>
             </Reveal>
           ))}
         </div>

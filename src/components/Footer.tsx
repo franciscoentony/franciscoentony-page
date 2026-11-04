@@ -6,19 +6,29 @@ const linkClass = "transition-colors duration-200 hover:text-paper";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-line pt-5.5 pb-10 text-xs text-secondary">
+    <footer className="border-t border-line pt-gutter pb-10 text-xs text-secondary">
       <Container className="flex flex-wrap justify-between gap-4">
         <p>{footer.copyright}</p>
 
         <nav aria-label="Rodapé">
-          <ul className="flex flex-wrap gap-5.5">
+          <ul className="flex flex-wrap gap-gutter">
             <li>
-              <a href={links.github} target="_blank" rel="noopener noreferrer" className={linkClass}>
+              <a
+                href={links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClass}
+              >
                 {footer.github}
               </a>
             </li>
             <li>
-              <a href={links.linkedin} target="_blank" rel="noopener noreferrer" className={linkClass}>
+              <a
+                href={links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClass}
+              >
                 {footer.linkedin}
               </a>
             </li>

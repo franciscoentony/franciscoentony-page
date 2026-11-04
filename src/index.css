@@ -25,15 +25,22 @@
   --color-holo-from: #16131f; /* gradiente dos cards holográficos */
   --color-holo-to: #0b0a10;
   --color-checkpoint: #1b1b1f; /* checkpoint apagado da timeline */
-  --color-cursor-fill: rgba(10, 8, 20, 0.25); /* fundo do anel do cursor (modo holo) */
+  --color-cursor-fill: rgba(
+    10,
+    8,
+    20,
+    0.25
+  ); /* fundo do anel do cursor (modo holo) */
 
   /* Sombras de texto */
   --text-shadow-chapter: 0 0 40px #000000, 0 0 80px #000000;
   --text-shadow-glow-gold: 0 0 18px rgba(255, 210, 94, 0.6);
 
   /* Fontes */
-  --font-display: "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  --font-display:
+    "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  --font-sans:
+    "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
   --font-dot: "Doto", "Geist Mono", monospace;
 
@@ -60,6 +67,51 @@
   --text-eyebrow--letter-spacing: -0.01em;
   --text-eyebrow--font-weight: 500;
 
+  /* Títulos de cards e fases (h3/h4) */
+  --text-title-lg: 24px; /* fase da experiência, nome na ficha */
+  --text-title-lg--letter-spacing: -0.03em;
+  --text-title-lg--font-weight: 600;
+  --text-title: 22px; /* card de projeto */
+  --text-title--letter-spacing: -0.03em;
+  --text-title--font-weight: 600;
+  --text-title-sm: 20px; /* card de post */
+  --text-title-sm--line-height: 1.2;
+  --text-title-sm--letter-spacing: -0.025em;
+  --text-title-sm--font-weight: 600;
+  --text-title-xs: 17px; /* colunas de skills */
+  --text-title-xs--letter-spacing: -0.02em;
+  --text-title-xs--font-weight: 600;
+
+  /* Textos menores */
+  --text-small: 13px; /* legendas, toast, classe da ficha */
+  --text-small--line-height: 1.4;
+  --text-menu: 12.5px; /* links da navbar */
+  --text-tag: 15px; /* tags da esfera */
+
+  /* Números em Doto (use junto com font-dot) */
+  --text-stat: clamp(40px, 4.4vw, 56px); /* números dos stats */
+  --text-stat--line-height: 1;
+  --text-stat--letter-spacing: -0.02em;
+  --text-stat--font-weight: 900;
+  --text-chapter: 15px; /* "01 — ORIGEM" */
+  --text-chapter--letter-spacing: 0.2em;
+  --text-chapter--font-weight: 800;
+  --text-level: 22px; /* "19" da ficha */
+  --text-level--font-weight: 900;
+
+  /* Labels em mono (use junto com font-mono e um tracking-label-*) */
+  --text-label-xs: 10px; /* atributos da ficha */
+  --text-label-sm: 10.5px; /* raridade dos projetos */
+  --text-label: 11px; /* metas, cabeçalho da ficha, dica de scroll */
+  --text-label-lg: 12px; /* datas da timeline */
+
+  /* Tracking (espaçamento entre letras) */
+  --tracking-mono: 0.02em; /* logo, tags */
+  --tracking-label: 0.04em;
+  --tracking-label-md: 0.06em;
+  --tracking-label-wide: 0.08em;
+  --tracking-label-wider: 0.12em;
+
   /* Raios */
   --radius-sm: 10px;
   --radius-portrait: 14px; /* moldura da foto */
@@ -70,13 +122,15 @@
   --shadow-ring-soft: 0 0 0 6px rgba(255, 255, 255, 0.08); /* hover do botão primário */
   --shadow-glow-gold: 0 0 12px var(--color-gold);
   --shadow-glow-gold-lg: 0 0 16px var(--color-gold); /* checkpoint ativo */
-  --shadow-cursor-dot: 0 0 10px var(--color-gold), 0 0 22px rgba(255, 210, 94, 0.5);
+  --shadow-cursor-dot:
+    0 0 10px var(--color-gold), 0 0 22px rgba(255, 210, 94, 0.5);
   --shadow-card: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
   --shadow-card-active: 0 40px 120px -30px rgba(139, 108, 255, 0.45);
 
   /* Espaçamentos */
   --spacing-section: clamp(110px, 16vh, 180px); /* py-section */
   --spacing-nav: 48px; /* h-nav */
+  --spacing-gutter: 22px; /* padding dos cards, gap do carrossel e do footer */
 
   /* Movimento */
   --ease-smooth: cubic-bezier(0.2, 0.7, 0.2, 1); /* o "--ease" do HANDOFF */
@@ -257,6 +311,8 @@ html {
   background-color: var(--color-ink);
   color: var(--color-paper);
   scroll-behavior: smooth;
+  /* Âncoras (#sobre, #projetos...) não ficam escondidas atrás da navbar fixa */
+  scroll-padding-top: var(--spacing-nav);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }

@@ -45,15 +45,18 @@ export default function Navbar() {
           to="/#top"
           onClick={closeMenu}
           aria-label={navbar.logoLabel}
-          className="flex items-center gap-2 font-mono text-[13px] font-medium tracking-[0.02em]"
+          className="flex items-center gap-2 font-mono text-small font-medium tracking-mono"
         >
-          <span aria-hidden="true" className="size-2 bg-gold shadow-glow-gold" />
+          <span
+            aria-hidden="true"
+            className="size-2 bg-gold shadow-glow-gold"
+          />
           {navbar.logo}
         </Link>
 
         {/* Links (desktop, a partir de 860px) */}
         <nav aria-label="Principal" className="hidden tab:block">
-          <ul className="flex gap-8 text-[12.5px] text-nav">
+          <ul className="flex gap-8 text-menu text-nav">
             {navbar.links.map((link) => (
               <li key={link.label}>
                 <Link
@@ -97,7 +100,10 @@ export default function Navbar() {
           <Container>
             <ul className="flex flex-col py-3">
               {navbar.links.map((link) => (
-                <li key={link.label} className="border-b border-line last:border-b-0">
+                <li
+                  key={link.label}
+                  className="border-b border-line last:border-b-0"
+                >
                   <Link
                     to={link.to}
                     onClick={closeMenu}

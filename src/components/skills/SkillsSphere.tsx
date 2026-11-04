@@ -146,7 +146,7 @@ export default function SkillsSphere() {
           ref={(element) => {
             tagRefs.current[index] = element;
           }}
-          className="absolute top-1/2 left-1/2 font-mono text-[15px] font-medium tracking-[0.02em] whitespace-nowrap transition-[color,text-shadow] duration-200 will-change-transform hover:text-gold! hover:text-shadow-glow-gold"
+          className="absolute top-1/2 left-1/2 font-mono text-tag font-medium tracking-mono whitespace-nowrap transition-[color,text-shadow] duration-200 will-change-transform hover:text-gold! hover:text-shadow-glow-gold"
         >
           {tag}
         </span>

@@ -32,9 +32,7 @@ export default function Skills() {
       <div className="mt-14 grid grid-cols-2 gap-8 tab:grid-cols-4">
         {skills.map((skill, index) => (
           <Reveal key={skill.title} delay={(index + 1) as 1 | 2 | 3 | 4}>
-            <h3 className="mb-2 text-[17px] font-semibold tracking-[-0.02em]">
-              {skill.title}
-            </h3>
+            <h3 className="mb-2 text-title-xs">{skill.title}</h3>
             <p className="text-sm leading-normal text-secondary">
               {skill.description}
             </p>

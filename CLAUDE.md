@@ -93,7 +93,9 @@ Ordem de implementação: **tokens → componentes base (Navbar, Footer, botões
 - **D9. Performance:** canvases pausados fora da viewport (IntersectionObserver), DPR limitado a 2, inicialização depois do primeiro paint e preload das fontes.
 - **D10. Commits:** pequenos e por etapa, na branch `redesign`, no padrão `tipo(escopo): descrição` em pt-BR.
 
-**Pendências com o Entony:** aprovar a copy (D3), confirmar os valores dos atributos e informar a URL do LinkedIn.
+- **D11. Decisões confirmadas pelo Entony em 04/11/2026:** o LinkedIn é `https://www.linkedin.com/in/franciscoentony` (usado no Footer e no Contato) e os atributos da ficha ficam como no protótipo (92/88/74/99).
+
+**Pendência com o Entony:** aprovar o restante da copy nova (D3).
 
 ### Critérios de aceite (Definition of Done)
 

@@ -125,7 +125,7 @@ A ordem atual é Navbar → Hero → About → Skills → Projects → Experienc
 6. **Experiência / Campanha** (`Experience.tsx`). **Muda:** 2 colunas, com o título sticky à esquerda e a timeline à direita (linha de 1px que se preenche com o scroll e checkpoints quadrados que acendem). Entra uma 4ª fase fixa, "Próxima fase · Bloqueada · Press start ›", como copy de UI. Textos de `experience.ts`, com as datas em caixa alta via CSS.
 7. **Blog teaser** (NOVO na Home): eyebrow "Diário de bordo", h2 e "Todos os posts ›" para `/blog`, mais os **3 posts mais recentes** de `/blog-data/index.json` (via `src/lib/blog.ts`). Os títulos do protótipo são fictícios.
 8. **Contato** (`Contact.tsx`). **Muda:** 100vh com campo ASCII em canvas que reage ao cursor, eyebrow "Continue?", h1 "Bora trocar uma ideia?", botão primário com o e-mail (copia para a área de transferência e mostra o toast "+1 E-mail copiado para o inventário") e "GitHub ›".
-9. **Footer** (`Footer.tsx`). **Muda:** minimalista, com borda superior: "© 2026 Francisco Entony" à esquerda; GitHub · LinkedIn · Blog · Topo ↑ à direita. **O link do LinkedIn ainda não foi informado.**
+9. **Footer** (`Footer.tsx`). **Muda:** minimalista, com borda superior: "© 2026 Francisco Entony" à esquerda; GitHub · LinkedIn · Blog · Topo ↑ à direita. LinkedIn: https://www.linkedin.com/in/franciscoentony (confirmado pelo Entony em 04/11/2026).
 
 Globais da Home: canvas de estrelas fixo atrás de tudo, grain, cursor custom e toast.
 

@@ -6,7 +6,17 @@ Guia para agentes (Claude Code e afins) que trabalham neste repositório.
 
 Site pessoal, portfólio e blog de Francisco Entony, publicado em **https://franciscoentony.com**.
 
-**Projeto em andamento: redesign do layout.** O designer entregou o novo layout no Figma, e a implementação acontece na branch `redesign`. O objetivo é trocar a camada visual sem perder conteúdo, rotas nem o pipeline de deploy.
+**Projeto em andamento: redesign do layout (v3).** O designer entregou o novo layout no Figma, e a implementação acontece na branch `redesign`. O objetivo é trocar a camada visual sem perder conteúdo, rotas nem o pipeline de deploy.
+
+### Fontes da verdade do design
+
+1. **`docs/redesign/HANDOFF.md`**: tokens, seções, estados, especificação das animações e diretrizes para Blog e Post. **Leia inteiro antes de começar.**
+2. **`docs/redesign/prototype/index.html`**: protótipo v3 aprovado, em HTML, CSS e JS vanilla. Os valores do handoff saíram dele.
+   - Para rodar: `cd docs/redesign/prototype && cp ~/Documents/franciscoentony-v3/foto.jpg . && python3 -m http.server 8765`
+   - Não faça commit dessa `foto.jpg`.
+3. **Figma** `IVBfkehugwHDKOfGi92OJa`: página v3 `18:868` e Code Layer final `29:3`. As páginas v1 e v2 estão **superadas, não usar**.
+
+Em caso de conflito: o `src/data/` manda no conteúdo, e o HANDOFF manda no visual. Se o HANDOFF e o protótipo divergirem, vale o HANDOFF (por exemplo, em reduced-motion e foco).
 
 ## Stack
 
@@ -70,9 +80,24 @@ public/blog-data/  Saída do Hugo (versionada; consumida em runtime)
 
 Ordem de implementação: **tokens → componentes base (Navbar, Footer, botões, cards) → seções da Home → Blog e BlogPost.**
 
+### Decisões técnicas (Tech Lead, 04/11/2026)
+
+- **D1. Breakpoints:** a fidelidade estrita vale em 1280 e 1440px. Em 375 e 768px não há frame: o Front-End adapta a partir do breakpoint de 860px do protótipo e das diretrizes do HANDOFF, e a validação é do QA mais o designer, sobre o preview. Crie o token `--breakpoint-tab: 860px`.
+- **D2. Raridade dos projetos:** derivada pelo índice (os 2 primeiros de `projects.ts` são "★ MISSÃO PRINCIPAL", os demais "◇ MISSÃO SECUNDÁRIA"). Não crie campo novo em `src/data`. Siga a ordem de `projects.ts`.
+- **D3. Copy nova de interface** (headline, capítulos, títulos de seção, atributos 92/88/74/99, toast, "Próxima fase"): fica centralizada em **`src/content/ui.ts`**, para facilitar a aprovação do Entony. O merge na `main` depende desse OK.
+- **D4. Sem novas dependências** de animação (framer-motion, GSAP, three.js etc.). Porte o protótipo para hooks próprios (`useScrollProgress`, `useAsciiCanvas`, `useInView`), com as constantes em `src/lib/motion.ts`. Qualquer outra dependência precisa de aprovação do Tech Lead.
+- **D5. Remover `styled-components`** do código e do `package.json`, junto com o Font Awesome se ficar sem uso.
+- **D6. Foto:** use a versão otimizada (`~/Documents/franciscoentony-v3/foto.jpg`) em `public/home/foto-entony.jpg`, mais uma versão WebP de cerca de 760px. **Nunca** faça commit do original `~/Downloads/foto_site.JPG` (4.9 MB, com EXIF).
+- **D7. Imagens antigas** (`public/home/*.png`, `avatar.JPG`, `EU-PNG.png`): ficam até a revisão final e saem num commit de limpeza separado, depois de conferir que nada as referencia.
+- **D8. Reduced motion e foco:** siga o HANDOFF, não o protótipo. Os canvases ficam estáticos e o `:focus-visible` usa outline lavanda de 2px com offset de 3px.
+- **D9. Performance:** canvases pausados fora da viewport (IntersectionObserver), DPR limitado a 2, inicialização depois do primeiro paint e preload das fontes.
+- **D10. Commits:** pequenos e por etapa, na branch `redesign`, no padrão `tipo(escopo): descrição` em pt-BR.
+
+**Pendências com o Entony:** aprovar a copy (D3), confirmar os valores dos atributos e informar a URL do LinkedIn.
+
 ### Critérios de aceite (Definition of Done)
 
-- Fidelidade ao Figma nas larguras 375, 768, 1280 e 1440px
+- Fidelidade ao design em 1280 e 1440px; em 375 e 768px, layout aprovado pelo QA e pelo designer (D1)
 - Lighthouse com Performance e Acessibilidade ≥ 90
 - Nenhum erro ou warning no console
 - `bun run lint` e `bun run build` sem erros

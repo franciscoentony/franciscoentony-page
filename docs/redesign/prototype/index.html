@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Francisco Entony</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;700&family=Doto:wght@500;800;900&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#000; --bg-2:#0a0a0c; --card:#111114; --line:rgba(255,255,255,.08);
+  --text:#f5f5f7; --muted:#86868b; --dim:#48484d;
+  --violet:#8b6cff; --lav:#c9bcff; --gold:#ffd25e;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --sans:'Geist',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
+  --mono:'Geist Mono',ui-monospace,monospace;
+  --dot:'Doto','Geist Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{font-family:var(--sans);font-size:17px;line-height:1.47;letter-spacing:-.011em;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--violet);color:#fff}
+.wrap{width:min(1080px,100% - 48px);margin-inline:auto}
+.eyebrow{font-size:14px;font-weight:500;color:var(--muted);letter-spacing:-.01em}
+.h1{font-size:clamp(40px,6vw,80px);line-height:1.02;font-weight:600;letter-spacing:-.045em}
+.h2{font-size:clamp(34px,4.6vw,60px);line-height:1.05;font-weight:600;letter-spacing:-.04em}
+.lead{font-size:clamp(17px,1.6vw,21px);line-height:1.45;color:var(--muted);font-weight:400;letter-spacing:-.015em}
+.lead b{color:var(--text);font-weight:500}
+.grad{background:linear-gradient(100deg,#fff 0%,var(--lav) 45%,var(--violet) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---------- starfield ---------- */
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+main,nav,footer{position:relative;z-index:1}
+.grain{position:fixed;inset:-50%;z-index:2;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:grain 1.2s steps(4) infinite}
+@keyframes grain{25%{transform:translate(2%,-3%)}50%{transform:translate(-3%,2%)}75%{transform:translate(3%,3%)}}
+
+/* ---------- nav ---------- */
+nav{position:fixed;top:0;left:0;right:0;height:48px;z-index:50;display:flex;align-items:center;
+  background:rgba(0,0,0,.55);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--line);transition:transform .5s var(--ease)}
+nav.hide{transform:translateY(-100%)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.02em;display:flex;gap:8px;align-items:center}
+.logo i{width:8px;height:8px;background:var(--gold);display:inline-block;image-rendering:pixelated;box-shadow:0 0 12px var(--gold)}
+.links{display:flex;gap:32px;font-size:12.5px;color:#d2d2d7}
+.links a{opacity:.8;transition:opacity .2s}.links a:hover{opacity:1}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:980px;font-size:14px;font-weight:500;padding:10px 20px;transition:transform .3s var(--ease),background .3s,box-shadow .3s}
+.btn-sm{font-size:12px;padding:5px 13px}
+.btn-primary{background:var(--text);color:#000}
+.btn-primary:hover{transform:scale(1.03);box-shadow:0 0 0 6px rgba(255,255,255,.08)}
+.btn-link{color:var(--lav);padding-inline:6px}.btn-link:hover{text-decoration:underline}
+
+/* ---------- universe (pinned story) ---------- */
+#universe{height:520vh;position:relative}
+.stage{position:sticky;top:0;height:100vh;overflow:hidden;display:grid;place-items:center}
+#planet{position:absolute;inset:0;width:100%;height:100%}
+.hero-copy{position:absolute;top:clamp(90px,15vh,150px);left:0;right:0;text-align:center;will-change:opacity,transform}
+.hero-copy .eyebrow{margin-bottom:14px}
+.hero-copy .h1{margin-inline:auto;max-width:14ch}
+.hero-copy .cta{margin-top:26px;display:flex;gap:14px;justify-content:center;align-items:center}
+.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;display:flex;flex-direction:column;align-items:center;gap:10px}
+.scroll-hint span{width:1px;height:36px;background:linear-gradient(var(--muted),transparent);animation:drip 2s var(--ease) infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.chapter{position:absolute;left:0;right:0;text-align:center;opacity:0;pointer-events:none;will-change:opacity,transform;padding-inline:24px}
+.chapter .num{font-family:var(--dot);font-weight:800;font-size:15px;letter-spacing:.2em;color:var(--lav);margin-bottom:18px}
+.chapter .h2{max-width:16ch;margin-inline:auto}
+.chapter p{margin:18px auto 0;max-width:36ch}
+.chapter{text-shadow:0 0 40px #000,0 0 80px #000}
+.chapter.c1,.chapter.c2{top:50%;margin-top:-120px;width:min(440px,40vw);text-align:left}
+.chapter.c1{left:max(24px,calc((100vw - 1080px)/2));right:auto}
+.chapter.c2{right:max(24px,calc((100vw - 1080px)/2));left:auto}
+.chapter.c1 .h2,.chapter.c2 .h2,.chapter.c1 p,.chapter.c2 p{margin-inline:0}
+.chapter.c3{bottom:9vh}
+@media (max-width:860px){.chapter.c1,.chapter.c2{left:0;right:0;width:auto;text-align:center;top:auto;bottom:10vh;margin-top:0}.chapter.c1 .h2,.chapter.c2 .h2,.chapter.c1 p,.chapter.c2 p{margin-inline:auto}}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(32px);transition:opacity 1s var(--ease),transform 1.1s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.08s}.rv.d2{transition-delay:.16s}.rv.d3{transition-delay:.24s}.rv.d4{transition-delay:.32s}
+.words .w{color:var(--dim);transition:color .4s}
+.words .w.on{color:var(--text)}
+
+section.block{padding-block:clamp(110px,16vh,180px)}
+
+/* ---------- player 1 ---------- */
+.player{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+.player .h2{margin:12px 0 22px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:48px;padding-top:28px;border-top:1px solid var(--line)}
+.stat .n{font-family:var(--dot);font-weight:900;font-size:clamp(40px,4.4vw,56px);line-height:1;letter-spacing:-.02em}
+.stat .l{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.4}
+
+/* ---------- holo card ---------- */
+.holo{perspective:900px;--mx:50%;--my:50%;--rx:0deg;--ry:0deg;--o:0}
+.holo__in{position:relative;border-radius:22px;overflow:hidden;transform:rotateX(var(--rx)) rotateY(var(--ry));transform-style:preserve-3d;
+  transition:transform .6s var(--ease),box-shadow .6s var(--ease);background:linear-gradient(160deg,#16131f,#0b0a10 60%);
+  border:1px solid rgba(255,255,255,.09);box-shadow:0 30px 80px -30px rgba(0,0,0,.8)}
+.holo.active .holo__in{transition:transform .08s linear,box-shadow .4s;box-shadow:0 40px 120px -30px rgba(139,108,255,.45)}
+.holo__foil{position:absolute;inset:0;pointer-events:none;mix-blend-mode:color-dodge;opacity:calc(.12 + var(--o)*.5);
+  background:
+   repeating-linear-gradient(115deg,#ff7ad9 0%,#ffd25e 6%,#7dffcf 12%,#6ec3ff 18%,#b38bff 24%,#ff7ad9 30%);
+  background-size:300% 300%;background-position:var(--mx) var(--my);filter:saturate(1.3) brightness(.75);
+  -webkit-mask:radial-gradient(farthest-corner circle at var(--mx) var(--my),#000 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,.15) 100%);
+          mask:radial-gradient(farthest-corner circle at var(--mx) var(--my),#000 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,.15) 100%);transition:opacity .4s}
+.holo__lines{position:absolute;inset:0;pointer-events:none;opacity:calc(.05 + var(--o)*.18);mix-blend-mode:overlay;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.5) 0 1px,transparent 1px 3px)}
+.holo__glare{position:absolute;inset:0;pointer-events:none;mix-blend-mode:overlay;opacity:var(--o);transition:opacity .4s;
+  background:radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.55),rgba(255,255,255,0) 45%)}
+
+/* character card */
+.ccard{aspect-ratio:5/7;width:min(380px,100%);margin-inline:auto}
+.ccard .holo__in{height:100%;padding:22px;display:flex;flex-direction:column}
+.ccard header{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em}
+.ccard header b{font-family:var(--dot);font-weight:900;font-size:22px;color:var(--gold);letter-spacing:0}
+.portrait{flex:1;margin:16px 0;border-radius:14px;background:#050508;border:1px solid var(--line);overflow:hidden;position:relative}
+.portrait canvas{width:100%;height:100%;display:block}
+.portrait .photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%;opacity:0;filter:saturate(.92) contrast(1.04) brightness(.96);transform:scale(1.04);transition:opacity 1.4s var(--ease),transform 1.6s var(--ease)}
+.portrait.revealed .photo{opacity:1;transform:none}
+.ccard.active .portrait.revealed .photo{-webkit-mask:radial-gradient(circle 74px at var(--px,50%) var(--py,50%),transparent 96%,#000 100%);mask:radial-gradient(circle 74px at var(--px,50%) var(--py,50%),transparent 96%,#000 100%)}
+.portrait::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 55%,rgba(5,5,8,.55));}
+.ccard .name{font-size:24px;font-weight:600;letter-spacing:-.03em}
+.ccard .cls{font-size:13px;color:var(--muted);margin-top:2px}
+.attrs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.attrs div{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.04em}
+.attrs b{display:block;font-family:var(--dot);font-weight:900;font-size:20px;color:var(--text);letter-spacing:0}
+
+/* ---------- skills sphere ---------- */
+.skills-head{text-align:center;max-width:720px;margin:0 auto}
+.skills-head .h2{margin:12px 0 18px}
+#sphere{position:relative;height:min(560px,70vw);margin-top:40px;cursor:grab;user-select:none}
+#sphere:active{cursor:grabbing}
+#sphere .tag{position:absolute;left:50%;top:50%;font-family:var(--mono);font-size:15px;font-weight:500;white-space:nowrap;letter-spacing:.02em;will-change:transform,opacity;transition:color .2s,text-shadow .2s}
+#sphere .tag:hover{color:var(--gold);text-shadow:0 0 18px rgba(255,210,94,.6)}
+#sphere canvas{position:absolute;inset:0;width:100%;height:100%}
+.cols{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:56px}
+.cols h4{font-size:17px;font-weight:600;letter-spacing:-.02em;margin-bottom:8px}
+.cols p{font-size:14px;color:var(--muted);line-height:1.5}
+
+/* ---------- projects carousel ---------- */
+.row-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:40px}
+.track{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:max(24px,calc((100vw - 1080px)/2));padding:20px max(24px,calc((100vw - 1080px)/2)) 50px;scrollbar-width:none}
+.track::-webkit-scrollbar{display:none}
+.pcard{flex:0 0 min(360px,82vw);scroll-snap-align:start;aspect-ratio:4/5}
+.pcard .holo__in{height:100%;display:flex;flex-direction:column}
+.pcard canvas{width:100%;height:58%;display:block;border-bottom:1px solid var(--line)}
+.pcard .body{padding:20px 22px;display:flex;flex-direction:column;gap:8px;flex:1}
+.pcard .rar{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--gold)}
+.pcard .rar.s{color:var(--lav)}
+.pcard h3{font-size:22px;font-weight:600;letter-spacing:-.03em}
+.pcard p{font-size:14px;color:var(--muted);line-height:1.45}
+.pcard .meta{margin-top:auto;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.pcard .meta a{color:var(--text)}
+.dots{display:flex;gap:8px;justify-content:center}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--dim);transition:all .4s var(--ease)}
+.dots i.on{width:24px;border-radius:8px;background:var(--text)}
+
+/* ---------- campaign ---------- */
+.camp{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px}
+.camp .stick{position:sticky;top:120px;align-self:start}
+.camp .h2{margin:12px 0 18px}
+.timeline{position:relative;padding-left:36px}
+.timeline .rail{position:absolute;left:5px;top:6px;bottom:6px;width:1px;background:var(--line)}
+.timeline .fill{position:absolute;left:5px;top:6px;width:1px;height:0;background:linear-gradient(var(--gold),var(--violet));box-shadow:0 0 12px var(--gold)}
+.step{position:relative;padding-bottom:64px}
+.step:last-child{padding-bottom:0}
+.step::before{content:"";position:absolute;left:-36px;top:6px;width:11px;height:11px;background:#1b1b1f;border:1px solid var(--dim);transition:all .5s var(--ease)}
+.step.on::before{background:var(--gold);border-color:var(--gold);box-shadow:0 0 16px var(--gold)}
+.step .when{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+.step h3{font-size:24px;font-weight:600;letter-spacing:-.03em;margin:6px 0 2px}
+.step .org{font-size:14px;color:var(--lav)}
+.step p{font-size:15px;color:var(--muted);margin-top:12px;max-width:46ch}
+.step.locked h3,.step.locked .org{color:var(--dim)}
+
+/* ---------- blog ---------- */
+.posts{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.post{border:1px solid var(--line);border-radius:22px;padding:26px;background:var(--bg-2);display:flex;flex-direction:column;gap:12px;min-height:250px;transition:transform .5s var(--ease),border-color .5s}
+.post:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.18)}
+.post .hash{font-family:var(--mono);font-size:11px;color:var(--gold)}
+.post h3{font-size:20px;font-weight:600;letter-spacing:-.025em;line-height:1.2}
+.post .m{margin-top:auto;font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;justify-content:space-between}
+
+/* ---------- contact ---------- */
+#contact{position:relative;min-height:100vh;display:grid;place-items:center;text-align:center;overflow:hidden}
+#field{position:absolute;inset:0;width:100%;height:100%}
+#contact .inner{position:relative;pointer-events:none}
+#contact .inner *{pointer-events:auto}
+#contact .h1{max-width:12ch;margin:14px auto 20px}
+#contact .cta{margin-top:30px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:32px;transform:translate(-50%,20px);opacity:0;background:#1c1c1f;border:1px solid var(--line);border-radius:980px;padding:10px 18px;font-size:13px;z-index:60;transition:all .5s var(--ease)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast b{font-family:var(--dot);color:var(--gold);font-weight:900;margin-right:6px}
+
+footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:12px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer nav{all:unset;display:flex;gap:22px}
+
+/* ---------- custom cursor ---------- */
+#trail{position:fixed;inset:0;width:100%;height:100%;z-index:98;pointer-events:none}
+.cur,.cur-ring{position:fixed;left:0;top:0;z-index:100;pointer-events:none;opacity:0;transition:opacity .3s}
+.has-cursor .cur,.has-cursor .cur-ring{opacity:1}
+.cur{width:8px;height:8px;margin:-4px 0 0 -4px;background:var(--gold);transform-origin:center;box-shadow:0 0 10px var(--gold),0 0 22px rgba(255,210,94,.5)}
+.cur-ring{width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:1px solid rgba(255,255,255,.45);
+  display:grid;place-items:center;transition:width .45s var(--ease),height .45s var(--ease),margin .45s var(--ease),background .35s,border-color .35s,opacity .3s}
+.cur-ring span{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:#fff;opacity:0;transform:scale(.8);transition:all .35s var(--ease);white-space:nowrap}
+.cur-ring.link{width:58px;height:58px;margin:-29px 0 0 -29px;background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.7)}
+.cur-ring.holo,.cur-ring.drag{width:96px;height:96px;margin:-48px 0 0 -48px;border-color:transparent;background:rgba(10,8,20,.25);backdrop-filter:blur(2px)}
+.cur-ring.holo::before,.cur-ring.drag::before{content:"";position:absolute;inset:0;border-radius:50%;padding:1.5px;
+  background:conic-gradient(from var(--a,0deg),#ff7ad9,#ffd25e,#7dffcf,#6ec3ff,#b38bff,#ff7ad9);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 3s linear infinite}
+.cur-ring.holo span,.cur-ring.drag span{opacity:1;transform:none}
+.cur-ring.down{transform:scale(.82)}
+@property --a{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes spin{to{--a:360deg}}
+@media (hover:hover) and (pointer:fine){ html.has-cursor, html.has-cursor *{cursor:none!important} }
+
+@media (max-width:860px){
+  .links{display:none}
+  .player,.camp{grid-template-columns:1fr;gap:48px}
+  .camp .stick{position:static}
+  .cols{grid-template-columns:1fr 1fr}
+  .posts{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr 1fr;gap:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<canvas id="trail" aria-hidden="true"></canvas>
+<div class="cur" id="cur" aria-hidden="true"></div>
+<div class="cur-ring" id="curRing" aria-hidden="true"><span></span></div>
+<div class="grain"></div>
+
+<nav id="nav"><div class="wrap">
+  <a class="logo" href="#top"><i></i>entony</a>
+  <div class="links"><a href="#player">Sobre</a><a href="#skills">Habilidades</a><a href="#projects">Projetos</a><a href="#campaign">Experiência</a><a href="#blog">Blog</a></div>
+  <a class="btn btn-primary btn-sm" href="#contact">Contato</a>
+</div></nav>
+
+<main id="top">
+<!-- ============ UNIVERSE: pinned storytelling ============ -->
+<section id="universe">
+  <div class="stage">
+    <canvas id="planet" aria-hidden="true"></canvas>
+    <div class="hero-copy" id="heroCopy">
+      <p class="eyebrow">Francisco Entony · Desenvolvedor Full-Stack</p>
+      <h1 class="h1">Construo sistemas que resolvem <span class="grad">problemas reais.</span></h1>
+      <div class="cta"><a class="btn btn-primary" href="#projects">Ver projetos</a><a class="btn btn-link" href="#contact">Fale comigo ›</a></div>
+    </div>
+    <div class="scroll-hint" id="hint">ROLE PARA EXPLORAR<span></span></div>
+
+    <div class="chapter c1" data-in=".24" data-out=".44">
+      <div class="num">01 — ORIGEM</div>
+      <h2 class="h2">Tudo começou aos 8 anos.</h2>
+      <p class="lead">Uma fantasia de criança que virou <b>propósito de vida.</b></p>
+    </div>
+    <div class="chapter c2" data-in=".52" data-out=".70">
+      <div class="num">02 — CURIOSIDADE</div>
+      <h2 class="h2">Biologia, física e astronomia.</h2>
+      <p class="lead">A vontade de entender o universo <b>virou código.</b></p>
+    </div>
+    <div class="chapter c3" data-in=".76" data-out=".92">
+      <div class="num">03 — AGORA</div>
+      <h2 class="h2">Hoje, aos 19, eu construo. E ensino.</h2>
+      <p class="lead">Full-stack no <b>Grupo Strategi</b> e no <b>NIC · IFRN</b>, orientando quem está começando.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLAYER 1 ============ -->
+<section class="block" id="player"><div class="wrap player">
+  <div>
+    <p class="eyebrow rv">Player 1</p>
+    <h2 class="h2 rv d1">Um dev que trata cada sistema como <span class="grad">uma nova fase.</span></h2>
+    <p class="lead words rv d2" data-words>Sou o Entony. Ajudo a conectar pessoas e organizações através de software bem construído, do front ao back-end. Curso Análise e Desenvolvimento de Sistemas no IFRN e ministro minicursos para jovens que querem entrar na área.</p>
+    <div class="stats">
+      <div class="stat rv d1"><div class="n grad" data-count="19">0</div><div class="l">anos de idade, 11 deles programando no imaginário</div></div>
+      <div class="stat rv d2"><div class="n grad" data-count="30" data-suffix="+">0</div><div class="l">alunos orientados em Java e Python</div></div>
+      <div class="stat rv d3"><div class="n grad" data-count="4">0</div><div class="l">missões publicadas no GitHub</div></div>
+    </div>
+  </div>
+  <div class="rv d2">
+    <div class="holo ccard" data-tilt>
+      <div class="holo__in">
+        <header><span>FICHA · LV.</span><b>19</b></header>
+        <div class="portrait" id="portraitBox"><canvas id="portrait" data-photo="foto.jpg"></canvas><img class="photo" id="photo" src="foto.jpg" alt="Foto de Francisco Entony" onerror="this.remove()"></div>
+        <div class="name">Francisco Entony</div>
+        <div class="cls">Classe: Dev Full-Stack · Canguaretama, RN</div>
+        <div class="attrs"><div><b>92</b>FRONT</div><div><b>88</b>BACK</div><div><b>74</b>DADOS</div><div><b>99</b>CURIO</div></div>
+        <div class="holo__foil"></div><div class="holo__lines"></div><div class="holo__glare"></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ SKILLS ============ -->
+<section class="block" id="skills"><div class="wrap">
+  <div class="skills-head">
+    <p class="eyebrow rv">Inventário</p>
+    <h2 class="h2 rv d1">O que eu trago <span class="grad">pra mesa.</span></h2>
+    <p class="lead rv d2">As ferramentas do dia a dia, independente do tamanho do projeto. <b>Arraste para girar.</b></p>
+  </div>
+  <div id="sphere" class="rv d2"></div>
+  <div class="cols">
+    <div class="rv d1"><h4>Front-end</h4><p>React, TypeScript, Next.js, Vite e Tailwind para interfaces rápidas e bem estruturadas.</p></div>
+    <div class="rv d2"><h4>Back-end</h4><p>Node.js, Express, Python e Django REST para APIs sólidas e escaláveis.</p></div>
+    <div class="rv d3"><h4>Dados</h4><p>MySQL, PostgreSQL, MongoDB e SQLite. Relacional e não-relacional.</p></div>
+    <div class="rv d4"><h4>Ferramentas</h4><p>Git, GitHub, Docker e arquitetura MVC no fluxo diário.</p></div>
+  </div>
+</div></section>
+
+<!-- ============ PROJECTS ============ -->
+<section class="block" id="projects">
+  <div class="wrap row-head">
+    <div><p class="eyebrow rv">Missões</p><h2 class="h2 rv d1">O que eu construí.</h2></div>
+    <a class="btn btn-link rv d2" href="https://github.com/franciscoentony" target="_blank" rel="noopener">Ver tudo no GitHub ›</a>
+  </div>
+  <div class="track" id="track">
+    <article class="holo pcard" data-tilt><div class="holo__in">
+      <canvas data-shape="paw"></canvas>
+      <div class="body"><span class="rar">★ MISSÃO PRINCIPAL</span><h3>petca</h3><p>Conecta cidadãos que avistam animais em situação de rua a ONGs de resgate.</p>
+      <div class="meta"><span>react-native · drf · pytest</span><a href="https://github.com/franciscoentony/petca" target="_blank" rel="noopener">GitHub ›</a></div></div>
+      <div class="holo__foil"></div><div class="holo__lines"></div><div class="holo__glare"></div></div></article>
+    <article class="holo pcard" data-tilt><div class="holo__in">
+      <canvas data-shape="gift"></canvas>
+      <div class="body"><span class="rar">★ MISSÃO PRINCIPAL</span><h3>connect-responsibly</h3><p>Conecta doadores a donatários, facilitando a chegada de doações à pessoa certa.</p>
+      <div class="meta"><span>python · django · mysql</span><a href="https://github.com/franciscoentony/connect-responsibily" target="_blank" rel="noopener">GitHub ›</a></div></div>
+      <div class="holo__foil"></div><div class="holo__lines"></div><div class="holo__glare"></div></div></article>
+    <article class="holo pcard" data-tilt><div class="holo__in">
+      <canvas data-shape="planet"></canvas>
+      <div class="body"><span class="rar s">◇ MISSÃO SECUNDÁRIA</span><h3>franciscoentony-page</h3><p>Página pessoal com projetos, palestras e aulas ministradas, com blog próprio.</p>
+      <div class="meta"><span>typescript · vite · hugo</span><a href="https://github.com/franciscoentony/franciscoentony-page" target="_blank" rel="noopener">GitHub ›</a></div></div>
+      <div class="holo__foil"></div><div class="holo__lines"></div><div class="holo__glare"></div></div></article>
+    <article class="holo pcard" data-tilt><div class="holo__in">
+      <canvas data-shape="film"></canvas>
+      <div class="body"><span class="rar s">◇ MISSÃO SECUNDÁRIA</span><h3>fullstack-filmes</h3><p>Autenticação, CRUD, permissões e rotas privadas em uma aplicação completa.</p>
+      <div class="meta"><span>node · mongodb · jwt</span><a href="https://github.com/franciscoentony/fullstack-filmes" target="_blank" rel="noopener">GitHub ›</a></div></div>
+      <div class="holo__foil"></div><div class="holo__lines"></div><div class="holo__glare"></div></div></article>
+  </div>
+  <div class="dots" id="dots"><i class="on"></i><i></i><i></i><i></i></div>
+</section>
+
+<!-- ============ CAMPAIGN ============ -->
+<section class="block" id="campaign"><div class="wrap camp">
+  <div class="stick">
+    <p class="eyebrow rv">Campanha</p>
+    <h2 class="h2 rv d1">Onde já botei a mão <span class="grad">no código.</span></h2>
+    <p class="lead rv d2">Cada fase desbloqueou uma habilidade nova. <b>A próxima pode ser com você.</b></p>
+  </div>
+  <div class="timeline" id="timeline"><div class="rail"></div><div class="fill" id="fill"></div>
+    <div class="step"><div class="when">AGO 2026 — ATUAL</div><h3>Desenvolvedor de Software Junior</h3><div class="org">Grupo Strategi</div><p>Desenvolvo e mantenho soluções escaláveis com Next.js, React e TypeScript, Django REST e SQL Server, monitorando sistemas corporativos robustos.</p></div>
+    <div class="step"><div class="when">AGO 2025 — ATUAL</div><h3>Engenheiro de Software</h3><div class="org">NIC · IFRN Campus Canguaretama</div><p>Sistemas em colaboração com professores, alunos e servidores, incluindo A Praça da Paz e o EVINST.</p></div>
+    <div class="step"><div class="when">JAN 2026 — ABR 2026</div><h3>Tutor de Aprendizagem em Laboratório</h3><div class="org">IFRN</div><p>Orientação de cerca de 30 alunos em POO (Java) e Programação Estruturada (Python).</p></div>
+    <div class="step locked"><div class="when">PRÓXIMA FASE</div><h3>Bloqueada</h3><div class="org">Press start ›</div></div>
+  </div>
+</div></section>
+
+<!-- ============ BLOG ============ -->
+<section class="block" id="blog"><div class="wrap">
+  <div class="row-head"><div><p class="eyebrow rv">Diário de bordo</p><h2 class="h2 rv d1">Anotações sobre código,<br>dados e aprendizado.</h2></div><a class="btn btn-link rv d2" href="/blog">Todos os posts ›</a></div>
+  <div class="posts">
+    <a class="post rv d1" href="/blog"><span class="hash">#a3f9c21</span><h3>Como organizei o deploy do meu portfólio com Vite e Hugo</h3><div class="m"><span>12 out 2026</span><span>6 min</span></div></a>
+    <a class="post rv d2" href="/blog"><span class="hash">#7be04d8</span><h3>Bastidores dos sistemas do NIC IFRN</h3><div class="m"><span>28 set 2026</span><span>8 min</span></div></a>
+    <a class="post rv d3" href="/blog"><span class="hash">#19cd5e2</span><h3>O que aprendi ensinando POO para 30 alunos</h3><div class="m"><span>03 set 2026</span><span>5 min</span></div></a>
+  </div>
+</div></section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact">
+  <canvas id="field" aria-hidden="true"></canvas>
+  <div class="inner wrap">
+    <p class="eyebrow rv">Continue?</p>
+    <h2 class="h1 rv d1">Bora trocar <span class="grad">uma ideia?</span></h2>
+    <p class="lead rv d2">Seja pra falar de projetos, oportunidades ou só sobre tecnologia.</p>
+    <div class="cta rv d3"><button class="btn btn-primary" id="copy" style="border:0;cursor:pointer;font-family:inherit">franciscoentonydev@gmail.com</button><a class="btn btn-link" href="https://github.com/franciscoentony" target="_blank" rel="noopener">GitHub ›</a></div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap"><span>© 2026 Francisco Entony</span><nav><a href="https://github.com/franciscoentony">GitHub</a><a href="#">LinkedIn</a><a href="/blog">Blog</a><a href="#top">Topo ↑</a></nav></div></footer>
+<div class="toast" id="toast"><b>+1</b>E-mail copiado para o inventário</div>
+
+<script>
+(() => {
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const DPR = Math.min(devicePixelRatio || 1, 2);
+const RAMP = ' .,:;-=+*#%@';
+const mouse = {x: innerWidth/2, y: innerHeight/2, nx: 0, ny: 0};
+addEventListener('pointermove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.nx = e.clientX/innerWidth*2-1; mouse.ny = e.clientY/innerHeight*2-1; }, {passive:true});
+const clamp = (v,a=0,b=1) => Math.max(a, Math.min(b, v));
+const lerp = (a,b,t) => a + (b-a)*t;
+const smooth = t => t*t*(3-2*t);
+let scrollY = window.scrollY; addEventListener('scroll', () => scrollY = window.scrollY, {passive:true});
+
+function fitCanvas(c){ const r = c.getBoundingClientRect(); c.width = Math.max(1, r.width*DPR); c.height = Math.max(1, r.height*DPR); const ctx = c.getContext('2d'); ctx.setTransform(DPR,0,0,DPR,0,0); return {ctx, w:r.width, h:r.height}; }
+const visible = new WeakMap();
+const io = new IntersectionObserver(es => es.forEach(e => visible.set(e.target, e.isIntersecting)), {rootMargin:'100px'});
+
+/* ---------- starfield (parallax) ---------- */
+const stars = document.getElementById('stars'); let S, SW, SH, starList=[];
+function initStars(){ ({ctx:S, w:SW, h:SH} = fitCanvas(stars)); starList = Array.from({length: Math.round(SW*SH/4200)}, () => ({x:Math.random()*SW, y:Math.random()*SH*3, z: Math.random()**2*0.9+0.1, t:Math.random()*6, spark: Math.random() < 0.02})); }
+function drawStars(t, warp){
+  S.clearRect(0,0,SW,SH);
+  for (const s of starList){
+    const y = ((s.y - scrollY*s.z*0.35) % (SH*3) + SH*3) % (SH*3) - SH;
+    if (y < -10 || y > SH+10) continue;
+    const x = s.x + mouse.nx*-12*s.z;
+    const tw = 0.7 + 0.3*Math.sin(t*0.002 + s.t);
+    const a = (0.35 + 0.6*s.z) * tw;
+    S.fillStyle = `rgba(235,230,255,${a})`;
+    if (warp > 0.01){ const cx=SW/2, cy=SH/2, dx=x-cx, dy=y-cy, k=warp*s.z*0.6; S.strokeStyle=S.fillStyle; S.lineWidth=0.6+s.z*1.8; S.beginPath(); S.moveTo(x,y); S.lineTo(x+dx*k,y+dy*k); S.stroke(); }
+    else {
+      const r = 0.7 + s.z*1.9;                                   // ~0.8px (far) → ~2.6px (near)
+      if (s.z > 0.6){ S.fillStyle = `rgba(200,185,255,${0.12*tw})`; S.fillRect(x - r, y - r, r*3, r*3); S.fillStyle = `rgba(240,236,255,${a})`; } // soft halo on near layer
+      S.fillRect(x, y, r, r);
+      if (s.spark){ const L = 3 + 4*tw; S.fillStyle = `rgba(220,210,255,${0.55*tw})`; S.fillRect(x + r/2 - 0.5, y - L, 1, L*2 + r); S.fillRect(x - L, y + r/2 - 0.5, L*2 + r, 1); }
+    }
+  }
+}
+
+/* ---------- ASCII planet (3D, light follows mouse) ---------- */
+const pc = document.getElementById('planet'); let P, PW, PH, cw, ch, FS;
+const universe = document.getElementById('universe');
+function initPlanet(){ ({ctx:P, w:PW, h:PH} = fitCanvas(pc)); FS = PW < 700 ? 8 : 10; P.font = `500 ${FS}px "Geist Mono", monospace`; cw = P.measureText('M').width; ch = FS*1.18; P.textBaseline='top'; }
+const seeds = new Float32Array(40000).map(() => Math.random()*2-1);
+const lightCur = {x:-.5, y:-.5};
+function noise3(x,y,z){ return Math.sin(x*1.7+Math.sin(y*2.3+z))*.5 + Math.sin(y*3.1+Math.cos(z*1.3+x*.7))*.3 + Math.sin(z*4.7+x*2.1)*.2; }
+function drawPlanet(t, prog){
+  P.clearRect(0,0,PW,PH);
+  const cols = Math.ceil(PW/cw), rows = Math.ceil(PH/ch);
+  // scroll choreography
+  const p1 = smooth(clamp(prog/0.18));              // hero -> story
+  const dis = smooth(clamp((prog-0.88)/0.12));      // dissolve at end
+  const mobile = PW < 860;
+  // organic path: rises from below the headline, then drifts opposite each chapter
+  const keys = [[0,.5,.9,.24],[.18,.5,.52,.25],[.30,mobile?.5:.7,.5,.24],[.44,mobile?.5:.7,.5,.24],[.56,mobile?.5:.3,.5,.24],[.68,mobile?.5:.3,.5,.24],[.80,.5,.42,.34],[1,.5,.42,.4]];
+  let a = keys[0], b = keys[keys.length-1];
+  for (let q=0;q<keys.length-1;q++) if (prog>=keys[q][0] && prog<=keys[q+1][0]){ a=keys[q]; b=keys[q+1]; break; }
+  const kt = smooth(clamp((prog-a[0])/((b[0]-a[0])||1)));
+  const R = Math.min(PW,PH) * lerp(a[3],b[3],kt) * (1 + dis*0.5) * (mobile?1.25:1);
+  const cx = PW*lerp(a[1],b[1],kt), cy = PH*lerp(a[2],b[2],kt);
+  const yaw = t*0.00022 + prog*5 + mouse.nx*0.4;
+  const elev = 0.3 + mouse.ny*0.08, roll = -0.22 + mouse.nx*0.05;
+  const se = Math.sin(elev), ce = Math.cos(elev), cr = Math.cos(roll), sr = Math.sin(roll);
+  lightCur.x = lerp(lightCur.x, mouse.nx*1.2 - 0.55, 0.06); lightCur.y = lerp(lightCur.y, mouse.ny*1.2 - 0.45, 0.06);
+  let L = [lightCur.x, lightCur.y, 0.75]; const ln = Math.hypot(...L); L = L.map(v => v/ln);
+  const cyw = Math.cos(yaw), syw = Math.sin(yaw);
+  const hueBase = 250 + Math.sin(t*0.0004)*8;
+  let k = 0, lastStyle = '';
+  for (let j=0;j<rows;j++){
+    const py = (j*ch + ch/2 - cy)/R;
+    for (let i=0;i<cols;i++, k++){
+      const px = (i*cw + cw/2 - cx)/R;
+      const d2 = px*px + py*py;
+      let char = null, bright = 0, hue = hueBase, depth = -9, sat = 80;
+      if (d2 < 1){
+        const pz = Math.sqrt(1-d2);
+        const lx = px*cyw - pz*syw, lz = px*syw + pz*cyw, ly = py;
+        const n = noise3(lx*2.4, ly*2.4, lz*2.4);
+        const land = smooth(clamp((n-0.05)*4));
+        const diff = Math.max(0, px*L[0] + py*L[1] + pz*L[2]);
+        const rim = Math.pow(1-pz, 2.5);                 // holographic fresnel
+        bright = clamp(diff*0.85 + 0.08 + land*0.14*diff + rim*0.5*(0.6+diff*0.4));
+        hue = hueBase + rim*110 + land*-25 + px*20;     // violet core → cyan/pink rim
+        sat = 70 + rim*30;
+        char = RAMP[Math.round(bright*(RAMP.length-1))];
+        depth = pz;
+      }
+      // ring: plane seen at elevation `elev`, rolled by `roll`
+      const ux = px*cr + py*sr, uy = -px*sr + py*cr;
+      const w = uy/se, rad = Math.hypot(ux, w), zr = w*ce;  // lower half in front
+      if (rad > 1.45 && rad < 2.05 && (char === null || char === ' ' || zr > depth)){
+        const band = Math.sin(rad*30)*0.5+0.5;
+        if (band > 0.2 && !(rad > 1.74 && rad < 1.8)){
+          // planet shadow on the far side of the ring
+          const shadow = (zr < 0 && Math.abs(ux) < 1) ? 0.35 : 1;
+          const lit = clamp((0.28 + band*0.4) * shadow * (0.6 + 0.4*Math.max(0, ux*L[0] + 0.5)));
+          char = RAMP[Math.max(1, Math.round(lit*(RAMP.length-1)))]; bright = lit; hue = hueBase + 20 + (rad-1.45)*60; sat = 75; depth = zr;
+        }
+      }
+      if (!char || char === ' ') continue;
+      let x = i*cw, y = j*ch, al = 0.25 + bright*0.75;
+      if (dis > 0){ const s1 = seeds[k%40000], s2 = seeds[(k*7)%40000]; x += s1*dis*PW*0.7; y += s2*dis*PH*0.7 - dis*60; al *= (1-dis)*(1-dis); }
+      const L2 = Math.round(50 + bright*40);
+      const style = `hsla(${Math.round(hue/6)*6},${Math.round(sat/10)*10}%,${L2 - L2%5}%,${Math.round(al*10)/10})`;
+      if (style !== lastStyle){ P.fillStyle = style; lastStyle = style; }
+      P.fillText(char, x, y);
+    }
+  }
+  // soft glow
+  const g = P.createRadialGradient(cx, cy, R*0.2, cx, cy, R*2.2);
+  g.addColorStop(0, `rgba(139,108,255,${0.16*(1-dis)})`); g.addColorStop(1,'rgba(0,0,0,0)');
+  P.globalCompositeOperation='lighter'; P.fillStyle=g; P.fillRect(0,0,PW,PH); P.globalCompositeOperation='source-over';
+}
+
+/* ---------- story text choreography ---------- */
+const heroCopy = document.getElementById('heroCopy'), hint = document.getElementById('hint');
+const chapters = [...document.querySelectorAll('.chapter')];
+function universeProgress(){ const r = universe.getBoundingClientRect(); return clamp(-r.top / (r.height - innerHeight)); }
+function story(prog){
+  const h = clamp(prog/0.12); heroCopy.style.opacity = 1-h; heroCopy.style.transform = `translateY(${-h*60}px) scale(${1-h*0.04})`;
+  hint.style.opacity = 1 - clamp(prog/0.04);
+  for (const c of chapters){
+    const a = +c.dataset.in, b = +c.dataset.out, m = 0.05;
+    const o = clamp((prog-a)/m) * (1 - clamp((prog-(b-m))/m));
+    c.style.opacity = o; c.style.transform = `translateY(${(1-o)*30}px)`;
+  }
+}
+
+/* ---------- holo tilt ---------- */
+document.querySelectorAll('[data-tilt]').forEach(el => {
+  const inner = el.querySelector('.holo__in');
+  el.addEventListener('pointermove', e => {
+    const r = el.getBoundingClientRect(); const x = (e.clientX - r.left)/r.width, y = (e.clientY - r.top)/r.height;
+    el.classList.add('active');
+    el.style.setProperty('--mx', (x*100)+'%'); el.style.setProperty('--my', (y*100)+'%');
+    el.style.setProperty('--rx', ((0.5-y)*14)+'deg'); el.style.setProperty('--ry', ((x-0.5)*18)+'deg');
+    el.style.setProperty('--o', Math.min(1, Math.hypot(x-.5,y-.5)*1.6 + .3));
+  });
+  el.addEventListener('pointerleave', () => { el.classList.remove('active'); ['--rx','--ry'].forEach(p => el.style.setProperty(p,'0deg')); el.style.setProperty('--o',0); el.style.setProperty('--mx','50%'); el.style.setProperty('--my','50%'); });
+});
+
+/* ---------- portrait: photo -> ASCII (fallback: procedural helmet) ---------- */
+const portrait = document.getElementById('portrait'); let PO, POW, POH, photoData = null;
+function initPortrait(){ ({ctx:PO, w:POW, h:POH} = fitCanvas(portrait)); PO.font = '600 8px "Geist Mono", monospace'; PO.textBaseline='top'; io.observe(portrait);  if (typeof samplePhoto === 'function') samplePhoto(); }
+let photoW = 90, photoH = 110, photoImg = null;
+function samplePhoto(){ if (!photoImg) return; try {
+    const r = portrait.getBoundingClientRect(); const ar = (r.width || 334) / (r.height || 290);
+    photoW = 120; photoH = Math.max(40, Math.round(120/ar));
+    const c = document.createElement('canvas'); c.width = photoW; c.height = photoH; const x = c.getContext('2d');
+    const ir = photoImg.width/photoImg.height; let sw = photoImg.width, sh = photoImg.height, sx = 0, sy = 0;
+    if (ir > ar){ sw = photoImg.height*ar; sx = (photoImg.width-sw)/2; } else { sh = photoImg.width/ar; sy = (photoImg.height-sh)*0.25; } // = object-position: center 25%
+    x.drawImage(photoImg, sx, sy, sw, sh, 0, 0, photoW, photoH); photoData = x.getImageData(0,0,photoW,photoH);
+  } catch(e) { photoData = null; } }
+if (portrait.dataset.photo){ const img = new Image(); img.onload = () => { photoImg = img; samplePhoto(); }; img.src = portrait.dataset.photo; }
+const portraitBox = document.getElementById('portraitBox');
+new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting && document.getElementById('photo')){ setTimeout(() => portraitBox.classList.add('revealed'), 1100); ob.disconnect(); } }), {threshold:.55}).observe(portraitBox);
+function drawPortrait(t){
+  PO.clearRect(0,0,POW,POH);
+  const cwp = 5.2, chp = 8, cols = Math.ceil(POW/cwp), rows = Math.ceil(POH/chp);
+  const r = portrait.getBoundingClientRect(); const mx = (mouse.x - r.left)/r.width, my = (mouse.y - r.top)/r.height;
+  portraitBox.style.setProperty('--px', (mx*100)+'%'); portraitBox.style.setProperty('--py', (my*100)+'%');
+  for (let j=0;j<rows;j++) for (let i=0;i<cols;i++){
+    const u = i/cols, v = j/rows; let b;
+    if (photoData){ const px = Math.min(photoW-1, Math.floor(u*photoW)), py = Math.min(photoH-1, Math.floor(v*photoH)), o = (py*photoW+px)*4; b = Math.pow((photoData.data[o]*.3 + photoData.data[o+1]*.59 + photoData.data[o+2]*.11)/255, 0.85)*1.1; }
+    else {
+      const hx = (u-.5)/.33, hy = (v-.42)/.3, hd = hx*hx + hy*hy;                 // helmet
+      const vx = (u-.5)/.22, vy = (v-.44)/.16, vd = vx*vx + vy*vy;                 // visor
+      const bx = (u-.5)/.48, by = (v-1.02)/.32, bd = bx*bx + by*by;                // shoulders
+      b = 0;
+      if (bd < 1) b = 0.35 + (1-bd)*0.35;
+      if (hd < 1){ b = 0.55 + (1-hd)*0.35 - hx*0.12; if (vd < 1){ b = 0.12 + Math.max(0, 1 - Math.hypot(u-.44, v-.39)/.08)*0.9; } }
+    }
+    const dm = Math.hypot(u-mx, v-my); b = clamp(b + Math.max(0, .25 - dm)*1.2*(b>0.05?1:0));
+    b *= 0.85 + Math.sin(t*0.004 + j*0.5)*0.08;
+    if (b < 0.06) continue;
+    PO.fillStyle = `hsla(${250 + u*40 + Math.sin(t*0.001)*20},90%,${55+b*35}%,${0.4+b*0.6})`;
+    PO.fillText(RAMP[Math.round(b*(RAMP.length-1))], i*cwp, j*chp);
+  }
+}
+
+/* ---------- project thumbnails (SDF -> ASCII) ---------- */
+const shapes = {
+  paw:(x,y)=>{ const c=(a,b,r)=>Math.hypot(x-a,y-b)-r; return Math.min(c(0,.18,.28), c(-.42,-.2,.13), c(-.15,-.42,.13), c(.15,-.42,.13), c(.42,-.2,.13)); },
+  gift:(x,y)=>{ const box=Math.max(Math.abs(x)-.42, Math.abs(y-.12)-.34); const lid=Math.max(Math.abs(x)-.5, Math.abs(y+.3)-.1); const bow=Math.min(Math.hypot(x+.15,y+.5)-.13, Math.hypot(x-.15,y+.5)-.13); return Math.min(box,lid,bow); },
+  planet:(x,y)=>{ const s=Math.hypot(x,y)-.38; const rx=x, ry=(y+x*.25)/.28; const r=Math.abs(Math.hypot(rx,ry)-.68)-.06; return Math.min(s, Math.max(r, -(s-.06)*(ry<0?1:-1e3))); },
+  film:(x,y)=>{ const o=Math.hypot(x,y)-.5; let h=1; for(let k=0;k<5;k++){const a=k/5*Math.PI*2; h=Math.min(h, Math.hypot(x-Math.cos(a)*.27,y-Math.sin(a)*.27)-.1);} return Math.max(o, -h, -(Math.hypot(x,y)-.05)); }
+};
+const thumbs = [...document.querySelectorAll('canvas[data-shape]')].map(c => ({c, f: shapes[c.dataset.shape], card: c.closest('.holo')}));
+function initThumbs(){ thumbs.forEach(o => { Object.assign(o, fitCanvas(o.c)); o.ctx.font='600 9px "Geist Mono", monospace'; o.ctx.textBaseline='top'; io.observe(o.c); }); }
+function drawThumb(o, t){
+  const {ctx, w, h, f} = o; ctx.clearRect(0,0,w,h);
+  const hot = o.card.classList.contains('active') ? 1 : 0; o.heat = lerp(o.heat||0, hot, 0.08);
+  const cwt = 6, cht = 10, cols = Math.ceil(w/cwt), rows = Math.ceil(h/cht), sc = Math.min(w,h)*0.62;
+  for (let j=0;j<rows;j++) for (let i=0;i<cols;i++){
+    const x = (i*cwt - w/2)/sc, y = (j*cht - h/2)/sc;
+    const wob = Math.sin(t*0.003 + i*0.3 + j*0.2) * 0.03 * (1+o.heat*3);
+    const d = f(x+wob, y);
+    let b = d < 0 ? clamp(0.55 - d*1.2) : clamp(0.25 - d*0.9) * (0.4 + 0.6*Math.sin(t*0.002 + i*0.7)*Math.cos(j*0.9 + t*0.001));
+    if (b < 0.08) continue;
+    ctx.fillStyle = `hsla(${255 + x*40 + o.heat*60*Math.sin(t*0.002+j)},90%,${55+b*35}%,${0.25+b*0.75})`;
+    ctx.fillText(RAMP[Math.round(b*(RAMP.length-1))], i*cwt, j*cht);
+  }
+}
+
+/* ---------- skills sphere ---------- */
+const sphereEl = document.getElementById('sphere');
+const techs = ['React','TypeScript','Next.js','Vite','Tailwind','Node.js','Express','Python','Django REST','Java','PostgreSQL','MySQL','MongoDB','SQL Server','SQLite','Git','GitHub','Docker','MVC','REST APIs','React Native','pytest'];
+const tags = techs.map((t,i) => { const el = document.createElement('span'); el.className='tag'; el.textContent=t; sphereEl.appendChild(el);
+  const phi = Math.acos(1 - 2*(i+.5)/techs.length), th = Math.PI*(1+Math.sqrt(5))*i; return {el, x:Math.sin(phi)*Math.cos(th), y:Math.cos(phi), z:Math.sin(phi)*Math.sin(th)}; });
+io.observe(sphereEl);
+let rotX = 0.3, rotY = 0, velX = 0.0012, velY = 0.0035, drag = null;
+sphereEl.addEventListener('pointerdown', e => { drag = {x:e.clientX, y:e.clientY}; sphereEl.setPointerCapture(e.pointerId); });
+sphereEl.addEventListener('pointermove', e => { if (!drag) return; velY = (e.clientX - drag.x)*0.0009; velX = (e.clientY - drag.y)*-0.0009; drag = {x:e.clientX, y:e.clientY}; });
+addEventListener('pointerup', () => drag = null);
+function drawSphere(){
+  const r = sphereEl.getBoundingClientRect(); const R = Math.min(r.width, r.height)*0.42;
+  if (!drag){ velX = lerp(velX, 0.0012 + mouse.ny*-0.002, 0.02); velY = lerp(velY, 0.0035 + mouse.nx*0.004, 0.02); }
+  rotX += velX*16; rotY += velY*16;
+  const cx = Math.cos(rotX), sx = Math.sin(rotX), cy = Math.cos(rotY), sy = Math.sin(rotY);
+  for (const t of tags){
+    let x = t.x*cy + t.z*sy, z = -t.x*sy + t.z*cy, y = t.y*cx - z*sx; z = t.y*sx + z*cx;
+    const s = 0.7 + (z+1)*0.3, o = 0.32 + (z+1)*0.34;
+    t.el.style.transform = `translate(-50%,-50%) translate3d(${x*R}px,${y*R*0.92}px,0) scale(${s})`;
+    t.el.style.opacity = o; t.el.style.zIndex = Math.round((z+1)*100);
+    t.el.style.color = z > 0.55 ? '#fff' : `hsl(${255 + x*30},70%,${60+z*15}%)`;
+  }
+}
+
+/* ---------- contact ASCII field (reacts to cursor) ---------- */
+const field = document.getElementById('field'); let F, FW, FH;
+function initField(){ ({ctx:F, w:FW, h:FH} = fitCanvas(field)); F.font='500 12px "Geist Mono", monospace'; F.textBaseline='top'; io.observe(field); }
+function drawField(t){
+  F.clearRect(0,0,FW,FH);
+  const r = field.getBoundingClientRect(); const mx = mouse.x - r.left, my = mouse.y - r.top;
+  const cwf = 11, chf = 16, cols = Math.ceil(FW/cwf), rows = Math.ceil(FH/chf);
+  for (let j=0;j<rows;j++) for (let i=0;i<cols;i++){
+    const x = i*cwf, y = j*chf, d = Math.hypot(x-mx, y-my);
+    const wave = Math.sin(d*0.035 - t*0.004)*0.5+0.5;
+    const near = Math.max(0, 1 - d/340);
+    const base = (Math.sin(i*0.21 + t*0.0006)*Math.cos(j*0.27 - t*0.0005))*0.5+0.5;
+    const vign = 1 - Math.min(1, Math.hypot((x-FW/2)/(FW*0.55), (y-FH/2)/(FH*0.6)));
+    let b = base*0.3*vign + Math.pow(near,1.5)*wave*0.9;
+    if (b < 0.07) continue;
+    F.fillStyle = `hsla(${255 + near*40 + Math.sin(t*0.001)*15},90%,${50+b*40}%,${Math.min(1,b*1.3)})`;
+    F.fillText(RAMP[Math.round(clamp(b)*(RAMP.length-1))], x, y);
+  }
+}
+
+/* ---------- reveals, words, counters ---------- */
+const rio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); rio.unobserve(e.target); } }), {threshold:.15});
+document.querySelectorAll('.rv').forEach(el => rio.observe(el));
+document.querySelectorAll('[data-words]').forEach(p => { p.innerHTML = p.textContent.trim().split(/\s+/).map(w => `<span class="w">${w}</span>`).join(' '); });
+const wordEls = [...document.querySelectorAll('[data-words]')];
+function words(){ for (const p of wordEls){ const r = p.getBoundingClientRect(); const prog = clamp((innerHeight*0.85 - r.top)/(r.height + innerHeight*0.35)); const ws = p.querySelectorAll('.w'); const n = Math.floor(prog*ws.length*1.05); ws.forEach((w,i) => w.classList.toggle('on', i < n)); } }
+const cio = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const el = e.target, end = +el.dataset.count, pre = el.dataset.prefix||'', suf = el.dataset.suffix||''; const t0 = performance.now();
+  const step = now => { const k = smooth(clamp((now-t0)/1400)); el.textContent = pre + Math.round(end*k) + suf; if (k<1) requestAnimationFrame(step); }; requestAnimationFrame(step); cio.unobserve(el); }), {threshold:.6});
+document.querySelectorAll('[data-count]').forEach(el => cio.observe(el));
+
+/* ---------- timeline fill ---------- */
+const tl = document.getElementById('timeline'), fill = document.getElementById('fill'), steps = [...tl.querySelectorAll('.step')];
+function timeline(){ const r = tl.getBoundingClientRect(); const p = clamp((innerHeight*0.6 - r.top)/r.height); fill.style.height = (p*(r.height-12))+'px';
+  steps.forEach(s => { const sr = s.getBoundingClientRect(); s.classList.toggle('on', sr.top < innerHeight*0.6 && !s.classList.contains('locked')); }); }
+
+/* ---------- carousel dots ---------- */
+const track = document.getElementById('track'), dots = [...document.querySelectorAll('#dots i')];
+track.addEventListener('scroll', () => { const cards = track.children; let best=0, bd=1e9; [...cards].forEach((c,i) => { const d = Math.abs(c.getBoundingClientRect().left - track.getBoundingClientRect().left - 24); if (d<bd){bd=d;best=i;} }); dots.forEach((d,i)=>d.classList.toggle('on', i===best)); }, {passive:true});
+
+/* ---------- nav hide on scroll ---------- */
+const nav = document.getElementById('nav'); let lastY = 0;
+addEventListener('scroll', () => { const y = window.scrollY; nav.classList.toggle('hide', y > lastY && y > 200); lastY = y; }, {passive:true});
+
+/* ---------- copy email ---------- */
+document.getElementById('copy').addEventListener('click', () => { navigator.clipboard?.writeText('franciscoentonydev@gmail.com'); const t = document.getElementById('toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); });
+
+/* ---------- custom cursor: guide star + ring + ASCII stardust trail ---------- */
+const fine = matchMedia('(hover:hover) and (pointer:fine)').matches && !RM;
+const cur = document.getElementById('cur'), ring = document.getElementById('curRing'), ringLabel = ring.querySelector('span');
+const trail = document.getElementById('trail'); let TR, TW, TH; const dust = [];
+const ringPos = {x: innerWidth/2, y: innerHeight/2}, prevM = {x: mouse.x, y: mouse.y}; let curAngle = 0;
+function initTrail(){ ({ctx:TR, w:TW, h:TH} = fitCanvas(trail)); TR.textBaseline='middle'; TR.textAlign='center'; }
+if (fine){
+  addEventListener('pointermove', () => document.documentElement.classList.add('has-cursor'), {once:true});
+  document.addEventListener('mouseleave', () => document.documentElement.classList.remove('has-cursor'));
+  document.addEventListener('mouseenter', () => document.documentElement.classList.add('has-cursor'));
+  document.addEventListener('pointerover', e => {
+    const t = e.target;
+    const mode = t.closest('#sphere') ? 'drag' : t.closest('.holo') ? 'holo' : t.closest('a,button') ? 'link' : '';
+    ring.classList.remove('link','holo','drag'); if (mode) ring.classList.add(mode);
+    ringLabel.textContent = mode === 'holo' ? 'INSPECIONAR' : mode === 'drag' ? 'ARRASTE' : '';
+  });
+  addEventListener('pointerdown', e => { ring.classList.add('down'); for (let i=0;i<18;i++){ const a = Math.random()*Math.PI*2, v = 1.5 + Math.random()*3.5; dust.push({x:e.clientX, y:e.clientY, vx:Math.cos(a)*v, vy:Math.sin(a)*v, life:1, ch:'✦*+'[i%3], h:Math.random()*360, s:12}); } });
+  addEventListener('pointerup', () => ring.classList.remove('down'));
+}
+const DUST = '·.:+*✦';
+function drawCursor(t){
+  if (!fine) return;
+  // dot snaps; ring eases behind
+  const dx = mouse.x - prevM.x, dy = mouse.y - prevM.y, speed = Math.hypot(dx, dy);
+  if (speed > 0.5) curAngle = Math.atan2(dy, dx);
+  cur.style.transform = `translate3d(${mouse.x}px,${mouse.y}px,0) rotate(${45 + curAngle*57.3*0.15}deg) scale(${1 + Math.min(speed,40)/80})`;
+  ringPos.x = lerp(ringPos.x, mouse.x, 0.16); ringPos.y = lerp(ringPos.y, mouse.y, 0.16);
+  ring.style.translate = `${ringPos.x}px ${ringPos.y}px`;
+  // spawn ASCII dust proportional to speed
+  const n = Math.min(4, Math.floor(speed/7));
+  for (let i=0;i<n;i++){ const k = i/n; dust.push({x: prevM.x + dx*k + (Math.random()-.5)*6, y: prevM.y + dy*k + (Math.random()-.5)*6, vx:(Math.random()-.5)*0.6 - dx*0.02, vy:(Math.random()-.5)*0.6 - dy*0.02 + 0.15, life:1, ch:DUST[Math.floor(Math.random()*DUST.length)], h: 250 + Math.sin(t*0.002)*50 + Math.random()*40, s: 9 + Math.random()*5}); }
+  prevM.x = mouse.x; prevM.y = mouse.y;
+  TR.clearRect(0,0,TW,TH);
+  for (let i = dust.length-1; i >= 0; i--){
+    const p = dust[i]; p.x += p.vx; p.y += p.vy; p.vx *= 0.96; p.vy *= 0.96; p.life -= 0.022;
+    if (p.life <= 0){ dust.splice(i,1); continue; }
+    TR.font = `500 ${p.s}px "Geist Mono", monospace`;
+    TR.fillStyle = `hsla(${p.h},95%,${70 + p.life*20}%,${p.life})`;
+    TR.fillText(p.life > 0.65 ? p.ch : p.life > 0.3 ? '+' : '·', p.x, p.y);
+  }
+  if (dust.length > 260) dust.splice(0, dust.length - 260);
+}
+
+/* ---------- loop ---------- */
+function initAll(){ initStars(); initPlanet(); initPortrait(); initThumbs(); initField(); initTrail(); }
+document.fonts.ready.then(initAll); initAll();
+let rs; addEventListener('resize', () => { clearTimeout(rs); rs = setTimeout(initAll, 150); });
+let last = 0;
+function frame(t){
+  const prog = universeProgress();
+  story(prog); words(); timeline();
+  const warp = smooth(clamp((prog-0.9)/0.1)) * (1 - clamp((prog-0.995)/0.005));
+  drawStars(t, RM ? 0 : warp*0.5);
+  if (t - last > 33 || RM){ // ~30fps for ASCII canvases
+    last = t;
+    if (prog < 1) drawPlanet(t, prog);
+    if (visible.get(portrait)) drawPortrait(t);
+    thumbs.forEach(o => visible.get(o.c) && drawThumb(o, t));
+    if (visible.get(field)) drawField(t);
+  }
+  if (visible.get(sphereEl)) drawSphere();
+  if (!RM) drawCursor(t);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

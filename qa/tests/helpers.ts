@@ -2,6 +2,7 @@ import { expect, type Page, type TestInfo, type ConsoleMessage } from "@playwrig
 import fs from "node:fs";
 import path from "node:path";
 import { BASE_URL, OUT_DIR } from "../qa.config.mjs";
+import { httpGet } from "../scripts/http.mjs";
 
 export type RouteDef = { id: string; path: string; label: string };
 
@@ -13,7 +14,8 @@ export async function firstSlug(): Promise<string> {
   if (process.env.QA_SLUG) return (slugCache = process.env.QA_SLUG);
   let posts: { slug: string; date: string }[];
   try {
-    const res = await fetch(`${BASE_URL}/blog-data/index.json`);
+    // httpGet em vez de fetch: o fetch do Node bloqueia "bad ports" como a 4190
+    const res = await httpGet(`${BASE_URL}/blog-data/index.json`);
     if (!res.ok) throw new Error(String(res.status));
     posts = await res.json();
   } catch {

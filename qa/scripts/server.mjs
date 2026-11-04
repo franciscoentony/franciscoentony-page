@@ -1,11 +1,12 @@
 // Garante um servidor para os scripts que não passam pelo Playwright (Lighthouse).
 // Sem QA_BASE_URL: sobe `bun run build && bun run preview` na raiz do repo.
 import { spawn } from "node:child_process";
+import { httpGet } from "./http.mjs";
 import { BASE_URL, IS_LOCAL, SERVER_COMMAND } from "../qa.config.mjs";
 
 async function up(url) {
   try {
-    const r = await fetch(url);
+    const r = await httpGet(url);
     return r.status < 500;
   } catch {
     return false;

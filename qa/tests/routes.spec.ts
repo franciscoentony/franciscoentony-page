@@ -131,17 +131,17 @@ test("[RT-06] navegação pela navbar entre rotas sem recarregar e sem erro @dod
   const con = watchConsole(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await settle(page);
-  const nav = page.locator("nav").first();
-  await expect(nav).toBeVisible();
+  const header = page.locator("header, nav").first();
+  await expect(header).toBeVisible();
 
-  const blogLink = page.locator('nav a[href="/blog"], nav a[href$="/blog"]').first();
-  if (!(await blogLink.isVisible())) {
+  const blogLinks = page.locator('header a[href="/blog"], nav a[href="/blog"], nav a[href$="/blog"]');
+  if (!(await blogLinks.locator("visible=true").count())) {
     // HANDOFF: abaixo de 860px os links somem; deve haver menu mobile
-    const toggle = page.getByRole("button", { name: /menu/i }).first();
+    const toggle = page.locator("button[aria-controls][aria-expanded]").or(page.getByRole("button", { name: /menu/i })).first();
     expect.soft(await toggle.count(), "Sem link de Blog visível e sem botão de menu mobile").toBeGreaterThan(0);
     if (await toggle.count()) await toggle.click();
   }
-  await blogLink.click();
+  await blogLinks.locator("visible=true").first().click();
   await expect(page).toHaveURL(/\/blog\/?$/);
   await expect(page.locator("h1").first()).toBeVisible();
 

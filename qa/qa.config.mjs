@@ -1,6 +1,7 @@
 // Configuração central do QA. Tudo pode ser sobrescrito por variáveis de ambiente.
 export const LOCAL_PORT = Number(process.env.QA_PORT ?? 4173);
-export const LOCAL_URL = `http://localhost:${LOCAL_PORT}`;
+// 127.0.0.1 e não localhost: o fetch do Node tenta ::1 (IPv6) e o vite preview só escuta em IPv4
+export const LOCAL_URL = `http://127.0.0.1:${LOCAL_PORT}`;
 
 /** URL alvo. Sem QA_BASE_URL, sobe `bun run build && bun run preview` na raiz. */
 export const BASE_URL = (process.env.QA_BASE_URL ?? LOCAL_URL).replace(/\/$/, "");

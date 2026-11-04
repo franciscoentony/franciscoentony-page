@@ -4,6 +4,7 @@ Testes automatizados do redesign v3: rotas, responsividade, console, acessibilid
 
 - **Plano de testes (casos e critérios):** [`PLANO-DE-TESTES.md`](PLANO-DE-TESTES.md)
 - **Baseline de produção (o "antes"):** [`baseline/RELATORIO.md`](baseline/RELATORIO.md)
+- **Relatórios por rodada:** [`rodadas/`](rodadas/) (ex.: [`R1-f28ce72.md`](rodadas/R1-f28ce72.md))
 
 Esta pasta é isolada: tem `package.json` próprio e **não altera** o `package.json` da raiz nem `src/`. As dependências de teste (Playwright, axe-core, Lighthouse) ficam só aqui e não entram no bundle do site (D4 não se aplica).
 
@@ -73,6 +74,7 @@ baseline/                    mesma estrutura, contra produção (versionado)
 | `tests/routes.spec.ts` | RT-01..07: acesso direto, 404 de slug, `404.html`, navegação, links, imagens/alt, overflow horizontal, console/rede, screenshots |
 | `tests/a11y.spec.ts` | A11Y-01 axe-core WCAG 2.1 AA · A11Y-02 texto final em muted `#48484D` · A11Y-03 semântica |
 | `tests/keyboard.spec.ts` | KB-01 ordem de Tab e foco visível (+ padrão D8 lavanda) · KB-02 âncoras · KB-03 carrossel |
+| `tests/navigation.spec.ts` | RT-08 Voltar mantém o scroll · KB-04 menu mobile · KB-05 navbar escondida reaparece com foco |
 | `tests/motion.spec.ts` | RM-01..05 reduced-motion · PF-01 canvas pausado fora da viewport · PF-02 DPR ≤ 2 · PF-03 FPS no scroll |
 | `scripts/lighthouse.mjs` | PF-LH: Performance, Acessibilidade, Best Practices e SEO |
 
@@ -83,6 +85,7 @@ As verificações usam `expect.soft`: um caso mostra **todas** as falhas de uma 
 - **Pulado (skipped):** o caso não se aplica àquela largura, ou o recurso ainda não existe (ex.: canvas e carrossel no site atual). Não é falha.
 - **Canvases (RM-03/PF-01):** a suíte conta as chamadas de desenho por canvas (instrumentando `CanvasRenderingContext2D`). Se o contador cresce, o canvas está animando.
 - **PF-03 (FPS):** headless sem GPU é pessimista. Use os números para comparar runs; confirme em máquina real antes de reprovar.
+- **Portas:** evite portas da lista de "bad ports" do fetch (ex.: 4190, 6000, 6665–6669). Os scripts usam `node:http` e funcionam nelas, mas outras ferramentas em Node podem falhar.
 - **Rede:** o Lighthouse checa a URL antes de começar e sai com código 2 se ela estiver inacessível. No Playwright, uma queda de rede aparece como dezenas de falhas `ERR_NAME_NOT_RESOLVED`/`ENOTFOUND`: nesse caso, descarte o run e rode de novo.
 - **RM-01:** registra `animationstart`/`transitionrun` desde o primeiro frame, então pega animações curtas que já terminaram antes da asserção.
 - **Status 404 em produção:** o GitHub Pages serve rotas SPA pelo `404.html` com status HTTP 404. O teste registra esse status como anotação e não reprova a rota por isso. O Lighthouse, porém, **não audita** páginas com status 404 (ver achado B1 em `baseline/RELATORIO.md`).

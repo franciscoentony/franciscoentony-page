@@ -6,6 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import lighthouse from "lighthouse";
 import * as chromeLauncher from "chrome-launcher";
+import { httpGet } from "./http.mjs";
 import { BASE_URL, OUT_DIR } from "../qa.config.mjs";
 import { ensureServer } from "./server.mjs";
 
@@ -15,7 +16,7 @@ const outDir = path.join(OUT_DIR, "lighthouse");
 fs.mkdirSync(outDir, { recursive: true });
 
 async function slug() {
-  const posts = await (await fetch(`${BASE_URL}/blog-data/index.json`)).json();
+  const posts = await (await httpGet(`${BASE_URL}/blog-data/index.json`)).json();
   posts.sort((a, b) => b.date.localeCompare(a.date));
   return posts[0].slug;
 }
@@ -23,7 +24,7 @@ async function slug() {
 const stop = await ensureServer();
 // pré-checagem: sem rede, aborta com mensagem clara em vez de gerar relatório vazio
 try {
-  await fetch(BASE_URL + "/");
+  await httpGet(BASE_URL + "/");
 } catch (e) {
   console.error(`[lh] ${BASE_URL} inacessível (${e.cause?.code ?? e.message}). Verifique a rede e rode de novo.`);
   stop();

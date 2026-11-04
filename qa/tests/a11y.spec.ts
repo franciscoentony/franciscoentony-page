@@ -1,6 +1,6 @@
 import { test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { routes, settle, autoScroll, scrollTop, attachJson, expect } from "./helpers";
+import { routes, settle, autoScroll, attachJson, expect } from "./helpers";
 import { TOKENS } from "../qa.config.mjs";
 
 const ROUTES = await routes();
@@ -9,13 +9,21 @@ for (const route of ROUTES) {
   test(`[A11Y-01] ${route.id}: axe-core WCAG 2.1 A/AA sem violações @dod`, async ({ page }, testInfo) => {
     await page.goto(route.path, { waitUntil: "domcontentloaded" });
     await settle(page);
-    // estado final: tudo revelado (o muted transitório já deve ter virado paper/secondary)
+    // Estado final: rola até o fim (tudo revelado e "lido") e analisa ali, sem voltar ao
+    // topo. Voltar ao topo faria o lead palavra a palavra (ligado ao scroll) regredir a
+    // muted, estado transitório aceito pelo HANDOFF §4 (o A11Y-02 cobre o estado final).
     await autoScroll(page);
-    await scrollTop(page);
+    await page.waitForTimeout(600);
 
-    const results = await new AxeBuilder({ page })
+    let axe = new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"])
-      .analyze();
+      // Decoração com aria-hidden (esfera de tags, canvases): exceção da WCAG 1.4.3
+      // para texto "puramente decorativo". O HANDOFF §4 define a esfera como decorativa.
+      .exclude('[aria-hidden="true"]');
+    // skip-link: o axe trata href="/#secao" como âncora da própria página; fora da Home
+    // esses links apontam para outra rota e o alerta é falso positivo.
+    if (route.id !== "home") axe = axe.disableRules(["skip-link"]);
+    const results = await axe.analyze();
     const resumo = results.violations.map((v) => ({
       id: v.id,
       impact: v.impact,
@@ -87,3 +95,20 @@ for (const route of ROUTES) {
     expect.soft(info.canvasSemAriaHidden, "canvases decorativos devem ser aria-hidden (HANDOFF §4)").toBe(0);
   });
 }
+
+test("[A11Y-04] Home: h1 continua na árvore de acessibilidade em qualquer posição do scroll @dod", async ({ page }, testInfo) => {
+  test.skip(!["w1280", "w375"].includes(testInfo.project.name), "1280 e 375");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await settle(page);
+  const falhas: string[] = [];
+  for (const frac of [0, 0.25, 0.5, 1]) {
+    await page.evaluate((f) => window.scrollTo({ top: (document.documentElement.scrollHeight - innerHeight) * f, behavior: "instant" as ScrollBehavior }), frac);
+    await page.waitForTimeout(500);
+    // visibility:hidden / display:none / aria-hidden tiram o h1 da árvore (leitor de tela não o encontra)
+    const ok = await page.evaluate(() =>
+      [...document.querySelectorAll("h1")].some((h) => h.checkVisibility({ visibilityProperty: true }) && !h.closest('[aria-hidden="true"]')),
+    );
+    if (!ok) falhas.push(`scroll ${frac * 100}%`);
+  }
+  expect.soft(falhas, "h1 some da árvore de acessibilidade (use só opacity no fade, ou um h1/sr-only persistente)").toEqual([]);
+});

@@ -98,7 +98,9 @@ test.describe("prefers-reduced-motion: reduce (comportamento do HANDOFF §4, D8)
             o *= Number(cs.opacity);
             if (cs.transform !== "none" && /matrix\(1, 0, 0, 1, 0, [1-9]/.test(cs.transform)) t = true;
           }
-          if (o < 0.99 || t) out.push(`${el.tagName.toLowerCase()} "${el.textContent.trim().slice(0, 50)}" opacity=${o.toFixed(2)}${t ? " translateY" : ""}`);
+          // < 0.5: "ainda não revelado" (.rv começa em 0). Opacidades de design, como os links
+          // da nav a 0.8 (HANDOFF §2), não contam.
+          if (o < 0.5 || t) out.push(`${el.tagName.toLowerCase()} "${el.textContent.trim().slice(0, 50)}" opacity=${o.toFixed(2)}${t ? " translateY" : ""}`);
         });
         return [...new Set(out)].slice(0, 40);
       });

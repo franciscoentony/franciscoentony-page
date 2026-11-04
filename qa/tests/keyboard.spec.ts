@@ -22,7 +22,7 @@ type Stop = {
 // Teclado é testado em desktop (1280) e mobile (375): no mobile o menu muda.
 for (const route of ROUTES) {
   test(`[KB-01] ${route.id}: Tab percorre tudo com foco visível @dod`, async ({ page }, testInfo) => {
-    test.skip(!["w1280", "w375"].includes(testInfo.project.name), "teclado: 1280 e 375");
+    test.skip(!["w1280", "w768", "w375"].includes(testInfo.project.name), "teclado: 1280, 768 e 375");
     await page.goto(route.path, { waitUntil: "domcontentloaded" });
     await settle(page);
     // scroll suave atrasa a chegada do foco à tela; aqui queremos o estado final
@@ -35,6 +35,13 @@ for (const route of ROUTES) {
     for (let i = 0; i < MAX_TABS; i++) {
       await page.keyboard.press("Tab");
       await page.waitForTimeout(120);
+      // espera a transição do foco (ex.: transition-colors anima a outline-color)
+      await page.evaluate(() =>
+        Promise.race([
+          Promise.all((document.activeElement?.getAnimations() ?? []).map((a) => a.finished)),
+          new Promise((r) => setTimeout(r, 1500)),
+        ]),
+      ).catch(() => {});
       const s = await page.evaluate((i) => {
         const el = document.activeElement as HTMLElement | null;
         if (!el || el === document.body) return null;

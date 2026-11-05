@@ -53,13 +53,23 @@ function startWhenIdle(start: () => void) {
   }
 }
 
+/**
+ * Canvases já entregues a um worker. Um canvas transferido não pode ser
+ * usado de novo: quem usa a opção `worker` precisa remontar o <canvas>
+ * (key) quando algo que reinicia o efeito mudar (ex.: nível de qualidade).
+ */
+const transferredCanvases = new WeakSet<HTMLCanvasElement>();
+
 /** Desenho dentro de um Web Worker com OffscreenCanvas (PERF-PLAN A8). */
 export interface CanvasWorkerOptions {
   /** O que o worker desenha (src/workers/canvasWorker.ts). */
   kind: WorkerKind;
   /** Fonte que o worker precisa carregar (o planeta usa Geist Mono). */
   fontUrl?: string;
-  /** Monta o estado de cada quadro, enviado ao worker (scroll, mouse...). */
+  /**
+   * Monta o estado de cada quadro, enviado ao worker (scroll, mouse...).
+   * Devolva null para não enviar este quadro (nada mudou).
+   */
   frameData: (frame: Omit<CanvasFrame, "ctx">) => unknown;
 }
 
@@ -129,6 +139,16 @@ export function useCanvasAnimation(
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // Proteção (P5 S-B): este canvas já foi para um worker e não volta
+    if (transferredCanvases.has(canvas)) {
+      if (import.meta.env.DEV) {
+        console.error(
+          "useCanvasAnimation: canvas já transferido para um worker. Remonte o <canvas> com uma key nova quando o efeito reiniciar.",
+        );
+      }
+      return;
+    }
+
     // Onde o desenho acontece: na página (ctx) ou num worker (A8).
     // Só sabemos depois que o worker responde se tem suporte.
     let ctx: CanvasRenderingContext2D | null = null;
@@ -169,15 +189,32 @@ export function useCanvasAnimation(
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
+    // Contrapressão (P5 S-A): só manda um quadro novo ao worker depois que
+    // ele avisa que desenhou o anterior. Se chegar outro antes, fica só o
+    // mais recente esperando (os do meio são descartados).
+    let workerBusy = false;
+    let pendingTime: number | null = null;
+
+    function sendFrameToWorker(time: number) {
+      if (!worker) return;
+      if (workerBusy) {
+        pendingTime = time;
+        return;
+      }
+      const data = workerOptionsRef.current?.frameData({
+        width,
+        height,
+        time,
+        isStatic,
+      });
+      if (data === null || data === undefined) return; // nada a desenhar
+      workerBusy = true;
+      worker.postMessage({ type: "frame", data });
+    }
+
     function drawFrame(time: number) {
       if (worker) {
-        const data = workerOptionsRef.current?.frameData({
-          width,
-          height,
-          time,
-          isStatic,
-        });
-        worker.postMessage({ type: "frame", data });
+        sendFrameToWorker(time);
         return;
       }
       if (!ctx) return;
@@ -268,13 +305,27 @@ export function useCanvasAnimation(
         { type: "module" },
       );
       worker.onmessage = (event: MessageEvent) => {
-        if (cancelled || event.data.type !== "capabilities") return;
+        if (cancelled) return;
+
+        // O worker terminou um quadro: libera e manda o pendente, se houver
+        if (event.data.type === "drawn") {
+          workerBusy = false;
+          if (pendingTime !== null) {
+            const time = pendingTime;
+            pendingTime = null;
+            sendFrameToWorker(time);
+          }
+          return;
+        }
+
+        if (event.data.type !== "capabilities") return;
         if (!event.data.ok) {
           fallBackToMainThread();
           return;
         }
         // Transfere o canvas para o worker (não tem volta)
         const offscreen = canvas.transferControlToOffscreen();
+        transferredCanvases.add(canvas);
         worker!.postMessage(
           { type: "init", canvas: offscreen, kind: options.kind },
           [offscreen],

@@ -30,6 +30,8 @@ function PlanetCanvasInner({ sectionRef }: PlanetCanvasProps) {
   // Parâmetros do nível de qualidade (células, faixas de matiz, fps)
   const { settings } = useQuality();
   const light = useRef<PlanetLight>({ x: -0.5, y: -0.5 });
+  // true depois de mandar o quadro "limpo" do fim da seção (S-A)
+  const clearedAfterEnd = useRef(false);
 
   function draw({ ctx, width, height, time, isStatic }: CanvasFrame) {
     const section = sectionRef?.current;
@@ -61,9 +63,14 @@ function PlanetCanvasInner({ sectionRef }: PlanetCanvasProps) {
       fontUrl: PLANET_FONT_URL,
       frameData: (frame) => {
         const section = sectionRef?.current;
+        const progress =
+          section && !frame.isStatic ? getScrollProgress(section) : 0;
+        // Depois do fim da seção, o worker só precisa limpar uma vez (S-A)
+        if (progress >= 1 && clearedAfterEnd.current) return null;
+        clearedAfterEnd.current = progress >= 1;
         return {
           ...frame,
-          progress: section && !frame.isStatic ? getScrollProgress(section) : 0,
+          progress,
           pointer: { ...pointer.current },
           hueBands: settings.hueBands,
           cellScale: settings.cellScale,

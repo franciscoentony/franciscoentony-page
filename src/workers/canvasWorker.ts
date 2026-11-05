@@ -11,7 +11,7 @@
  *   check   → responde se dá para rodar aqui (OffscreenCanvas + fontes)
  *   init    → recebe o canvas transferido e o tipo ("stars" | "planet")
  *   resize  → novo tamanho do canvas
- *   frame   → desenha um quadro
+ *   frame   → desenha um quadro e responde "drawn"
  */
 import { drawPlanet, type PlanetLight } from "../lib/planet";
 import { drawStars, type StarsFrame, type StarsState } from "../lib/stars";
@@ -84,26 +84,34 @@ scope.onmessage = async (event: MessageEvent) => {
   }
 
   if (message.type === "frame") {
-    if (kind === "stars") {
-      drawStars(ctx, starsState, message.data as StarsFrame);
-      return;
-    }
-
-    const frame = message.data as PlanetFrame;
-    // Depois do fim da seção o planeta já se dissolveu: só limpa
-    if (frame.progress >= 1) {
-      ctx.clearRect(0, 0, frame.width, frame.height);
-      return;
-    }
-    drawPlanet(
-      ctx,
-      frame.width,
-      frame.height,
-      frame.time,
-      frame.progress,
-      frame.pointer,
-      planetLight,
-      { hueBands: frame.hueBands, cellScale: frame.cellScale, dpr },
-    );
+    drawFrame(message.data);
+    // Avisa a página que terminou (contrapressão, P5 S-A)
+    scope.postMessage({ type: "drawn" });
   }
 };
+
+function drawFrame(data: StarsFrame | PlanetFrame) {
+  if (!ctx) return;
+
+  if (kind === "stars") {
+    drawStars(ctx, starsState, data as StarsFrame);
+    return;
+  }
+
+  const frame = data as PlanetFrame;
+  // Depois do fim da seção o planeta já se dissolveu: só limpa
+  if (frame.progress >= 1) {
+    ctx.clearRect(0, 0, frame.width, frame.height);
+    return;
+  }
+  drawPlanet(
+    ctx,
+    frame.width,
+    frame.height,
+    frame.time,
+    frame.progress,
+    frame.pointer,
+    planetLight,
+    { hueBands: frame.hueBands, cellScale: frame.cellScale, dpr },
+  );
+}

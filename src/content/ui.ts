@@ -63,11 +63,13 @@ export const navbar = {
 
 // ---------- Hero / Universe ----------
 
+const age = new Date().getFullYear() - 2006;
+
 export const hero = {
-  eyebrow: "Francisco Entony · Desenvolvedor Full-Stack",
+  eyebrow: "Francisco Entony · Engenheiro de Software",
   title: {
     start: "Construo sistemas que resolvem ",
-    gradient: "problemas reais.",
+    gradient: "problemas reais",
   } as GradientTitle,
   primaryCta: "Ver projetos",
   secondaryCta: "Fale comigo ›",
@@ -81,7 +83,7 @@ export const chapters: {
 }[] = [
   {
     number: "01 — ORIGEM",
-    title: "Tudo começou aos 8 anos.",
+    title: "Tudo começou aos 8 anos",
     lead: [
       { text: "Uma fantasia de criança que virou " },
       { text: "propósito de vida.", bold: true },
@@ -97,7 +99,7 @@ export const chapters: {
   },
   {
     number: "03 — AGORA",
-    title: "Hoje, aos 19, eu construo. E ensino.",
+    title: `Hoje, aos ${age}, eu construo. E ensino.`,
     lead: [
       { text: "Full-stack no " },
       { text: "Grupo Strategi", bold: true },
@@ -119,9 +121,9 @@ export const player = {
   lead: "Sou o Entony. Ajudo a conectar pessoas e organizações através de software bem construído, do front ao back-end. Curso Análise e Desenvolvimento de Sistemas no IFRN e ministro minicursos para jovens que querem entrar na área.",
   stats: [
     {
-      value: 19,
+      value: age,
       suffix: "",
-      label: "anos de idade, 11 deles programando no imaginário",
+      label: `anos de idade, ${age - 8} deles programando no imaginário`,
     },
     { value: 30, suffix: "+", label: "alunos orientados em Java e Python" },
     {
@@ -132,9 +134,9 @@ export const player = {
   ],
   card: {
     header: "FICHA · LV.",
-    level: "19",
+    level: String(age),
     name: "Francisco Entony",
-    className: "Classe: Dev Full-Stack · Canguaretama, RN",
+    className: "Classe: Dev Full-Stack · Natal, RN",
     photoAlt: "Foto de Francisco Entony",
     // Valores aprovados pelo Entony (D11).
     attributes: [
@@ -190,8 +192,8 @@ export const projects = {
   cardGithubLink: "GitHub ›",
   /** D2: os 2 primeiros projetos de projects.ts são principais, o resto secundários. */
   mainMissionCount: 2,
-  rarityMain: "★ MISSÃO PRINCIPAL",
-  raritySide: "◇ MISSÃO SECUNDÁRIA",
+  rarityMain: "★ Missão Principal",
+  raritySide: "◇ Missão Secundária",
   carouselLabel: "Projetos (use as setas para navegar)",
 };
 
@@ -327,8 +329,10 @@ export const toast = {
 
 // ---------- Footer ----------
 
+const footerDate = new Date();
+
 export const footer = {
-  copyright: "© 2026 Francisco Entony",
+  copyright: `© ${footerDate.getFullYear()} Francisco Entony`,
   github: "GitHub",
   linkedin: "LinkedIn",
   blog: "Blog",
@@ -342,7 +346,7 @@ export const footer = {
 export const seo = {
   homeTitle: "Francisco Entony · Desenvolvedor Full-Stack",
   homeDescription:
-    "Francisco Entony, desenvolvedor full-stack em Canguaretama, RN. Construo sistemas que resolvem problemas reais. Projetos, experiência e blog.",
+    "Francisco Entony, desenvolvedor full-stack em Natal, RN. Construo sistemas que resolvem problemas reais. Projetos, experiência e blog.",
   blogTitle: "Blog · Francisco Entony",
   /** Vai depois do título do post na aba (ex.: "Meu post · Francisco Entony"). */
   titleSuffix: " · Francisco Entony",

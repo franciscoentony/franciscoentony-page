@@ -39,13 +39,13 @@ export function projectSlug(project: Project): string {
 
 export const projects: Project[] = [
   {
-    name: "connect-responsibly",
+    name: "connect",
     description:
       "Conecta doadores a donatários, facilitando a chegada de doações à pessoa certa.",
-    language: "Python",
-    languageColor: "#3572A5",
-    topics: ["django", "mysql"],
-    url: "https://github.com/franciscoentony/connect-responsibily",
+    language: "Javascript",
+    languageColor: "#F1E05A",
+    topics: ["React.JS", "Next.JS", "Docker", "PostgreSQL"],
+    url: "https://github.com/franciscoentony/connect",
   },
   {
     name: "petca",

@@ -134,13 +134,14 @@ export default function Navbar() {
             to="/#top"
             onClick={closeMenu}
             aria-label={navbar.logoLabel}
-            className="flex items-center gap-2 font-mono text-small font-medium tracking-mono"
+            className="flex items-center gap-1 text-lg font-bold"
           >
-            <span
+            {/* <span
               aria-hidden="true"
               className="size-2 bg-gold shadow-glow-gold"
-            />
-            {navbar.logo}
+            /> */}
+            {/* {navbar.logo} */}
+            <span className="text-accent">F.</span>Entony
           </Link>
 
           {/* Links (desktop, a partir de 860px) */}

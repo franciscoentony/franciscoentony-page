@@ -33,7 +33,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
 
       <div className="flex flex-1 flex-col gap-2 px-gutter py-5">
         <span
-          className={`font-mono text-label-sm tracking-label-wider ${
+          className={`font-dot text-chapter tracking-label ${
             isMain ? "text-gold" : "text-accent-soft"
           }`}
         >

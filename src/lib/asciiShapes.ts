@@ -21,7 +21,7 @@ export const shapes: Record<ShapeName, (x: number, y: number) => number> = {
       circle(x, y, 0.42, -0.2, 0.13),
     ),
 
-  // Presente (connect-responsibly)
+  // Presente (connect)
   gift: (x, y) => {
     const box = Math.max(Math.abs(x) - 0.42, Math.abs(y - 0.12) - 0.34);
     const lid = Math.max(Math.abs(x) - 0.5, Math.abs(y + 0.3) - 0.1);
@@ -59,7 +59,7 @@ export const shapes: Record<ShapeName, (x: number, y: number) => number> = {
 /** Ícone de cada projeto, pelo nome do repositório. Projetos novos usam "planet". */
 const projectShapes: Record<string, ShapeName> = {
   petca: "paw",
-  "connect-responsibly": "gift",
+  connect: "gift",
   "franciscoentony-page": "planet",
   "fullstack-filmes": "film",
 };

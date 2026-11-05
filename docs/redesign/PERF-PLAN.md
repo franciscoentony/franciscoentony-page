@@ -89,6 +89,14 @@ Perfil de referência: **Lighthouse mobile** (Moto G Power simulado) e **Chrome 
 
 **B3. Reduced motion continua mandando.** Se o usuário pediu menos movimento, é nível Baixo sempre.
 
+## 3b. Spec dos níveis (P1, designer): `docs/redesign/PERF-TIERS.md`
+
+Ela **prevalece** sobre a tabela B1 acima quando as duas divergirem. Pontos principais:
+- **Atlas (A1):** 12 níveis de brilho (um por glifo da rampa; **8 não é aceitável**), 6 faixas de matiz no Alto e 4 no Médio, 2 faixas de saturação, e alpha via `globalAlpha` (sem quantizar).
+- **Dois sinais separados:** `quality: alto | medio | baixo` e `motion: full | reduced`. O nível Baixo mantém as transições CSS baratas, e o reduced motion não. O reduced motion força `quality = baixo` **e** `motion = reduced`.
+- **Governador (B2):** cair para Baixo só **fora** da seção Universe, para evitar o pulo de layout ao desligar o pin.
+- **O que não cai em nenhum nível:** a §4 da spec.
+
 ## 4. Execução
 
 O plano começa **depois** da rodada final de correções em andamento. Os itens I-5 (R2) e DS-1 (designer) **saem daquela rodada e passam para este plano**, que é mais amplo.

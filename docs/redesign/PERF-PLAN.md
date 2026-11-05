@@ -1,6 +1,6 @@
 # Plano de desempenho: o site rodando liso até em aparelho fraco
 
-**Autor:** Tech Lead. **Data:** 04/11/2026. **Status:** proposta, aguardando o OK do Entony.
+**Autor:** Tech Lead. **Data:** 04/11/2026. **Status:** APROVADO pelo Entony em 04/11/2026. Desempenho é critério de merge. Sem botão manual de "modo leve" (recomendação aceita por padrão); o teste final usa emulação até haver um aparelho real.
 
 ## 1. Diagnóstico (medido pelo Revisor e pelo designer em f28ce72)
 

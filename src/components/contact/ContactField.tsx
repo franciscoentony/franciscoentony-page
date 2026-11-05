@@ -4,8 +4,9 @@ import {
   type CanvasFrame,
 } from "../../hooks/useCanvasAnimation";
 import { usePointer } from "../../hooks/usePointer";
-import { ASCII_FRAME_INTERVAL, FIELD } from "../../lib/motion";
+import { FIELD } from "../../lib/motion";
 import { drawAsciiGrid, getAsciiAtlas } from "../../lib/asciiAtlas";
+import { useQuality } from "../../hooks/useQuality";
 
 /**
  * Campo ASCII do contato (HANDOFF §4): um padrão lento de senos com vinheta,
@@ -13,6 +14,8 @@ import { drawAsciiGrid, getAsciiAtlas } from "../../lib/asciiAtlas";
  */
 export default function ContactField() {
   const pointer = usePointer();
+  // Parâmetros do nível de qualidade (células 1.2× maiores no Médio/Baixo)
+  const { motion, settings } = useQuality();
   // Vinheta pré-calculada para o tamanho atual do canvas (A1b)
   const vignetteCache = useRef<{ key: string; values: Float32Array }>({
     key: "",
@@ -24,17 +27,26 @@ export default function ContactField() {
     const t = isStatic ? 0 : time;
     const rect = ctx.canvas.getBoundingClientRect();
     // Com reduced motion o campo não reage ao mouse (quadro estático)
-    const mouseX = isStatic ? -9999 : pointer.current.x - rect.left;
-    const mouseY = isStatic ? -9999 : pointer.current.y - rect.top;
+    // Quadro parado: no nível Baixo a onda fica no centro; com reduced
+    // motion, sem onda nenhuma
+    let mouseX = pointer.current.x - rect.left;
+    let mouseY = pointer.current.y - rect.top;
+    if (isStatic) {
+      mouseX = motion === "reduced" ? -9999 : width / 2;
+      mouseY = motion === "reduced" ? -9999 : height / 2;
+    }
+    const cellWidth = FIELD.cellWidth * settings.fieldCellScale;
+    const cellHeight = FIELD.cellHeight * settings.fieldCellScale;
+    const fontSize = Math.round(12 * settings.fieldCellScale * 10) / 10;
     const hueShift = Math.sin(t * 0.001) * 15;
 
-    const cols = Math.ceil(width / FIELD.cellWidth);
-    const rows = Math.ceil(height / FIELD.cellHeight);
+    const cols = Math.ceil(width / cellWidth);
+    const rows = Math.ceil(height / cellHeight);
 
     const atlas = getAsciiAtlas({
-      font: '500 12px "Geist Mono", monospace',
-      fontSize: 12,
-      hueBands: 6,
+      font: `500 ${fontSize}px "Geist Mono", monospace`,
+      fontSize,
+      hueBands: settings.hueBands,
       saturations: [90],
       lightness: (bright) => 50 + bright * 40,
     });
@@ -53,8 +65,8 @@ export default function ContactField() {
       const values = new Float32Array(cols * rows);
       for (let j = 0; j < rows; j++) {
         for (let i = 0; i < cols; i++) {
-          const x = i * FIELD.cellWidth;
-          const y = j * FIELD.cellHeight;
+          const x = i * cellWidth;
+          const y = j * cellHeight;
           values[j * cols + i] =
             1 -
             Math.min(
@@ -74,11 +86,11 @@ export default function ContactField() {
     drawAsciiGrid(ctx, atlas, {
       cols,
       rows,
-      cellWidth: FIELD.cellWidth,
-      cellHeight: FIELD.cellHeight,
+      cellWidth,
+      cellHeight,
       cell: (i, j, out) => {
-        const x = i * FIELD.cellWidth;
-        const y = j * FIELD.cellHeight;
+        const x = i * cellWidth;
+        const y = j * cellHeight;
         const cellVignette = vignette[j * cols + i];
 
         // Onda do cursor: só existe a até 340px dele
@@ -109,7 +121,7 @@ export default function ContactField() {
   }
 
   const canvasRef = useCanvasAnimation(draw, {
-    frameInterval: ASCII_FRAME_INTERVAL,
+    frameInterval: settings.asciiInterval,
   });
 
   return (

@@ -1,6 +1,6 @@
 import { useRef, type ReactNode } from "react";
 import { useInView } from "../../hooks/useInView";
-import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { useQuality } from "../../hooks/useQuality";
 import { REVEAL } from "../../lib/motion";
 
 interface RevealProps {
@@ -21,7 +21,7 @@ export default function Reveal({
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { threshold: REVEAL.threshold, once: true });
-  const reducedMotion = usePrefersReducedMotion();
+  const reducedMotion = useQuality().motion === "reduced";
   const visible = inView || reducedMotion;
 
   return (

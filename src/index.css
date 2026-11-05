@@ -339,6 +339,28 @@
   transition: opacity 0.4s;
 }
 
+/* Foil do nível Médio: sem mix-blend-mode, opacidade fixa (PERF-TIERS) */
+@utility holo-foil-flat {
+  opacity: 0.18;
+  background: repeating-linear-gradient(
+    115deg,
+    #ff7ad9 0%,
+    #ffd25e 6%,
+    #7dffcf 12%,
+    #6ec3ff 18%,
+    #b38bff 24%,
+    #ff7ad9 30%
+  );
+  background-size: 300% 300%;
+  background-position: var(--mx, 50%) var(--my, 50%);
+  mask: radial-gradient(
+    farthest-corner circle at var(--mx, 50%) var(--my, 50%),
+    #000 0%,
+    rgba(0, 0, 0, 0.35) 45%,
+    rgba(0, 0, 0, 0.15) 100%
+  );
+}
+
 @utility holo-lines {
   mix-blend-mode: overlay;
   opacity: calc(0.05 + var(--o, 0) * 0.18);

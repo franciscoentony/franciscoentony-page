@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { MAX_DPR } from "../lib/motion";
 import { subscribe } from "../lib/ticker";
-import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
+import { useQuality } from "./useQuality";
 
 export interface CanvasFrame {
   ctx: CanvasRenderingContext2D;
@@ -10,7 +10,7 @@ export interface CanvasFrame {
   height: number;
   /** Tempo em ms desde que a página abriu (igual ao do requestAnimationFrame). */
   time: number;
-  /** true quando o usuário pediu menos movimento: desenhe um quadro parado. */
+  /** true no nível Baixo (e com reduced motion): desenhe um quadro parado. */
   isStatic: boolean;
 }
 
@@ -67,7 +67,7 @@ interface CanvasAnimationOptions {
  *   chegam a ~1 tela de distância E o navegador está ocioso (BL1, A3);
  * - desenha pelo ticker único (A2): fora da tela, cancela a inscrição e
  *   não agenda mais nenhum quadro (D9);
- * - com prefers-reduced-motion desenha um único quadro parado (D8).
+ * - no nível Baixo (e com reduced motion) desenha um único quadro parado (D8).
  *
  * Exemplo:
  *   const canvasRef = useCanvasAnimation(({ ctx, width, height, time }) => {
@@ -81,7 +81,8 @@ export function useCanvasAnimation(
   { frameInterval = 0 }: CanvasAnimationOptions = {},
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const isStatic = usePrefersReducedMotion();
+  // Nível Baixo (inclui reduced motion): um quadro parado por canvas
+  const isStatic = useQuality().quality === "baixo";
 
   // Guarda sempre a versão mais nova da função de desenho,
   // sem precisar reiniciar o loop a cada render.

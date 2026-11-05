@@ -6,8 +6,8 @@ import {
 } from "../../hooks/useCanvasAnimation";
 import { useInView } from "../../hooks/useInView";
 import { usePointer } from "../../hooks/usePointer";
-import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
-import { ASCII_FRAME_INTERVAL, PORTRAIT, clamp } from "../../lib/motion";
+import { useQuality } from "../../hooks/useQuality";
+import { PORTRAIT, clamp } from "../../lib/motion";
 import { drawAsciiGrid, getAsciiAtlas } from "../../lib/asciiAtlas";
 import { resolveAssetPath } from "../../utils/resolvePath";
 
@@ -75,7 +75,8 @@ interface PortraitProps {
 export default function Portrait({ cardActive }: PortraitProps) {
   const boxRef = useRef<HTMLDivElement>(null);
   const pointer = usePointer();
-  const reducedMotion = usePrefersReducedMotion();
+  const { quality, motion, settings } = useQuality();
+  const reducedMotion = motion === "reduced";
   const inView = useInView(boxRef, {
     threshold: PORTRAIT.revealThreshold,
     once: true,
@@ -117,7 +118,10 @@ export default function Portrait({ cardActive }: PortraitProps) {
     // Com a foto já visível, o ASCII só aparece pela lente (mouse em cima).
     // Sem lente, não redesenha: o último quadro fica escondido sob a foto
     // (PERF-TIERS: retrato "só redesenha durante a lente").
-    if (photoSettled && !cardActive && !isStatic) return;
+    // No Médio para assim que a foto aparece (sem lente).
+    const stopDrawing =
+      quality === "medio" ? revealed : photoSettled && !cardActive;
+    if (stopDrawing && !isStatic) return;
 
     ctx.clearRect(0, 0, width, height);
     if (!image.current || width === 0 || height === 0) return;
@@ -137,17 +141,18 @@ export default function Portrait({ cardActive }: PortraitProps) {
     boxRef.current?.style.setProperty("--px", `${mouseX * 100}%`);
     boxRef.current?.style.setProperty("--py", `${mouseY * 100}%`);
 
-    const cellWidth = 5.2;
-    const cellHeight = 8;
+    const cellWidth = 5.2 * settings.cellScale;
+    const cellHeight = 8 * settings.cellScale;
+    const fontSize = Math.round(8 * settings.cellScale * 10) / 10;
     const cols = Math.ceil(width / cellWidth);
     const rows = Math.ceil(height / cellHeight);
     const wave = isStatic ? 0 : time;
     const hueShift = Math.sin(wave * 0.001) * 20;
 
     const atlas = getAsciiAtlas({
-      font: '600 8px "Geist Mono", monospace',
-      fontSize: 8,
-      hueBands: 6,
+      font: `600 ${fontSize}px "Geist Mono", monospace`,
+      fontSize,
+      hueBands: settings.hueBands,
       saturations: [90],
       lightness: (bright) => 55 + bright * 35,
     });
@@ -186,7 +191,7 @@ export default function Portrait({ cardActive }: PortraitProps) {
   }
 
   const canvasRef = useCanvasAnimation(draw, {
-    frameInterval: ASCII_FRAME_INTERVAL,
+    frameInterval: settings.asciiInterval,
   });
   const showPhoto = revealed || reducedMotion;
 

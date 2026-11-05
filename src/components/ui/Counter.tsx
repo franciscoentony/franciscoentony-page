@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "../../hooks/useInView";
-import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { useQuality } from "../../hooks/useQuality";
 import { COUNTER, clamp, smoothstep } from "../../lib/motion";
 import { subscribe } from "../../lib/ticker";
 
@@ -21,7 +21,7 @@ export default function Counter({
 }: CounterProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { threshold: COUNTER.threshold, once: true });
-  const reducedMotion = usePrefersReducedMotion();
+  const reducedMotion = useQuality().motion === "reduced";
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {

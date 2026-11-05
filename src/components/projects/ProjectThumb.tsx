@@ -4,8 +4,9 @@ import {
   type CanvasFrame,
 } from "../../hooks/useCanvasAnimation";
 import { shapes, type ShapeName } from "../../lib/asciiShapes";
-import { ASCII_FRAME_INTERVAL, clamp, lerp } from "../../lib/motion";
+import { clamp, lerp } from "../../lib/motion";
 import { drawAsciiGrid, getAsciiAtlas } from "../../lib/asciiAtlas";
+import { useQuality } from "../../hooks/useQuality";
 
 interface ProjectThumbProps {
   shape: ShapeName;
@@ -16,6 +17,8 @@ interface ProjectThumbProps {
 /** Ícone do projeto desenhado em ASCII (58% de cima do card). */
 export default function ProjectThumb({ shape, activeRef }: ProjectThumbProps) {
   const heat = useRef(0);
+  // Parâmetros do nível de qualidade (células 1.3× maiores no Médio/Baixo)
+  const { settings } = useQuality();
 
   function draw({ ctx, width, height, time, isStatic }: CanvasFrame) {
     ctx.clearRect(0, 0, width, height);
@@ -23,16 +26,17 @@ export default function ProjectThumb({ shape, activeRef }: ProjectThumbProps) {
     const t = isStatic ? 0 : time;
     const distanceTo = shapes[shape];
 
-    const cellWidth = 6;
-    const cellHeight = 10;
+    const cellWidth = 6 * settings.cellScale;
+    const cellHeight = 10 * settings.cellScale;
+    const fontSize = Math.round(9 * settings.cellScale);
     const cols = Math.ceil(width / cellWidth);
     const rows = Math.ceil(height / cellHeight);
     const scale = Math.min(width, height) * 0.62;
 
     const atlas = getAsciiAtlas({
-      font: '600 9px "Geist Mono", monospace',
-      fontSize: 9,
-      hueBands: 6,
+      font: `600 ${fontSize}px "Geist Mono", monospace`,
+      fontSize,
+      hueBands: settings.hueBands,
       saturations: [90],
       lightness: (bright) => 55 + bright * 35,
     });
@@ -71,7 +75,7 @@ export default function ProjectThumb({ shape, activeRef }: ProjectThumbProps) {
   }
 
   const canvasRef = useCanvasAnimation(draw, {
-    frameInterval: ASCII_FRAME_INTERVAL,
+    frameInterval: settings.asciiInterval,
   });
 
   return (

@@ -5,7 +5,7 @@ import {
   type CanvasFrame,
 } from "../../hooks/useCanvasAnimation";
 import { usePointer } from "../../hooks/usePointer";
-import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { useQuality } from "../../hooks/useQuality";
 import { CURSOR, afterNextPaint, lerp } from "../../lib/motion";
 
 const FINE_POINTER = "(hover: hover) and (pointer: fine)";
@@ -15,7 +15,8 @@ const FINE_POINTER = "(hover: hover) and (pointer: fine)";
  * e fica desligado com reduced motion. Nos outros casos, cursor do sistema.
  */
 export default function CustomCursor() {
-  const reducedMotion = usePrefersReducedMotion();
+  // Nível Baixo (e reduced motion): cursor do sistema
+  const isLowQuality = useQuality().quality === "baixo";
   const [hasFinePointer, setHasFinePointer] = useState(
     () => window.matchMedia(FINE_POINTER).matches,
   );
@@ -32,7 +33,7 @@ export default function CustomCursor() {
     return () => media.removeEventListener("change", handleChange);
   }, []);
 
-  if (!hasFinePointer || reducedMotion) return null;
+  if (!hasFinePointer || isLowQuality) return null;
   return <CursorLayer />;
 }
 
@@ -58,6 +59,8 @@ const ringStyles: Record<Mode, string> = {
 };
 
 function CursorLayer() {
+  // Médio: rastro menor (até 120 partículas, 2 por quadro)
+  const { settings } = useQuality();
   const pointer = usePointer();
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
@@ -160,7 +163,10 @@ function CursorLayer() {
     }
 
     // Rastro de "poeira" ASCII: até 4 partículas por frame, conforme a velocidade
-    const count = Math.min(4, Math.floor(speed / 7));
+    const count = Math.min(
+      settings.cursorParticlesPerFrame,
+      Math.floor(speed / 7),
+    );
     for (let i = 0; i < count; i++) {
       const k = i / count;
       particles.current.push({
@@ -199,8 +205,8 @@ function CursorLayer() {
       const char = p.life > 0.65 ? p.char : p.life > 0.3 ? "+" : "·";
       ctx.fillText(char, p.x, p.y);
     }
-    if (list.length > CURSOR.maxParticles) {
-      list.splice(0, list.length - CURSOR.maxParticles);
+    if (list.length > settings.cursorMaxParticles) {
+      list.splice(0, list.length - settings.cursorMaxParticles);
     }
   }
 

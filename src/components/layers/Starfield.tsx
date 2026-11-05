@@ -4,6 +4,7 @@ import {
   type CanvasFrame,
 } from "../../hooks/useCanvasAnimation";
 import { usePointer } from "../../hooks/usePointer";
+import { useQuality } from "../../hooks/useQuality";
 import { ASCII_FRAME_INTERVAL, STARS, warpState } from "../../lib/motion";
 
 interface Star {
@@ -17,8 +18,12 @@ interface Star {
   hasSpark: boolean;
 }
 
-function createStars(width: number, height: number): Star[] {
-  const count = Math.round((width * height) / STARS.areaPerStar);
+function createStars(
+  width: number,
+  height: number,
+  areaPerStar: number,
+): Star[] {
+  const count = Math.round((width * height) / areaPerStar);
   const stars: Star[] = [];
 
   for (let i = 0; i < count; i++) {
@@ -41,23 +46,27 @@ function createStars(width: number, height: number): Star[] {
  */
 export default function Starfield() {
   const pointer = usePointer();
+  // Nível de qualidade: menos estrelas, sem halo/cruz e sem warp no Médio/Baixo
+  const { settings } = useQuality();
   const stars = useRef<Star[]>([]);
-  const lastWidth = useRef(0);
+  const lastKey = useRef("");
 
   function draw({ ctx, width, height, time, isStatic }: CanvasFrame) {
     // Recria as estrelas só quando a LARGURA muda. No celular a altura muda
     // o tempo todo (barra do navegador aparecendo/sumindo) e isso faria as
     // estrelas "pularem".
-    if (width !== lastWidth.current) {
-      stars.current = createStars(width, height);
-      lastWidth.current = width;
+    // (e também quando o nível de qualidade muda a densidade)
+    const key = `${width}/${settings.areaPerStar}`;
+    if (key !== lastKey.current) {
+      stars.current = createStars(width, height, settings.areaPerStar);
+      lastKey.current = key;
     }
 
     ctx.clearRect(0, 0, width, height);
 
     const totalHeight = height * STARS.wrapScreens;
     const scrollY = window.scrollY;
-    const warp = isStatic ? 0 : warpState.value;
+    const warp = isStatic || !settings.warp ? 0 : warpState.value;
 
     for (const star of stars.current) {
       // Parallax vertical com "volta" (wrap) a cada 3 alturas de tela
@@ -88,7 +97,7 @@ export default function Starfield() {
       }
 
       // Halo lavanda nas estrelas mais próximas
-      if (star.z > STARS.haloDepth) {
+      if (settings.starDetails && star.z > STARS.haloDepth) {
         ctx.fillStyle = `rgba(${STARS.haloColor}, ${0.12 * twinkle})`;
         ctx.fillRect(x - size, y - size, size * 3, size * 3);
         ctx.fillStyle = `rgba(${STARS.nearColor}, ${alpha})`;
@@ -98,7 +107,7 @@ export default function Starfield() {
       ctx.fillRect(x, y, size, size);
 
       // Cruz de brilho
-      if (star.hasSpark) {
+      if (settings.starDetails && star.hasSpark) {
         const length = 3 + 4 * twinkle;
         ctx.fillStyle = `rgba(${STARS.sparkColor}, ${0.55 * twinkle})`;
         ctx.fillRect(x + size / 2 - 0.5, y - length, 1, length * 2 + size);

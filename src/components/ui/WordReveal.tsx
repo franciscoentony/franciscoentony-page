@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useScrollWhileVisible } from "../../hooks/useScrollWhileVisible";
-import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { useQuality } from "../../hooks/useQuality";
 import { WORDS, clamp } from "../../lib/motion";
 
 interface WordRevealProps {
@@ -15,7 +15,7 @@ interface WordRevealProps {
  */
 export default function WordReveal({ text, className = "" }: WordRevealProps) {
   const ref = useRef<HTMLParagraphElement>(null);
-  const reducedMotion = usePrefersReducedMotion();
+  const reducedMotion = useQuality().motion === "reduced";
   const words = text.split(" ");
   const [litCount, setLitCount] = useState(0);
 

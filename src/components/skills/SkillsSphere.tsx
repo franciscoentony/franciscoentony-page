@@ -1,7 +1,7 @@
 import { useEffect, useRef, type PointerEvent } from "react";
 import { skills } from "../../content/ui";
 import { usePointer } from "../../hooks/usePointer";
-import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { useQuality } from "../../hooks/useQuality";
 import { ASCII_FRAME_INTERVAL, SPHERE, lerp } from "../../lib/motion";
 import { subscribe } from "../../lib/ticker";
 
@@ -26,7 +26,7 @@ export default function SkillsSphere() {
   const containerRef = useRef<HTMLDivElement>(null);
   const tagRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const pointer = usePointer();
-  const reducedMotion = usePrefersReducedMotion();
+  const isLowQuality = useQuality().quality === "baixo";
 
   // Estado da rotação (fica em refs porque muda a cada frame)
   const rotation = useRef({ x: 0.3, y: 0 });
@@ -119,8 +119,8 @@ export default function SkillsSphere() {
       placeTags();
     }
 
-    // Reduced motion: posiciona uma vez e pronto
-    if (reducedMotion) {
+    // Nível Baixo (e reduced motion): posiciona uma vez e pronto
+    if (isLowQuality) {
       placeTags();
       window.addEventListener("resize", placeTags);
       return () => window.removeEventListener("resize", placeTags);
@@ -142,10 +142,10 @@ export default function SkillsSphere() {
       unsubscribe?.();
       observer.disconnect();
     };
-  }, [reducedMotion, pointer]);
+  }, [isLowQuality, pointer]);
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
-    if (reducedMotion) return;
+    if (isLowQuality) return;
     drag.current = { x: event.clientX, y: event.clientY };
     event.currentTarget.setPointerCapture(event.pointerId);
   }

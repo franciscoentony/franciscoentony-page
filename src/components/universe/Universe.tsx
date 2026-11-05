@@ -1,6 +1,6 @@
 import { useEffect, useRef, type RefObject } from "react";
 import { chapters, hero, sectionIds } from "../../content/ui";
-import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { useQuality } from "../../hooks/useQuality";
 import { useScrollWhileVisible } from "../../hooks/useScrollWhileVisible";
 import {
   UNIVERSE,
@@ -19,11 +19,12 @@ import PlanetCanvas from "./PlanetCanvas";
  * - Normal: seção de 520vh com um "palco" sticky de 100vh. Conforme o scroll,
  *   o planeta anda, a headline some, os 3 capítulos aparecem e, no fim,
  *   o planeta se dissolve e as estrelas fazem o efeito "velocidade da luz".
- * - Reduced motion: sem pin. Hero e capítulos viram blocos empilhados.
+ * - Nível Baixo (e reduced motion): sem pin. Hero e capítulos viram blocos
+ *   empilhados.
  */
 export default function Universe() {
-  const reducedMotion = usePrefersReducedMotion();
-  return reducedMotion ? <UniverseStatic /> : <UniverseAnimated />;
+  const isLowQuality = useQuality().quality === "baixo";
+  return isLowQuality ? <UniverseStatic /> : <UniverseAnimated />;
 }
 
 // ---------- Partes reutilizadas nas duas versões ----------

@@ -1,5 +1,5 @@
 import { useRef, useState, type PointerEvent, type ReactNode } from "react";
-import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { useQuality } from "../../hooks/useQuality";
 import { HOLO } from "../../lib/motion";
 
 interface HoloCardProps {
@@ -29,13 +29,15 @@ export default function HoloCard({
 }: HoloCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
-  const reducedMotion = usePrefersReducedMotion();
+  const { quality, settings } = useQuality();
+  // Nível Baixo (e reduced motion): sem tilt; o hover é só borda e sombra
+  const noTilt = quality === "baixo";
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
     // Só com mouse: no toque o card fica parado
     if (event.pointerType !== "mouse" || !cardRef.current) return;
     // Com reduced motion o card fica parado (R2 I-4)
-    if (reducedMotion) return;
+    if (noTilt) return;
 
     const card = cardRef.current;
     const rect = card.getBoundingClientRect();
@@ -84,7 +86,11 @@ export default function HoloCard({
         className={`holo-tilt relative h-full overflow-hidden rounded-lg border border-line-holo bg-linear-160 from-holo-from to-holo-to to-60% ${
           active
             ? "shadow-card-active [transition:transform_80ms_linear,box-shadow_400ms]"
-            : "shadow-card [transition:transform_600ms_var(--ease-smooth),box-shadow_600ms_var(--ease-smooth)]"
+            : `shadow-card [transition:transform_600ms_var(--ease-smooth),box-shadow_600ms_var(--ease-smooth),border-color_300ms] ${
+                noTilt
+                  ? "hover:border-line-strong hover:shadow-card-active"
+                  : ""
+              }`
         } ${innerClassName}`}
       >
         {children}
@@ -92,7 +98,8 @@ export default function HoloCard({
         {/* Camadas de efeito (decorativas) */}
         <div
           aria-hidden="true"
-          className="holo-foil pointer-events-none absolute inset-0"
+          // Médio: foil sem mix-blend-mode (camada simples, mais barata)
+          className={`${settings.foilBlend ? "holo-foil" : "holo-foil-flat"} pointer-events-none absolute inset-0`}
         />
         <div
           aria-hidden="true"

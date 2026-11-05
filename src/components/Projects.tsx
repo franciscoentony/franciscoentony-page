@@ -1,7 +1,7 @@
 import { useRef, useState, type KeyboardEvent } from "react";
 import { links, projects as projectsCopy, sectionIds } from "../content/ui";
 import { projects } from "../data/projects";
-import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
+import { useQuality } from "../hooks/useQuality";
 import ProjectCard from "./projects/ProjectCard";
 import Button from "./ui/Button";
 import Container from "./ui/Container";
@@ -14,7 +14,7 @@ import Reveal from "./ui/Reveal";
 export default function Projects() {
   const trackRef = useRef<HTMLUListElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const reducedMotion = usePrefersReducedMotion();
+  const reducedMotion = useQuality().motion === "reduced";
 
   /** Rola o carrossel até o card de número `index`. */
   function goTo(index: number) {

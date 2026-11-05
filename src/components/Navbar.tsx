@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { navbar } from "../content/ui";
 import { useHideOnScroll } from "../hooks/useHideOnScroll";
 import { useIsOverUniverse } from "../hooks/useIsOverUniverse";
+import { useQuality } from "../hooks/useQuality";
 import Button from "./ui/Button";
 import Container from "./ui/Container";
 
@@ -12,6 +13,7 @@ export default function Navbar() {
   const scrolledDown = useHideOnScroll();
   // Sobre o Universe (só céu escuro atrás) a navbar dispensa o blur (A5)
   const overUniverse = useIsOverUniverse();
+  const { settings } = useQuality();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const overlayRef = useRef<HTMLElement>(null);
@@ -88,8 +90,13 @@ export default function Navbar() {
         ref={headerRef}
         // Com foco de TECLADO (:focus-visible) dentro, a navbar volta a aparecer (WCAG 2.4.11).
         // Foco de clique de mouse não conta, senão ela nunca mais sumiria (R2 I-1).
-        className={`fixed inset-x-0 top-0 z-50 h-nav border-b border-line bg-ink/55 transition-transform duration-500 ${
-          overUniverse ? "" : "backdrop-blur-[20px] backdrop-saturate-180"
+        className={`fixed inset-x-0 top-0 z-50 h-nav border-b border-line transition-transform duration-500 ${
+          // Médio/Baixo: sem blur, fundo ink a 92%. Alto: blur só fora do Universe
+          !settings.navbarBlur
+            ? "bg-ink/92"
+            : overUniverse
+              ? "bg-ink/55"
+              : "bg-ink/55 backdrop-blur-[20px] backdrop-saturate-180"
         } ${
           hidden
             ? "-translate-y-full has-[:focus-visible]:translate-y-0"

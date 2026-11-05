@@ -1,3 +1,4 @@
+import { useQuality } from "../../hooks/useQuality";
 import { resolveAssetPath } from "../../utils/resolvePath";
 
 // Textura de ruído em PNG (128px, ~8 KB), repetida pela tela.
@@ -8,10 +9,15 @@ const grainUrl = `url("${resolveAssetPath("/textures/grain.png")}")`;
 
 /** Camada de grão a 5% de opacidade, animada em 4 passos (HANDOFF §2). */
 export default function Grain() {
+  // Parado nos níveis Médio e Baixo
+  const { settings } = useQuality();
+
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed -inset-1/2 z-40 animate-grain opacity-5"
+      className={`pointer-events-none fixed -inset-1/2 z-40 opacity-5 ${
+        settings.grainAnimated ? "animate-grain" : ""
+      }`}
       style={{ backgroundImage: grainUrl }}
     />
   );

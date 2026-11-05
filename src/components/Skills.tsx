@@ -1,6 +1,6 @@
 import { sectionIds, skills as skillsCopy } from "../content/ui";
 import { skills } from "../data/skills";
-import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
+import { useQuality } from "../hooks/useQuality";
 import SkillsSphere from "./skills/SkillsSphere";
 import Reveal from "./ui/Reveal";
 import { GradientText } from "./ui/RichText";
@@ -8,7 +8,7 @@ import Section from "./ui/Section";
 
 /** Seção "Inventário" (Habilidades): esfera 3D de tags + 4 colunas de skills.ts. */
 export default function Skills() {
-  const reducedMotion = usePrefersReducedMotion();
+  const isLowQuality = useQuality().quality === "baixo";
 
   return (
     <Section id={sectionIds.skills}>
@@ -24,8 +24,8 @@ export default function Skills() {
         <Reveal delay={2}>
           <p className="text-lead text-secondary">
             {skillsCopy.lead}
-            {/* Com reduced motion a esfera não gira, então a dica sai */}
-            {!reducedMotion && (
+            {/* No nível Baixo (e com reduced motion) a esfera não gira: a dica sai */}
+            {!isLowQuality && (
               <b className="font-medium text-paper"> {skillsCopy.dragHint}</b>
             )}
           </p>

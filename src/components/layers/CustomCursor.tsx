@@ -146,6 +146,15 @@ function CursorLayer() {
     const dy = y - previous.current.y;
     const speed = Math.hypot(dx, dy);
 
+    // Parado: mouse sem mexer, anel já alcançou o ponto e nenhuma partícula
+    // viva. Não desenha nem mexe no DOM; o hook tira o cursor do ticker até
+    // o próximo movimento (P5 I-B).
+    const ringSettled =
+      Math.abs(ring.current.x - x) < 0.1 && Math.abs(ring.current.y - y) < 0.1;
+    if (speed < 0.1 && ringSettled && particles.current.length === 0) {
+      return false;
+    }
+
     // Ponto: gira um pouco na direção do movimento e estica com a velocidade
     if (speed > 0.5) angle.current = Math.atan2(dy, dx);
     const rotation = 45 + angle.current * 57.3 * 0.15;
@@ -212,7 +221,7 @@ function CursorLayer() {
 
   // Exceção à regra dos 30fps: o cursor acompanha o mouse a cada frame,
   // senão ele "atrasa" visivelmente.
-  const canvasRef = useCanvasAnimation(draw);
+  const canvasRef = useCanvasAnimation(draw, { sleepUntilPointer: true });
   const label =
     mode === "holo" ? cursorCopy.holo : mode === "drag" ? cursorCopy.drag : "";
   const opacity = visible ? "opacity-100" : "opacity-0";

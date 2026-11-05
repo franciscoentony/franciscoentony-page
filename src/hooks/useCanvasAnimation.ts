@@ -73,6 +73,12 @@ interface CanvasAnimationOptions {
    * deve remontar o <canvas> (key) quando o nível de qualidade mudar.
    */
   worker?: CanvasWorkerOptions;
+  /**
+   * Se o `draw` devolver `false` ("nada a fazer"), o canvas sai do ticker e
+   * só volta no próximo movimento/toque do ponteiro. Usado pelo cursor
+   * custom parado (P5 I-B).
+   */
+  sleepUntilPointer?: boolean;
 }
 
 /**
@@ -95,8 +101,12 @@ interface CanvasAnimationOptions {
  *   return <canvas ref={canvasRef} aria-hidden="true" />;
  */
 export function useCanvasAnimation(
-  draw: (frame: CanvasFrame) => void,
-  { frameInterval = 0, worker: workerOptions }: CanvasAnimationOptions = {},
+  draw: (frame: CanvasFrame) => void | boolean,
+  {
+    frameInterval = 0,
+    worker: workerOptions,
+    sleepUntilPointer = false,
+  }: CanvasAnimationOptions = {},
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Nível Baixo (inclui reduced motion): um quadro parado por canvas
@@ -171,13 +181,31 @@ export function useCanvasAnimation(
         return;
       }
       if (!ctx) return;
-      drawRef.current({ ctx, width, height, time, isStatic });
+      return drawRef.current({ ctx, width, height, time, isStatic });
     }
 
     function tick(time: number) {
       if (time - lastDrawTime < frameInterval) return;
       lastDrawTime = time;
-      drawFrame(time);
+      const result = drawFrame(time);
+      if (result === false && sleepUntilPointer) sleep();
+    }
+
+    // Dormindo: fora do ticker até o próximo movimento do ponteiro
+    let sleeping = false;
+
+    function sleep() {
+      sleeping = true;
+      updateSubscription();
+      window.addEventListener("pointermove", wake, { passive: true });
+      window.addEventListener("pointerdown", wake);
+    }
+
+    function wake() {
+      window.removeEventListener("pointermove", wake);
+      window.removeEventListener("pointerdown", wake);
+      sleeping = false;
+      updateSubscription();
     }
 
     function start() {
@@ -193,7 +221,8 @@ export function useCanvasAnimation(
 
     /** Entra no ticker quando está visível e sai quando deixa de estar. */
     function updateSubscription() {
-      const shouldRun = started && !isStatic && isVisible && !cancelled;
+      const shouldRun =
+        started && !isStatic && isVisible && !cancelled && !sleeping;
       if (shouldRun && !unsubscribe) {
         unsubscribe = subscribe(tick);
       } else if (!shouldRun && unsubscribe) {
@@ -304,12 +333,14 @@ export function useCanvasAnimation(
     return () => {
       cancelled = true;
       unsubscribe?.();
+      window.removeEventListener("pointermove", wake);
+      window.removeEventListener("pointerdown", wake);
       worker?.terminate();
       visibilityObserver.disconnect();
       nearObserver.disconnect();
       resizeObserver.disconnect();
     };
-  }, [isStatic, frameInterval]);
+  }, [isStatic, frameInterval, sleepUntilPointer]);
 
   return canvasRef;
 }

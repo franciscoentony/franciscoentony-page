@@ -28,11 +28,14 @@ export default function PostCard({
   const Heading = headingLevel;
   const visibleTags = post.tags?.slice(0, MAX_TAGS) ?? [];
   const hiddenTagCount = (post.tags?.length ?? 0) - visibleTags.length;
+  // Card do /blog sem capa: sem altura mínima e com a data logo abaixo das
+  // tags (DS-P5c). O teaser da Home mantém os 250px com a data no rodapé.
+  const compact = showTags && !(showCover && post.cover);
 
   return (
     <Link
       to={`/blog/${post.slug}`}
-      className="flex h-full min-h-[250px] flex-col gap-3 rounded-lg border border-line bg-raised p-6.5 transition-[translate,border-color] duration-500 hover:-translate-y-1.5 hover:border-line-strong"
+      className={`flex h-full flex-col gap-3 rounded-lg ${compact ? "" : "min-h-[250px]"} border border-line bg-raised p-6.5 transition-[translate,border-color] duration-500 hover:-translate-y-1.5 hover:border-line-strong`}
     >
       {showCover && post.cover && (
         <img
@@ -67,7 +70,9 @@ export default function PostCard({
         </ul>
       )}
 
-      <div className="mt-auto flex justify-between gap-3 font-mono text-label text-secondary">
+      <div
+        className={`flex justify-between gap-3 font-mono text-label text-secondary ${compact ? "mt-1" : "mt-auto"}`}
+      >
         <span>{formatShortDate(post.date)}</span>
         <span>{post.readTime}</span>
       </div>

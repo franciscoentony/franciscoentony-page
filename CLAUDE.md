@@ -105,6 +105,8 @@ Ordem de implementação: **tokens → componentes base (Navbar, Footer, botões
 
 - **D24. Aprovações do Entony (04–05/11/2026):** a copy de interface de `src/content/ui.ts` está **aprovada por completo** (D3), incluindo a copy de SEO; a limpeza de arquivos soltos de `public/blog-data` foi feita (1c82205, 4b4af83); a compressão das fotos dos posts e os novos `alt` descritivos foram feitos (4b4af83); o plano de desempenho (`docs/redesign/PERF-PLAN.md`) foi aprovado, e desempenho é critério de merge.
 
+- **D25. Páginas de projeto e post (05/11/2026):** vale a v3 (`docs/redesign/HANDOFF-ADENDO-V3-PROJETO-POST.md`), que substitui a v1 e a v2. A copy da v3 foi aprovada pelo Entony. Princípio de design para o site inteiro (`docs/redesign/REVIEW-CARA-DE-IA.md`): nada de "cara de IA". A referência é o padrão Apple: hierarquia por tipografia, imagem e espaço; componentes próprios, sem caixas com borda e raio grande, rótulos mono em caps com ›, colchetes ou pills. Toda tela nova ou refeita passa pelo skill **impeccable** (`.claude/skills/impeccable`: context, critique e `reference/craft-floor.md`). A Home e o Header estão sendo reestilizados com o mesmo princípio.
+
 **Pendências com o Entony:** nenhuma. Alterações futuras de copy em `ui.ts` voltam a precisar de aprovação.
 
 ### Critérios de aceite (Definition of Done)

@@ -85,13 +85,20 @@ export default function Projects() {
         </Reveal>
       </Container>
 
+      {/*
+        O trilho rola na horizontal (overflow-x-auto), e isso também corta
+        na vertical. O brilho do card no hover (shadow-card-active) desce
+        ~130px e sobe ~50px, então o trilho tem padding vertical grande
+        (pt-15/pb-35) compensado por margens negativas (-mt-10/-mb-[90px]):
+        o layout (título e dots) fica no mesmo lugar.
+      */}
       <ul
         ref={trackRef}
         tabIndex={0}
         aria-label={projectsCopy.carouselLabel}
         onScroll={handleScroll}
         onKeyDown={handleKeyDown}
-        className="scrollbar-hidden relative flex snap-x snap-mandatory scroll-px-[max(24px,calc((100vw-1080px)/2))] gap-gutter overflow-x-auto px-[max(24px,calc((100vw-1080px)/2))] pt-5 pb-12.5"
+        className="scrollbar-hidden relative flex snap-x snap-mandatory scroll-px-[max(24px,calc((100vw-1080px)/2))] gap-gutter overflow-x-auto px-[max(24px,calc((100vw-1080px)/2))] -mt-10 -mb-[90px] pt-15 pb-35"
       >
         {projects.map((project, index) => (
           <li
@@ -104,7 +111,7 @@ export default function Projects() {
       </ul>
 
       {/* Dots: atalho visual para o mouse (no teclado, use as setas) */}
-      <div aria-hidden="true" className="flex justify-center gap-2">
+      <div aria-hidden="true" className="relative flex justify-center gap-2">
         {projects.map((project, index) => (
           <button
             key={project.name}

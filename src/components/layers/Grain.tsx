@@ -1,6 +1,10 @@
-// Ruído gerado por SVG (feTurbulence), usado como textura de "filme" sobre a página.
-const noiseSvg =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+import { resolveAssetPath } from "../../utils/resolvePath";
+
+// Textura de ruído em PNG (128px, ~8 KB), repetida pela tela.
+// Antes era um SVG com filtro feTurbulence, que o navegador recalculava ao
+// animar. Com um PNG e animação só de transform, o compositor da GPU move
+// a camada sem repintar a página (PERF-PLAN A5).
+const grainUrl = `url("${resolveAssetPath("/textures/grain.png")}")`;
 
 /** Camada de grão a 5% de opacidade, animada em 4 passos (HANDOFF §2). */
 export default function Grain() {
@@ -8,7 +12,7 @@ export default function Grain() {
     <div
       aria-hidden="true"
       className="pointer-events-none fixed -inset-1/2 z-40 animate-grain opacity-5"
-      style={{ backgroundImage: noiseSvg }}
+      style={{ backgroundImage: grainUrl }}
     />
   );
 }

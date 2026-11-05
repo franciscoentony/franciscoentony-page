@@ -53,8 +53,8 @@ interface Particle {
 const ringStyles: Record<Mode, string> = {
   "": "size-9 border-white/45",
   link: "size-[58px] border-white/70 bg-white/7",
-  holo: "size-24 border-transparent bg-cursor-fill backdrop-blur-[2px] cursor-ring-iridescent",
-  drag: "size-24 border-transparent bg-cursor-fill backdrop-blur-[2px] cursor-ring-iridescent",
+  holo: "size-24 border-transparent bg-cursor-fill cursor-ring-iridescent",
+  drag: "size-24 border-transparent bg-cursor-fill cursor-ring-iridescent",
 };
 
 function CursorLayer() {

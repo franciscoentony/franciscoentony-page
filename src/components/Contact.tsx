@@ -1,5 +1,6 @@
 import { contact, links, sectionIds, toast } from "../content/ui";
 import { useToast } from "../hooks/useToast";
+import { afterNextPaint } from "../lib/motion";
 import ContactField from "./contact/ContactField";
 import Button from "./ui/Button";
 import Container from "./ui/Container";
@@ -10,14 +11,22 @@ import { GradientText } from "./ui/RichText";
 export default function Contact() {
   const showToast = useToast();
 
-  async function copyEmail() {
-    try {
-      await navigator.clipboard.writeText(links.email);
-      showToast(toast.emailCopied);
-    } catch {
-      // Sem acesso à área de transferência: abre o app de e-mail
-      window.location.href = `mailto:${links.email}`;
-    }
+  function copyEmail() {
+    // A cópia começa na hora (o Safari exige que seja dentro do clique), mas
+    // o toast só aparece depois do paint: o botão responde primeiro (A10, INP)
+    const copying = navigator.clipboard
+      ? navigator.clipboard.writeText(links.email)
+      : Promise.reject(new Error("sem área de transferência"));
+
+    afterNextPaint(async () => {
+      try {
+        await copying;
+        showToast(toast.emailCopied);
+      } catch {
+        // Sem acesso à área de transferência: abre o app de e-mail
+        window.location.href = `mailto:${links.email}`;
+      }
+    });
   }
 
   return (

@@ -6,7 +6,7 @@ import {
 } from "../../hooks/useCanvasAnimation";
 import { usePointer } from "../../hooks/usePointer";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
-import { CURSOR, lerp } from "../../lib/motion";
+import { CURSOR, afterNextPaint, lerp } from "../../lib/motion";
 
 const FINE_POINTER = "(hover: hover) and (pointer: fine)";
 
@@ -97,20 +97,24 @@ function CursorLayer() {
     // Clique: encolhe o anel e solta uma explosão de partículas
     function handleDown(event: PointerEvent) {
       pressed.current = true;
-      for (let i = 0; i < CURSOR.clickParticles; i++) {
-        const direction = Math.random() * Math.PI * 2;
-        const speed = 1.5 + Math.random() * 3.5;
-        particles.current.push({
-          x: event.clientX,
-          y: event.clientY,
-          vx: Math.cos(direction) * speed,
-          vy: Math.sin(direction) * speed,
-          life: 1,
-          char: "✦*+"[i % 3],
-          hue: Math.random() * 360,
-          size: 12,
-        });
-      }
+      // Explosão de partículas depois do paint do clique (A10, INP)
+      const { clientX, clientY } = event;
+      afterNextPaint(() => {
+        for (let i = 0; i < CURSOR.clickParticles; i++) {
+          const direction = Math.random() * Math.PI * 2;
+          const speed = 1.5 + Math.random() * 3.5;
+          particles.current.push({
+            x: clientX,
+            y: clientY,
+            vx: Math.cos(direction) * speed,
+            vy: Math.sin(direction) * speed,
+            life: 1,
+            char: "✦*+"[i % 3],
+            hue: Math.random() * 360,
+            size: 12,
+          });
+        }
+      });
     }
 
     function handleUp() {

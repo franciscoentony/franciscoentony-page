@@ -189,3 +189,12 @@ export const CURSOR = {
   maxParticles: 260,
   trailChars: "·.:+*✦",
 };
+
+/**
+ * Roda `callback` logo depois do próximo paint (PERF-PLAN A10).
+ * Útil em cliques: o navegador mostra a resposta visual primeiro (INP menor)
+ * e o trabalho extra (toast, partículas, área de transferência) vem depois.
+ */
+export function afterNextPaint(callback: () => void) {
+  requestAnimationFrame(() => setTimeout(callback, 0));
+}

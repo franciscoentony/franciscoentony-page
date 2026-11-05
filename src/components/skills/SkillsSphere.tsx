@@ -60,6 +60,8 @@ export default function SkillsSphere() {
   const drag = useRef<{ x: number; y: number } | null>(null);
   const lastFrameTime = useRef(-Infinity);
   const colors = useRef<{ paper: string; gold: string } | null>(null);
+  // Largura de cada tag no tamanho base (medida uma vez só)
+  const baseWidths = useRef<number[] | null>(null);
 
   function rotate(time: number) {
     // Tempo desde o último quadro (no 1º quadro, ~33ms; no máximo 100ms)
@@ -102,6 +104,14 @@ export default function SkillsSphere() {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.letterSpacing = "0.02em"; // igual ao token tracking-mono
+    // Uma fonte só por quadro: o tamanho de cada tag vem da escala do
+    // setTransform (trocar ctx.font 44x por quadro era o que pesava)
+    ctx.font = `500 ${TAG_FONT_SIZE}px "Geist Mono", monospace`;
+    baseWidths.current ??= skills.sphereTags.map(
+      (label) => ctx.measureText(label).width,
+    );
+    const widths = baseWidths.current;
+    const base = ctx.getTransform(); // já inclui o DPR
 
     const radius = Math.min(width, height) * SPHERE.radius;
     const cosX = Math.cos(rotation.current.x);
@@ -120,7 +130,6 @@ export default function SkillsSphere() {
       // Mais perto (z maior) = maior
       const scale = 0.7 + (z + 1) * 0.3;
       const label = skills.sphereTags[index];
-      ctx.font = `500 ${TAG_FONT_SIZE * scale}px "Geist Mono", monospace`;
 
       return {
         label,
@@ -129,7 +138,7 @@ export default function SkillsSphere() {
         sphereX: x,
         z,
         scale,
-        halfWidth: ctx.measureText(label).width / 2,
+        halfWidth: (widths[index] * scale) / 2,
         halfHeight: (TAG_FONT_SIZE * scale) / 2,
       };
     });
@@ -152,7 +161,15 @@ export default function SkillsSphere() {
     }
 
     for (const tag of projected) {
-      ctx.font = `500 ${TAG_FONT_SIZE * tag.scale}px "Geist Mono", monospace`;
+      // Posiciona e escala a tag (a fonte base vira 15px × escala)
+      ctx.setTransform(
+        base.a * tag.scale,
+        0,
+        0,
+        base.d * tag.scale,
+        base.e + base.a * tag.x,
+        base.f + base.d * tag.y,
+      );
       ctx.globalAlpha = 0.32 + (tag.z + 1) * 0.34;
 
       if (tag === hovered) {
@@ -169,9 +186,10 @@ export default function SkillsSphere() {
         ctx.shadowBlur = 0;
       }
 
-      ctx.fillText(tag.label, tag.x, tag.y);
+      ctx.fillText(tag.label, 0, 0);
     }
 
+    ctx.setTransform(base);
     ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
   }

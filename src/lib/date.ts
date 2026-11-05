@@ -11,3 +11,27 @@ export function formatShortDate(iso: string): string {
   if (!year || !day || !blog.monthsShort[monthIndex]) return iso;
   return `${day} ${blog.monthsShort[monthIndex]} ${year}`;
 }
+
+/**
+ * Data por extenso com o dia da semana, como numa dataline de jornal:
+ * "2026-06-06" → "Sábado, 6 de junho de 2026" (adendo v3).
+ * Formata em UTC para o dia não voltar um (mesmo motivo de formatShortDate).
+ */
+export function formatLongDate(iso: string): string {
+  const date = new Date(`${iso.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return iso;
+  const text = new Intl.DateTimeFormat("pt-BR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** Minutos de leitura a partir do texto do Hugo ("3 min de leitura" → 3). */
+export function readMinutes(readTime: string): number | null {
+  const minutes = Number(/\d+/.exec(readTime)?.[0]);
+  return minutes > 0 ? minutes : null;
+}

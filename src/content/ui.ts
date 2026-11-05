@@ -224,7 +224,6 @@ export const blog = {
   allPostsLink: "Todos os posts ›",
   /** Card-convite do teaser quando há menos de 3 posts (DS-14). */
   inviteTitle: "Mais registros no diário",
-  backLink: "‹ Voltar pro blog",
   loading: "Carregando posts...",
   error: "Não foi possível carregar os posts agora.",
   empty: "Nenhum post publicado ainda.",
@@ -233,10 +232,31 @@ export const blog = {
   moreTagsLabel: "mais tags",
   // Página do post (/blog/:slug)
   loadingPost: "Carregando post...",
-  notFoundEyebrow: "404",
   notFoundTitle: "Post não encontrado.",
   notFoundText: "O link pode estar quebrado ou o post foi movido.",
   coverAltPrefix: "Capa do post:",
+  /**
+   * Detalhe do post, adendo v3 (copy aprovada pelo Entony, D25).
+   * "Não deu para copiar" é o texto de falha do protótipo v3.
+   */
+  post: {
+    /** Nome da seção na local nav (é o link de volta). */
+    section: "Blog",
+    copyLink: "Copiar link",
+    linkCopied: "Link copiado",
+    copyFailed: "Não deu para copiar",
+    linkedIn: "LinkedIn",
+    whatsApp: "WhatsApp",
+    /** "3 minutos de leitura" (substitui "3 min de leitura"). */
+    readTime: (minutes: number) =>
+      `${minutes} ${minutes === 1 ? "minuto" : "minutos"} de leitura`,
+    /** "Arquivado em Palestras, Google I/O e IFRN." */
+    filedUnder: (tags: string) => `Arquivado em ${tags}.`,
+    next: "Próximo post.",
+    prev: "Post anterior.",
+    /** Nome que assina o post (ao lado do retrato em ASCII). */
+    author: "Francisco Entony",
+  },
   /** Meses abreviados para as datas dos cards (ex.: "06 jun 2026"). */
   monthsShort: [
     "jan",

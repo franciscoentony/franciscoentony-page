@@ -113,6 +113,7 @@
   --color-accent-soft: #c9bcff; /* lavanda: links */
   --color-gold: #ffd25e; /* dourado: logo, checkpoints, raridade */
   --color-void: #050508; /* fundo da moldura da foto */
+  --color-code: #0c0c10; /* fundo da linha do git clone */
   --color-holo-from: #16131f; /* gradiente dos cards holográficos */
   --color-holo-to: #0b0a10;
   --color-checkpoint: #1b1b1f; /* checkpoint apagado da timeline */
@@ -152,6 +153,46 @@
   --text-post-title--line-height: 1.08;
   --text-post-title--letter-spacing: -0.035em;
   --text-post-title--font-weight: 600;
+
+  /* ---- Páginas de projeto e post (adendo v3) ---- */
+  --text-page-title: clamp(34px, 4.4vw, 56px); /* h1 do post */
+  --text-page-title--line-height: 1.06;
+  --text-page-title--letter-spacing: -0.038em;
+  --text-page-title--font-weight: 600;
+  --text-project-title: clamp(44px, 5.6vw, 80px); /* nome do projeto */
+  --text-project-title--line-height: 1;
+  --text-project-title--letter-spacing: -0.04em;
+  --text-project-title--font-weight: 600;
+  --text-intro: clamp(19px, 1.9vw, 24px); /* abertura do post e tagline */
+  --text-intro--line-height: 1.4;
+  --text-intro--letter-spacing: -0.018em;
+  --text-onward: clamp(30px, 4.4vw, 56px); /* "Próximo post." */
+  --text-onward--line-height: 1.08;
+  --text-onward--letter-spacing: -0.035em;
+  --text-onward--font-weight: 600;
+  --text-onward-sm: 21px; /* "Post anterior." */
+  --text-onward-sm--line-height: 1.3;
+  --text-onward-sm--letter-spacing: -0.02em;
+  --text-onward-sm--font-weight: 600;
+  --text-results: clamp(28px, 3.4vw, 44px); /* frase dos resultados */
+  --text-results--line-height: 1.2;
+  --text-results--letter-spacing: -0.03em;
+  --text-results--font-weight: 600;
+  --text-section-title: clamp(
+    26px,
+    2.6vw,
+    34px
+  ); /* capítulos, Ficha técnica, Telas */
+  --text-section-title--line-height: 1.15;
+  --text-section-title--letter-spacing: -0.03em;
+  --text-section-title--font-weight: 600;
+  --text-local-nav: 19px; /* "Blog" / "Projetos" na local nav */
+  --text-local-nav--letter-spacing: -0.02em;
+  --text-local-nav--font-weight: 600;
+  --text-fact: 19px; /* valor da ficha (período, papel, status) */
+  --text-fact--letter-spacing: -0.015em;
+  --text-caption: 14px; /* legendas das fotos */
+  --text-caption--line-height: 1.5;
 
   --text-h2: clamp(34px, 4.6vw, 60px);
   --text-h2--line-height: 1.05;
@@ -241,11 +282,13 @@
   /* Espaçamentos */
   --spacing-section: clamp(110px, 16vh, 180px); /* py-section */
   --spacing-nav: 48px; /* h-nav */
+  --spacing-lnav: 52px; /* local nav das páginas de projeto e post */
   --spacing-hero-top: clamp(90px, 15vh, 150px); /* topo da headline do hero */
   --spacing-gutter: 22px; /* padding dos cards, gap do carrossel e do footer */
 
   /* Movimento */
   --ease-smooth: cubic-bezier(0.2, 0.7, 0.2, 1); /* o "--ease" do HANDOFF */
+  --ease-page: cubic-bezier(0.16, 1, 0.3, 1); /* o "--ease" do adendo v3 */
   --default-transition-timing-function: var(--ease-smooth);
 
   /* Breakpoint único do protótipo: tab:... (>= 860px) e max-tab:... (< 860px) */
@@ -519,146 +562,221 @@
   );
 }
 
-/* ---------- Corpo dos posts do blog, HANDOFF §7 ----------
- * O HTML do post vem pronto do Hugo, então estilizamos as tags de dentro
- * (p, h2, a, img, code...) a partir desta classe. Uso: <div className="post-content">.
+/* ---------- Corpo do post (adendo v3) ----------
+ * O HTML vem pronto do Hugo (e passa por src/lib/postContent.ts), então
+ * estilizamos as tags de dentro a partir de .post-body.
+ * Cada bloco de texto fica na coluna de 640px; as fotos ficam na trilha
+ * média (880px, .fig.mid) ou na coluna. Sem bordas: a foto é o conteúdo.
  */
-@utility post-content {
-  font-size: 18px;
-  line-height: 1.7;
-  color: var(--color-prose);
+@layer components {
+  .post-body {
+    font-size: 18px;
+    line-height: 1.7;
+    letter-spacing: -0.012em;
+    color: var(--color-prose);
+    text-wrap: pretty;
 
-  /* A partir de 860px: 19px (DF-6) */
-  @media (width >= 53.75rem) {
-    font-size: 19px;
+    @media (width >= 53.75rem) {
+      font-size: 19px;
+    }
   }
 
-  & > * + * {
-    margin-top: 1.25em;
+  /* Coluna de leitura (640) e trilha média (880), com 24px de respiro */
+  .post-body > * {
+    width: min(640px, 100% - 48px);
+    margin-inline: auto;
+  }
+  .post-body > * + * {
+    margin-top: 1.1em;
+  }
+  .post-body > .fig.mid {
+    width: min(880px, 100% - 48px);
   }
 
-  & h2,
-  & h3 {
-    margin-top: 2em;
+  .post-body h2,
+  .post-body h3 {
     color: var(--color-paper);
     font-weight: 600;
-    letter-spacing: -0.03em;
     line-height: 1.2;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
   }
-
-  & h2 {
+  .post-body > h2 {
+    margin-top: 2.4em;
     font-size: 28px;
   }
-
-  & h3 {
+  .post-body > h3 {
+    margin-top: 2em;
     font-size: 22px;
   }
-
-  & a {
-    color: var(--color-accent-soft);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  & strong {
+  .post-body strong {
     color: var(--color-paper);
     font-weight: 600;
   }
-
-  & ul,
-  & ol {
+  .post-body a {
+    color: var(--color-paper);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgb(201 188 255 / 0.5);
+    text-underline-offset: 0.22em;
+    transition: text-decoration-color 300ms var(--ease-page);
+  }
+  .post-body a:hover {
+    text-decoration-color: var(--color-accent-soft);
+  }
+  .post-body ul,
+  .post-body ol {
     padding-left: 1.4em;
   }
-
-  & ul {
+  .post-body ul {
     list-style: disc;
   }
-
-  & ol {
+  .post-body ol {
     list-style: decimal;
   }
-
-  & li + li {
+  .post-body li + li {
     margin-top: 0.4em;
   }
-
-  & blockquote {
-    border-left: 2px solid var(--color-accent-soft);
+  .post-body blockquote {
+    font-size: 1.1em;
+    color: var(--color-paper);
     padding-left: 1em;
-    color: var(--color-secondary);
+    border-left: 1px solid var(--color-line-strong);
   }
-
-  & hr {
+  .post-body hr {
     border-color: var(--color-line);
   }
-
-  /* Código inline */
-  & code {
+  /* Código: aqui o mono é código de verdade */
+  .post-body code {
     font-family: var(--font-mono);
-    font-size: 0.88em;
-    background: var(--color-raised);
-    border: 1px solid var(--color-line);
+    font-size: 0.86em;
+    background: var(--color-code);
     border-radius: 6px;
     padding: 0.1em 0.35em;
   }
-
-  /* Código em bloco */
-  & pre {
+  .post-body pre {
     font-family: var(--font-mono);
     font-size: 14px;
     line-height: 1.6;
-    background: var(--color-raised);
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-md);
+    background: var(--color-code);
+    border-radius: var(--radius-portrait);
     padding: 20px;
     overflow-x: auto;
   }
-
-  & pre code {
+  .post-body pre code {
     background: none;
-    border: 0;
     padding: 0;
     font-size: inherit;
   }
 
-  /* Imagens: ocupam no máximo a coluna; as verticais ficam com no máximo
-     80% da tela (ou 720px) de altura, centralizadas (DF-7) */
-  /* Imagens: o width/height do HTML (render hook do Hugo, A9) dá a
-     proporção, então o espaço já fica reservado antes de a foto chegar.
-     Horizontais ocupam a coluna; verticais (.post-image-portrait) têm
-     altura de no máximo 80% da tela ou 720px, centralizadas (DF-7). */
-  & img {
+  /* Fotos: 64px de respiro em volta, raio 14, sem borda */
+  .post-body > .fig {
+    margin-block: 64px;
+  }
+  .post-body .media-frame {
+    width: 100%;
+    aspect-ratio: var(--ratio);
+    border: 0;
+    border-radius: var(--radius-portrait);
+  }
+  /* Vertical sozinha: altura de no máximo 80% da tela (ou 720px) */
+  .post-body .fig.portrait .media-frame {
+    width: min(100%, calc(min(80svh, 720px) * (var(--ratio))));
+    margin-inline: auto;
+  }
+  /* Par: as duas fotos com a mesma altura (cada uma cresce pelo seu --r) */
+  .post-body .pair {
+    display: flex;
+    gap: 12px;
+  }
+  .post-body .pair > .media-frame {
+    flex: var(--r, 1) 1 0;
+    min-width: 0;
+  }
+  /* Imagem sem moldura (fora do JSON de imagens): ocupa a coluna */
+  .post-body img:not(.media-frame > img) {
     display: block;
     width: 100%;
-    max-width: 100%;
     height: auto;
-    margin-inline: auto;
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-portrait);
   }
 
-  /* --ratio (largura/altura) vem do render hook. A largura é calculada para
-     a altura caber em min(80svh, 720px), sem passar da coluna; a altura
-     segue a proporção (height: auto), então nada distorce. */
-  & img.post-image-portrait {
-    width: min(100%, calc(min(80svh, 720px) * var(--ratio, 0.75)));
+  /* Legenda: na voz dele, como em revista */
+  .fig-caption,
+  .post-body .cap {
+    margin-top: 14px;
+    max-width: 60ch;
+    font-size: var(--text-caption);
+    line-height: var(--text-caption--line-height);
+    color: var(--color-secondary);
+    text-wrap: pretty;
   }
 
-  /* Com o skeleton (render hook), a MOLDURA reserva o espaço pela proporção
-     (--ratio: largura/altura) e a imagem só preenche (CLS 0) */
-  & .media-frame {
-    width: 100%;
-    margin-inline: auto;
-    aspect-ratio: var(--ratio);
+  /* ---- Foto sem moldura (capa, telas, próximo post) ---- */
+  .media-frame.photo {
+    border: 0;
+    border-radius: var(--radius-portrait);
   }
-  & .media-frame.post-image-portrait {
-    width: min(100%, calc(min(80svh, 720px) * (var(--ratio))));
-  }
-  & .media-frame > img {
-    max-width: none;
-    height: 100%;
+  .media-frame.bleed {
     border: 0;
     border-radius: 0;
+  }
+
+  /* ---- Revelação da capa: o ASCII da foto aparece e a foto entra por cima ---- */
+  .media-frame > canvas.reveal {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1.2s var(--ease-page) 0.4s;
+  }
+  .media-frame[data-reveal="ascii"] > canvas.reveal {
+    opacity: 1;
+    transition: none;
+  }
+  .media-frame[data-reveal="ascii"] > img {
+    opacity: 0;
+    scale: 1.03;
+    transition: none;
+  }
+  .media-frame[data-reveal="photo"] > img {
+    transition:
+      opacity 1.4s var(--ease-page),
+      scale 1.6s var(--ease-page);
+  }
+
+  /* ---- Lente: um furo na foto mostra o ASCII por baixo (só com mouse) ---- */
+  .media-frame > canvas.lens {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .media-frame[data-lens="on"] > img {
+    mask: radial-gradient(
+      circle var(--lens-r, 140px) at var(--px, 50%) var(--py, 50%),
+      transparent 92%,
+      #000 100%
+    );
+  }
+
+  /* ---- Erro: o tile fica parado e o alt aparece sobre um gradiente ---- */
+  .media-frame[data-state="error"][data-alt]::before {
+    content: "";
+    position: absolute;
+    inset: 40% 0 0;
+    background: linear-gradient(transparent, rgb(5 5 8 / 0.92) 60%);
+  }
+  .media-frame[data-state="error"][data-alt]::after {
+    content: attr(data-alt);
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 14px;
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    color: var(--color-prose);
   }
 }
 

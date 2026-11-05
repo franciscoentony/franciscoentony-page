@@ -62,7 +62,10 @@ export function watchMediaFrame(frame: HTMLElement): () => void {
   }
 
   function handleError() {
-    if (!stopped) setState(frame, "error");
+    if (stopped) return;
+    // O alt aparece sobre o tile parado (estado de erro do adendo v3)
+    if (img!.alt) frame.dataset.alt = img!.alt;
+    setState(frame, "error");
   }
 
   img.addEventListener("load", handleLoad, { once: true });

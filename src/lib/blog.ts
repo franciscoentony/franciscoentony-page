@@ -87,7 +87,12 @@ export function resolveContentHtml(html: string): string {
       srcset.replace(/\/blog\/images\//g, `${base}/blog-data/images/`),
     );
 
-  // O visual das imagens (raio, borda) vem da classe post-content em
+  // O visual das imagens (raio, borda) vem da classe post-body em
   // src/index.css (D14), não mais de estilo inline.
   return out;
+}
+
+/** Endereço da página atual, sem âncora (o que vai no "Copiar link"). */
+export function postUrl(): string {
+  return window.location.origin + window.location.pathname;
 }

@@ -81,29 +81,41 @@ function setMeta(html, key, value) {
   return html.replace(pattern, `$1${escapeHtml(value)}$2`);
 }
 
-/** Cria dist/<pasta>/index.html com o título e a descrição da página. */
+// Larguras da capa do post: ela sangra de ponta a ponta (igual a COVER_SIZES
+// em src/components/post/PostCover.tsx)
+const COVER_SIZES = "100vw";
+
 /**
- * Preload da 1ª imagem do post (é o LCP): o navegador começa a baixá-la
- * junto com o HTML, sem esperar o JS buscar o index.json (A9).
+ * Preload da capa do post (é o LCP): o navegador começa a baixá-la junto
+ * com o HTML, sem esperar o JS buscar o index.json (A9). A capa é o campo
+ * `cover` ou, sem ele, a 1ª imagem do corpo, que sobe para a capa (adendo v3).
  */
-function firstImagePreload(contentHtml) {
-  const img = /<img\b[^>]*>/i.exec(contentHtml ?? "")?.[0];
+function coverPreload(post) {
+  const toSite = (url) =>
+    url
+      .replace(/^\/(blog|blog-data)\//, "/blog-data/")
+      .replace(/\/blog\/images\//g, "/blog-data/images/");
+
+  if (post.cover) {
+    return `<link rel="preload" as="image" fetchpriority="high" href="${escapeHtml(toSite(post.cover))}" />`;
+  }
+
+  const img = /<img\b[^>]*>/i.exec(post.content ?? "")?.[0];
   if (!img) return "";
   const attr = (name) => new RegExp(`${name}="([^"]*)"`).exec(img)?.[1];
-  const toSite = (url) =>
-    url.replace(/\/blog\/images\//g, "/blog-data/images/");
   const src = attr("src");
   if (!src) return "";
   const srcset = attr("srcset");
-  const sizes = attr("sizes");
   return (
     `<link rel="preload" as="image" fetchpriority="high" href="${escapeHtml(toSite(src))}"` +
-    (srcset ? ` imagesrcset="${escapeHtml(toSite(srcset))}"` : "") +
-    (sizes ? ` imagesizes="${escapeHtml(sizes)}"` : "") +
+    (srcset
+      ? ` imagesrcset="${escapeHtml(toSite(srcset))}" imagesizes="${COVER_SIZES}"`
+      : "") +
     " />"
   );
 }
 
+/** Cria dist/<pasta>/index.html com o título e a descrição da página. */
 function createRoute(
   folder,
   title,
@@ -167,7 +179,7 @@ for (const post of posts) {
     `${title}${titleSuffix}`,
     description,
     "article",
-    `${postsPreload}\n    ${firstImagePreload(post.content)}`,
+    `${postsPreload}\n    ${coverPreload(post)}`,
   );
 }
 

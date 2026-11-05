@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { navbar } from "../content/ui";
 import { useHideOnScroll } from "../hooks/useHideOnScroll";
@@ -10,6 +10,14 @@ import Container from "./ui/Container";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { pathname } = useLocation();
+
+  /** Seção atual: /blog/... marca "Blog" e /projetos/... marca "Projetos". */
+  function isCurrent(to: string) {
+    if (to === "/blog") return pathname.startsWith("/blog");
+    if (to.endsWith("#projetos")) return pathname.startsWith("/projetos");
+    return false;
+  }
   const scrolledDown = useHideOnScroll();
   // Sobre o Universe (só céu escuro atrás) a navbar dispensa o blur (A5)
   const overUniverse = useIsOverUniverse();
@@ -37,6 +45,8 @@ export default function Navbar() {
     const outside = [
       document.querySelector("main"),
       document.querySelector("footer"),
+      // Local nav das páginas de post e projeto (adendo v3)
+      document.querySelector<HTMLElement>("[data-local-nav]"),
     ];
     outside.forEach((element) => {
       if (element) element.inert = true;
@@ -140,7 +150,8 @@ export default function Navbar() {
                 <li key={link.label}>
                   <Link
                     to={link.to}
-                    className="opacity-80 transition-opacity duration-200 hover:opacity-100"
+                    aria-current={isCurrent(link.to) ? "page" : undefined}
+                    className="opacity-80 transition-opacity duration-200 hover:opacity-100 aria-[current=page]:opacity-100"
                   >
                     {link.label}
                   </Link>
@@ -205,7 +216,8 @@ export default function Navbar() {
                 <Link
                   to={link.to}
                   onClick={closeMenu}
-                  className="block py-4 text-menu-overlay text-paper"
+                  aria-current={isCurrent(link.to) ? "page" : undefined}
+                  className="block py-4 text-menu-overlay text-paper aria-[current=page]:text-gold"
                 >
                   {link.label}
                 </Link>

@@ -183,11 +183,31 @@ export const FIELD = {
 
 // ---------- Cursor custom ----------
 
+/** Cursor foguete (docs/redesign/SPEC-CURSOR-FOGUETE.md). Fatores por quadro de 16ms. */
 export const CURSOR = {
-  ringFollow: 0.16, // lerp do anel seguindo o ponto
-  clickParticles: 18,
-  maxParticles: 260,
-  trailChars: "·.:+*✦",
+  ringFollow: 0.16, // lerp da órbita seguindo o nariz
+  /** Hotspot = nariz do foguete, em px dentro do SVG de 24×24. */
+  noseX: 12,
+  noseY: 1.5,
+  /** Distância do nariz até o bocal (de onde sai a exaustão), em px. */
+  tailDistance: 18,
+  /** Pose parada: nariz para cima e para a esquerda, como a seta do sistema. */
+  restAngle: -45,
+  velocitySmoothing: 0.25, // EMA da velocidade
+  turnMinSpeed: 2, // px/quadro: abaixo disso o foguete não gira
+  turnFactor: 0.82, // k = 1 - 0.82^(dt/16) ao virar para o rumo
+  restDelay: 250, // ms parado antes de voltar à pose
+  restFactor: 0.94, // k = 1 - 0.94^(dt/16) ao voltar à pose (~0,8s)
+  flameMinSpeed: 6, // px/quadro: abaixo disso, sem chama
+  particleDecay: 0.035, // vida perdida por quadro (~0,5s)
+  flameSpread: 18, // ± graus de espalhamento da exaustão
+  flameJitter: 1.5, // ± px na origem
+  boostCone: 70, // graus do cone da rajada do clique
+  linkScale: 1.1, // foguete sobre links e botões
+  pressedScale: 0.9, // no pointerdown
+  pressedLinkScale: 0.99, // no pointerdown sobre link
+  pressedRingScale: 0.82,
+  scaleTau: 60, // ms: volta da escala em ~200ms
 };
 
 /**

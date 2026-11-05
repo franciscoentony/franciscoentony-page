@@ -6,7 +6,7 @@ import {
 } from "../../hooks/useCanvasAnimation";
 import { usePointer } from "../../hooks/usePointer";
 import { useQuality } from "../../hooks/useQuality";
-import { CURSOR, afterNextPaint, lerp } from "../../lib/motion";
+import { CURSOR, afterNextPaint } from "../../lib/motion";
 
 const FINE_POINTER = "(hover: hover) and (pointer: fine)";
 
@@ -45,34 +45,114 @@ interface Particle {
   vx: number;
   vy: number;
   life: number; // 1 = acabou de nascer, 0 = some
-  char: string;
-  hue: number;
+  /** Qual dos 2 glifos de cada faixa de vida (0 ou 1). */
+  variant: number;
+  /** Glifo fixo (rajada do clique). Sem ele, o glifo segue a vida. */
+  glyph?: string;
+  /** Matiz "frio" (lavanda) para depois que a partícula esfria. */
+  coolHue: number;
   size: number;
 }
 
-// Tamanho e estilo do anel em cada modo
+// Glifos da exaustão por vida: quente → morno → frio
+const FLAME_GLYPHS = [
+  ["✦", "*"], // vida > 0.7
+  ["+", ":"], // vida > 0.4
+  ["·", "."], // fim
+];
+const BOOST_GLYPHS = "✦*+";
+
+// Órbita (anel) em cada modo. No padrão ela não existe.
 const ringStyles: Record<Mode, string> = {
-  "": "size-9 border-white/45",
-  link: "size-[58px] border-white/70 bg-white/7",
+  "": "size-0 border-transparent",
+  link: "size-10 border-paper/40",
   holo: "size-24 border-transparent bg-cursor-fill cursor-ring-iridescent",
   drag: "size-24 border-transparent bg-cursor-fill cursor-ring-iridescent",
 };
 
+/** Fator de aproximação por quadro corrigido pelo tempo: 1 - base^(dt/16). */
+function frameFactor(base: number, dt: number) {
+  return 1 - Math.pow(base, dt / 16);
+}
+
+/** Diferença entre dois ângulos pelo caminho mais curto (-180..180). */
+function angleDiff(target: number, current: number) {
+  return ((((target - current) % 360) + 540) % 360) - 180;
+}
+
+/**
+ * Cursor foguete (docs/redesign/SPEC-CURSOR-FOGUETE.md).
+ * - O nariz é o hotspot: fica exatamente sobre o ponteiro em qualquer
+ *   rotação (transform-origin no nariz + translate de -nariz).
+ * - Gira na direção do movimento (sem tremer em movimentos pequenos) e,
+ *   parado, volta à pose de -45°.
+ * - A exaustão (partículas ASCII douradas que esfriam em lavanda) sai do
+ *   bocal; o clique solta uma rajada (boost).
+ * - Ocioso, o draw devolve false e sai do ticker (P5 I-B).
+ */
 function CursorLayer() {
-  // Médio: rastro menor (até 120 partículas, 2 por quadro)
+  // Médio: menos partículas (limites em quality.ts)
   const { settings } = useQuality();
   const pointer = usePointer();
-  const dotRef = useRef<HTMLDivElement>(null);
+  const rocketRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const [mode, setMode] = useState<Mode>("");
+  const modeRef = useRef<Mode>("");
 
-  // Valores que mudam a cada frame ficam em refs (sem re-render)
+  // Valores que mudam a cada quadro ficam em refs (sem re-render)
   const ring = useRef({ x: 0, y: 0 });
   const previous = useRef({ x: 0, y: 0 });
-  const angle = useRef(0);
+  const velocity = useRef({ x: 0, y: 0 }); // px por quadro de 16ms (suavizada)
+  const angle = useRef<number>(CURSOR.restAngle); // graus; 0 = nariz para cima
+  const lastTurnTime = useRef(0);
+  const lastTime = useRef(0);
+  const scale = useRef(1);
   const pressed = useRef(false);
+  const previousTail = useRef<{ x: number; y: number } | null>(null);
   const particles = useRef<Particle[]>([]);
+
+  /** Posição do bocal (cauda) para o nariz em (x, y) e o ângulo atual. */
+  function tailPosition(x: number, y: number) {
+    const radians = (angle.current * Math.PI) / 180;
+    return {
+      x: x - Math.sin(radians) * CURSOR.tailDistance,
+      y: y + Math.cos(radians) * CURSOR.tailDistance,
+    };
+  }
+
+  /** Cria uma partícula saindo da cauda, na direção oposta ao nariz. */
+  function emit(
+    x: number,
+    y: number,
+    spreadDegrees: number,
+    speed: number,
+    time: number,
+    glyph?: string,
+  ) {
+    const exhaust =
+      angle.current + 180 + (Math.random() - 0.5) * 2 * spreadDegrees;
+    const radians = (exhaust * Math.PI) / 180;
+    particles.current.push({
+      x: x + (Math.random() - 0.5) * 2 * CURSOR.flameJitter,
+      y: y + (Math.random() - 0.5) * 2 * CURSOR.flameJitter,
+      // 0° = para cima: x = sen, y = -cos
+      vx: Math.sin(radians) * speed,
+      vy: -Math.cos(radians) * speed,
+      life: 1,
+      variant: Math.random() < 0.5 ? 0 : 1,
+      coolHue: 250 + (Math.sin(time * 0.002) * 0.5 + 0.5) * 50,
+      size: 8 + Math.random() * 4,
+      glyph,
+    });
+  }
+
+  // Partículas da rajada do clique (Médio: menos). Em ref para o listener
+  // de clique sempre ler o valor do nível atual.
+  const boostCount = useRef(settings.cursorBoostParticles);
+  useEffect(() => {
+    boostCount.current = settings.cursorBoostParticles;
+  });
 
   useEffect(() => {
     const html = document.documentElement;
@@ -91,31 +171,31 @@ function CursorLayer() {
     // Descobre o modo pelo elemento embaixo do mouse
     function handleOver(event: PointerEvent) {
       const target = event.target as Element;
-      if (target.closest('[data-cursor="drag"]')) setMode("drag");
-      else if (target.closest('[data-cursor="holo"]')) setMode("holo");
-      else if (target.closest("a, button")) setMode("link");
-      else setMode("");
+      let next: Mode = "";
+      if (target.closest('[data-cursor="drag"]')) next = "drag";
+      else if (target.closest('[data-cursor="holo"]')) next = "holo";
+      else if (target.closest("a, button")) next = "link";
+      modeRef.current = next;
+      setMode(next);
     }
 
-    // Clique: encolhe o anel e solta uma explosão de partículas
-    function handleDown(event: PointerEvent) {
+    // Clique = boost: o foguete encolhe e solta uma rajada pela cauda
+    function handleDown() {
       pressed.current = true;
-      // Explosão de partículas depois do paint do clique (A10, INP)
-      const { clientX, clientY } = event;
+      // Partículas depois do paint do clique (A10, INP)
       afterNextPaint(() => {
-        for (let i = 0; i < CURSOR.clickParticles; i++) {
-          const direction = Math.random() * Math.PI * 2;
-          const speed = 1.5 + Math.random() * 3.5;
-          particles.current.push({
-            x: clientX,
-            y: clientY,
-            vx: Math.cos(direction) * speed,
-            vy: Math.sin(direction) * speed,
-            life: 1,
-            char: "✦*+"[i % 3],
-            hue: Math.random() * 360,
-            size: 12,
-          });
+        const tail = tailPosition(pointer.current.x, pointer.current.y);
+        const now = performance.now();
+        for (let i = 0; i < boostCount.current; i++) {
+          const speed = 2 + Math.random() * 3;
+          emit(
+            tail.x,
+            tail.y,
+            CURSOR.boostCone / 2,
+            speed,
+            now,
+            BOOST_GLYPHS[i % 3],
+          );
         }
       });
     }
@@ -138,93 +218,157 @@ function CursorLayer() {
       window.removeEventListener("pointerdown", handleDown);
       window.removeEventListener("pointerup", handleUp);
     };
+    // tailPosition e emit só leem refs (nada que precise reiniciar o efeito)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function draw({ ctx, width, height, time }: CanvasFrame) {
-    const { x, y } = pointer.current;
-    const dx = x - previous.current.x;
-    const dy = y - previous.current.y;
-    const speed = Math.hypot(dx, dy);
+    // Tempo desde o último quadro (no 1º, 16ms; no máximo 100ms)
+    const dt =
+      lastTime.current === 0
+        ? 16
+        : Math.min(Math.max(time - lastTime.current, 1), 100);
+    lastTime.current = time;
 
-    // Parado: mouse sem mexer, anel já alcançou o ponto e nenhuma partícula
-    // viva. Não desenha nem mexe no DOM; o hook tira o cursor do ticker até
-    // o próximo movimento (P5 I-B).
+    const { x, y } = pointer.current;
+
+    // Velocidade suavizada (EMA), em px por quadro de 16ms
+    const dx = ((x - previous.current.x) * 16) / dt;
+    const dy = ((y - previous.current.y) * 16) / dt;
+    const smoothing = frameFactor(1 - CURSOR.velocitySmoothing, dt);
+    velocity.current.x += (dx - velocity.current.x) * smoothing;
+    velocity.current.y += (dy - velocity.current.y) * smoothing;
+    const speed = Math.hypot(velocity.current.x, velocity.current.y);
+    previous.current = { x, y };
+
+    // Escala alvo: maior sobre links; menor enquanto pressiona
+    const isLink = modeRef.current === "link";
+    const targetScale = pressed.current
+      ? isLink
+        ? CURSOR.pressedLinkScale
+        : CURSOR.pressedScale
+      : isLink
+        ? CURSOR.linkScale
+        : 1;
+
+    // Ocioso: parado, na pose, órbita no lugar, escala certa e sem chama.
+    // Não desenha nem mexe no DOM; o hook tira o cursor do ticker (P5 I-B).
     const ringSettled =
       Math.abs(ring.current.x - x) < 0.1 && Math.abs(ring.current.y - y) < 0.1;
-    if (speed < 0.1 && ringSettled && particles.current.length === 0) {
+    const atRest = Math.abs(angleDiff(CURSOR.restAngle, angle.current)) < 0.5;
+    const scaleSettled = Math.abs(scale.current - targetScale) < 0.001;
+    if (
+      speed < 0.1 &&
+      atRest &&
+      ringSettled &&
+      scaleSettled &&
+      particles.current.length === 0
+    ) {
+      previousTail.current = null;
       return false;
     }
 
-    // Ponto: gira um pouco na direção do movimento e estica com a velocidade
-    if (speed > 0.5) angle.current = Math.atan2(dy, dx);
-    const rotation = 45 + angle.current * 57.3 * 0.15;
-    const stretch = 1 + Math.min(speed, 40) / 80;
-    if (dotRef.current) {
-      dotRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) rotate(${rotation}deg) scale(${stretch})`;
+    // Rotação: segue o rumo só com movimento de verdade (> 2 px/quadro),
+    // pelo caminho mais curto; parado por 250ms, volta à pose de -45°
+    if (speed > CURSOR.turnMinSpeed) {
+      const heading =
+        (Math.atan2(velocity.current.y, velocity.current.x) * 180) / Math.PI +
+        90;
+      angle.current +=
+        angleDiff(heading, angle.current) * frameFactor(CURSOR.turnFactor, dt);
+      lastTurnTime.current = time;
+    } else if (time - lastTurnTime.current > CURSOR.restDelay) {
+      angle.current +=
+        angleDiff(CURSOR.restAngle, angle.current) *
+        frameFactor(CURSOR.restFactor, dt);
     }
 
-    // Anel: segue o ponto com atraso
-    ring.current.x = lerp(ring.current.x, x, CURSOR.ringFollow);
-    ring.current.y = lerp(ring.current.y, y, CURSOR.ringFollow);
+    // Mantém o ângulo entre -180 e 180 (só para os valores não crescerem)
+    angle.current = angleDiff(angle.current, 0);
+
+    // Escala aproxima o alvo (pressionar é imediato; soltar leva ~200ms)
+    scale.current = pressed.current
+      ? targetScale
+      : scale.current +
+        (targetScale - scale.current) * (1 - Math.exp(-dt / CURSOR.scaleTau));
+
+    // Foguete: o nariz (transform-origin) fica exatamente sobre o ponteiro
+    if (rocketRef.current) {
+      rocketRef.current.style.transform = `translate3d(${x - CURSOR.noseX}px, ${y - CURSOR.noseY}px, 0) rotate(${angle.current}deg) scale(${scale.current})`;
+    }
+
+    // Órbita: segue o nariz com atraso
+    const follow = frameFactor(1 - CURSOR.ringFollow, dt);
+    ring.current.x += (x - ring.current.x) * follow;
+    ring.current.y += (y - ring.current.y) * follow;
     if (ringRef.current) {
-      const scale = pressed.current ? 0.82 : 1;
-      ringRef.current.style.transform = `translate3d(${ring.current.x}px, ${ring.current.y}px, 0) translate(-50%, -50%) scale(${scale})`;
+      const ringScale = pressed.current ? CURSOR.pressedRingScale : 1;
+      ringRef.current.style.transform = `translate3d(${ring.current.x}px, ${ring.current.y}px, 0) translate(-50%, -50%) scale(${ringScale})`;
     }
 
-    // Rastro de "poeira" ASCII: até 4 partículas por frame, conforme a velocidade
+    // Exaustão: da cauda anterior até a atual (sem buracos em movimentos
+    // rápidos). Abaixo de 6 px/quadro, nenhuma chama.
+    const tail = tailPosition(x, y);
+    const fromTail = previousTail.current ?? tail;
     const count = Math.min(
       settings.cursorParticlesPerFrame,
-      Math.floor(speed / 7),
+      Math.floor(speed / CURSOR.flameMinSpeed),
     );
     for (let i = 0; i < count; i++) {
-      const k = i / count;
-      particles.current.push({
-        x: previous.current.x + dx * k + (Math.random() - 0.5) * 6,
-        y: previous.current.y + dy * k + (Math.random() - 0.5) * 6,
-        vx: (Math.random() - 0.5) * 0.6 - dx * 0.02,
-        vy: (Math.random() - 0.5) * 0.6 - dy * 0.02 + 0.15,
-        life: 1,
-        char: CURSOR.trailChars[
-          Math.floor(Math.random() * CURSOR.trailChars.length)
-        ],
-        hue: 250 + Math.sin(time * 0.002) * 50 + Math.random() * 40,
-        size: 9 + Math.random() * 5,
-      });
+      const k = count === 1 ? 1 : i / (count - 1);
+      emit(
+        fromTail.x + (tail.x - fromTail.x) * k,
+        fromTail.y + (tail.y - fromTail.y) * k,
+        CURSOR.flameSpread,
+        0.8 + speed * 0.06,
+        time,
+      );
     }
-    previous.current = { x, y };
+    previousTail.current = tail;
 
-    // Atualiza e desenha as partículas
+    // Atualiza e desenha as partículas (tudo corrigido pelo tempo do quadro)
     ctx.clearRect(0, 0, width, height);
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
+    const steps = dt / 16;
+    const damping = Math.pow(0.96, steps);
     const list = particles.current;
     for (let i = list.length - 1; i >= 0; i--) {
       const p = list[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vx *= 0.96;
-      p.vy *= 0.96;
-      p.life -= 0.022;
+      p.x += p.vx * steps;
+      p.y += p.vy * steps;
+      p.vx *= damping;
+      p.vy *= damping;
+      p.life -= CURSOR.particleDecay * steps;
       if (p.life <= 0) {
         list.splice(i, 1);
         continue;
       }
+      // Dourada saindo do bocal (1º quarto da vida), depois esfria em lavanda
+      const hue = p.life > 0.75 ? 45 : p.coolHue;
+      const glyphs =
+        p.life > 0.7
+          ? FLAME_GLYPHS[0]
+          : p.life > 0.4
+            ? FLAME_GLYPHS[1]
+            : FLAME_GLYPHS[2];
       ctx.font = `500 ${p.size}px "Geist Mono", monospace`;
-      ctx.fillStyle = `hsla(${p.hue},95%,${70 + p.life * 20}%,${p.life})`;
-      const char = p.life > 0.65 ? p.char : p.life > 0.3 ? "+" : "·";
-      ctx.fillText(char, p.x, p.y);
+      ctx.fillStyle = `hsla(${hue},95%,${70 + p.life * 20}%,${p.life})`;
+      ctx.fillText(p.glyph ?? glyphs[p.variant], p.x, p.y);
     }
     if (list.length > settings.cursorMaxParticles) {
       list.splice(0, list.length - settings.cursorMaxParticles);
     }
   }
 
-  // Exceção à regra dos 30fps: o cursor acompanha o mouse a cada frame,
+  // Exceção à regra dos 30fps: o cursor acompanha o mouse a cada quadro,
   // senão ele "atrasa" visivelmente.
   const canvasRef = useCanvasAnimation(draw, { sleepUntilPointer: true });
   const label =
     mode === "holo" ? cursorCopy.holo : mode === "drag" ? cursorCopy.drag : "";
   const opacity = visible ? "opacity-100" : "opacity-0";
+  // A órbita não existe no modo padrão
+  const ringOpacity = visible && mode !== "" ? "opacity-100" : "opacity-0";
 
   return (
     <>
@@ -233,15 +377,53 @@ function CursorLayer() {
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-98 size-full"
       />
+
+      {/* Foguete (SVG 24×24, nariz em 12,1.5 = hotspot) */}
       <div
-        ref={dotRef}
+        ref={rocketRef}
         aria-hidden="true"
-        className={`pointer-events-none fixed top-0 left-0 z-100 size-2 bg-gold shadow-cursor-dot transition-opacity duration-300 ${opacity}`}
-      />
+        className={`pointer-events-none fixed top-0 left-0 z-100 size-6 origin-[12px_1.5px] drop-shadow-rocket transition-opacity duration-300 ${opacity}`}
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          strokeWidth="1.25"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          className="stroke-paper"
+        >
+          {/* corpo (nariz em 12,1.5) */}
+          <path
+            d="M12 1.5C15.2 4.5 16 8.5 16 12.5V17H8V12.5C8 8.5 8.8 4.5 12 1.5Z"
+            className="fill-ink"
+          />
+          {/* aletas */}
+          <path d="M8 13.5L5 17V19.5L8 17.5" className="stroke-accent-soft" />
+          <path
+            d="M16 13.5L19 17V19.5L16 17.5"
+            className="stroke-accent-soft"
+          />
+          {/* bocal */}
+          <path d="M10 17L10.6 19H13.4L14 17" />
+          {/* escotilha: o ponto dourado de antes; brilha sobre links */}
+          <circle
+            cx="12"
+            cy="9.5"
+            r="1.9"
+            className={`fill-gold stroke-none transition-[filter] duration-300 ${
+              mode === "link" ? "drop-shadow-glow-gold" : ""
+            }`}
+          />
+        </svg>
+      </div>
+
+      {/* Órbita: só em links (40px) e nos modos holo/arrastar (96px) */}
       <div
         ref={ringRef}
         aria-hidden="true"
-        className={`pointer-events-none fixed top-0 left-0 z-100 grid place-items-center rounded-full border transition-[width,height,background-color,border-color,opacity] duration-450 ${ringStyles[mode]} ${opacity}`}
+        className={`pointer-events-none fixed top-0 left-0 z-100 grid place-items-center rounded-full border transition-[width,height,background-color,border-color,opacity] duration-450 ${ringStyles[mode]} ${ringOpacity}`}
       >
         <span
           className={`font-mono text-label-2xs tracking-label-widest whitespace-nowrap text-white transition-all duration-350 ${

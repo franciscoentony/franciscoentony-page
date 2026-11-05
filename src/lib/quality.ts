@@ -41,6 +41,8 @@ export interface QualitySettings {
   /** Rastro do cursor: máximo de partículas e quantas nascem por quadro. */
   cursorMaxParticles: number;
   cursorParticlesPerFrame: number;
+  /** Partículas da rajada do clique (boost do foguete). */
+  cursorBoostParticles: number;
 }
 
 /** Parâmetros de cada nível (tabela da PERF-TIERS §1). */
@@ -60,6 +62,7 @@ export const QUALITY_SETTINGS: Record<Quality, QualitySettings> = {
     foilBlend: true,
     cursorMaxParticles: 260,
     cursorParticlesPerFrame: 4,
+    cursorBoostParticles: 12,
   },
   medio: {
     asciiInterval: 50, // 20fps
@@ -76,6 +79,7 @@ export const QUALITY_SETTINGS: Record<Quality, QualitySettings> = {
     foilBlend: false,
     cursorMaxParticles: 120,
     cursorParticlesPerFrame: 2,
+    cursorBoostParticles: 8,
   },
   // Baixo = Médio, mas com os canvases em quadro estático (isso é decidido
   // por quem usa: useCanvasAnimation, Universe, esfera, cursor...)
@@ -94,6 +98,7 @@ export const QUALITY_SETTINGS: Record<Quality, QualitySettings> = {
     foilBlend: false,
     cursorMaxParticles: 0,
     cursorParticlesPerFrame: 0,
+    cursorBoostParticles: 0,
   },
 };
 

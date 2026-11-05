@@ -231,8 +231,10 @@
   --shadow-ring-soft: 0 0 0 6px rgba(255, 255, 255, 0.08); /* hover do botão primário */
   --shadow-glow-gold: 0 0 12px var(--color-gold);
   --shadow-glow-gold-lg: 0 0 16px var(--color-gold); /* checkpoint ativo */
-  --shadow-cursor-dot:
-    0 0 10px var(--color-gold), 0 0 22px rgba(255, 210, 94, 0.5);
+
+  /* Brilhos do cursor foguete (filter: drop-shadow; vale para SVG) */
+  --drop-shadow-rocket: 0 0 6px rgba(201, 188, 255, 0.45); /* lavanda */
+  --drop-shadow-glow-gold: 0 0 6px var(--color-gold); /* escotilha em links */
   --shadow-card: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
   --shadow-card-active: 0 40px 120px -30px rgba(139, 108, 255, 0.45);
 

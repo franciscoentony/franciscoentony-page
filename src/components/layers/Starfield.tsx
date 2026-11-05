@@ -5,39 +5,8 @@ import {
 } from "../../hooks/useCanvasAnimation";
 import { usePointer } from "../../hooks/usePointer";
 import { useQuality } from "../../hooks/useQuality";
-import { ASCII_FRAME_INTERVAL, STARS, warpState } from "../../lib/motion";
-
-interface Star {
-  x: number;
-  y: number;
-  /** Profundidade: 0.1 (longe) a 1 (perto). */
-  z: number;
-  /** Fase da cintilação, para cada estrela piscar num tempo diferente. */
-  phase: number;
-  /** 2% das estrelas têm uma cruz de brilho. */
-  hasSpark: boolean;
-}
-
-function createStars(
-  width: number,
-  height: number,
-  areaPerStar: number,
-): Star[] {
-  const count = Math.round((width * height) / areaPerStar);
-  const stars: Star[] = [];
-
-  for (let i = 0; i < count; i++) {
-    stars.push({
-      x: Math.random() * width,
-      y: Math.random() * height * STARS.wrapScreens,
-      z: Math.random() ** 2 * 0.9 + 0.1,
-      phase: Math.random() * 6,
-      hasSpark: Math.random() < STARS.sparkChance,
-    });
-  }
-
-  return stars;
-}
+import { ASCII_FRAME_INTERVAL, warpState } from "../../lib/motion";
+import { drawStars, type StarsState } from "../../lib/stars";
 
 /**
  * Fundo de estrelas com parallax (HANDOFF §4, "Fundo de estrelas").
@@ -45,80 +14,49 @@ function createStars(
  * viram linhas saindo do centro (efeito "velocidade da luz", warpState).
  */
 export default function Starfield() {
+  // O canvas vai para um Web Worker (A8) e não volta: quando o nível de
+  // qualidade muda, remontamos o <canvas> (key) para começar do zero.
+  const { quality } = useQuality();
+  return <StarfieldCanvas key={quality} />;
+}
+
+function StarfieldCanvas() {
   const pointer = usePointer();
   // Nível de qualidade: menos estrelas, sem halo/cruz e sem warp no Médio/Baixo
   const { settings } = useQuality();
-  const stars = useRef<Star[]>([]);
-  const lastKey = useRef("");
+  const state = useRef<StarsState>({ stars: [], key: "" });
 
   function draw({ ctx, width, height, time, isStatic }: CanvasFrame) {
-    // Recria as estrelas só quando a LARGURA muda. No celular a altura muda
-    // o tempo todo (barra do navegador aparecendo/sumindo) e isso faria as
-    // estrelas "pularem".
-    // (e também quando o nível de qualidade muda a densidade)
-    const key = `${width}/${settings.areaPerStar}`;
-    if (key !== lastKey.current) {
-      stars.current = createStars(width, height, settings.areaPerStar);
-      lastKey.current = key;
-    }
-
-    ctx.clearRect(0, 0, width, height);
-
-    const totalHeight = height * STARS.wrapScreens;
-    const scrollY = window.scrollY;
-    const warp = isStatic || !settings.warp ? 0 : warpState.value;
-
-    for (const star of stars.current) {
-      // Parallax vertical com "volta" (wrap) a cada 3 alturas de tela
-      const shiftedY = star.y - scrollY * star.z * STARS.parallax;
-      const y =
-        (((shiftedY % totalHeight) + totalHeight) % totalHeight) - height;
-      if (y < -10 || y > height + 10) continue;
-
-      const x = star.x + pointer.current.nx * STARS.mouseShift * star.z;
-
-      // Cintilação (desligada com reduced motion)
-      const twinkle = isStatic
-        ? 1
-        : 0.7 + 0.3 * Math.sin(time * 0.002 + star.phase);
-      const alpha = (0.35 + 0.6 * star.z) * twinkle;
-      const size = STARS.sizeBase + star.z * STARS.sizeDepth;
-
-      // Velocidade da luz: cada estrela vira uma linha saindo do centro da tela
-      if (warp > 0.01) {
-        const length = warp * star.z * 0.6;
-        ctx.strokeStyle = `rgba(${STARS.color}, ${alpha})`;
-        ctx.lineWidth = 0.6 + star.z * 1.8;
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + (x - width / 2) * length, y + (y - height / 2) * length);
-        ctx.stroke();
-        continue;
-      }
-
-      // Halo lavanda nas estrelas mais próximas
-      if (settings.starDetails && star.z > STARS.haloDepth) {
-        ctx.fillStyle = `rgba(${STARS.haloColor}, ${0.12 * twinkle})`;
-        ctx.fillRect(x - size, y - size, size * 3, size * 3);
-        ctx.fillStyle = `rgba(${STARS.nearColor}, ${alpha})`;
-      } else {
-        ctx.fillStyle = `rgba(${STARS.color}, ${alpha})`;
-      }
-      ctx.fillRect(x, y, size, size);
-
-      // Cruz de brilho
-      if (settings.starDetails && star.hasSpark) {
-        const length = 3 + 4 * twinkle;
-        ctx.fillStyle = `rgba(${STARS.sparkColor}, ${0.55 * twinkle})`;
-        ctx.fillRect(x + size / 2 - 0.5, y - length, 1, length * 2 + size);
-        ctx.fillRect(x - length, y + size / 2 - 0.5, length * 2 + size, 1);
-      }
-    }
+    drawStars(ctx, state.current, {
+      width,
+      height,
+      time,
+      isStatic,
+      scrollY: window.scrollY,
+      pointerNx: pointer.current.nx,
+      warpValue: warpState.value,
+      settings,
+    });
   }
 
   // ~30fps, como os outros canvases (D9 / R1 item 9)
   const canvasRef = useCanvasAnimation(draw, {
     frameInterval: ASCII_FRAME_INTERVAL,
+    // Desenha num Web Worker quando o navegador suporta (A8); senão, `draw`
+    worker: {
+      kind: "stars",
+      frameData: (frame) => ({
+        ...frame,
+        scrollY: window.scrollY,
+        pointerNx: pointer.current.nx,
+        warpValue: warpState.value,
+        settings: {
+          areaPerStar: settings.areaPerStar,
+          starDetails: settings.starDetails,
+          warp: settings.warp,
+        },
+      }),
+    },
   });
 
   return (

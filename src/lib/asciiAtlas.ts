@@ -16,6 +16,23 @@
  */
 import { ASCII_RAMP, MAX_DPR, clamp } from "./motion";
 
+/** Contexto 2D de um canvas normal ou de um OffscreenCanvas (dentro do worker, A8). */
+export type Canvas2D =
+  CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+
+/**
+ * Cria um canvas escondido. Na página usa <canvas>; dentro de um Web Worker
+ * (onde não existe document) usa OffscreenCanvas.
+ */
+function createHiddenCanvas(width: number, height: number) {
+  if (typeof document === "undefined")
+    return new OffscreenCanvas(width, height);
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  return canvas;
+}
+
 /** Quantos níveis de brilho existem (= número de glifos da rampa). */
 export const ASCII_LEVELS = ASCII_RAMP.length; // 12
 
@@ -34,10 +51,12 @@ export interface AtlasOptions {
   saturations: number[];
   /** Luminosidade (%) de cada nível de brilho: recebe 0..1, devolve 0..100. */
   lightness: (bright: number) => number;
+  /** Densidade de pixels (no worker não existe window: quem chama informa). */
+  dpr?: number;
 }
 
 export interface AsciiAtlas {
-  canvas: HTMLCanvasElement;
+  canvas: HTMLCanvasElement | OffscreenCanvas;
   /** Tamanho de um tile em pixels CSS (é o tamanho com que ele é desenhado). */
   tileWidth: number;
   tileHeight: number;
@@ -69,7 +88,8 @@ export function getLevel(bright: number): number {
  * garante isso).
  */
 export function getAsciiAtlas(options: AtlasOptions): AsciiAtlas {
-  const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+  const dpr =
+    options.dpr ?? Math.min(globalThis.devicePixelRatio || 1, MAX_DPR);
   const key = [
     options.font,
     options.hueBands,
@@ -85,7 +105,7 @@ export function getAsciiAtlas(options: AtlasOptions): AsciiAtlas {
   if (cached) return cached;
 
   // Mede o glifo para saber o tamanho do tile (com folga para não cortar)
-  const measure = document.createElement("canvas").getContext("2d")!;
+  const measure = createHiddenCanvas(1, 1).getContext("2d") as Canvas2D;
   measure.font = options.font;
   const tileWidth = Math.ceil(measure.measureText("M").width) + 2;
   const tileHeight = Math.ceil(options.fontSize * 1.4);
@@ -94,10 +114,11 @@ export function getAsciiAtlas(options: AtlasOptions): AsciiAtlas {
 
   // Layout do atlas: colunas = níveis de brilho; linhas = matiz × saturação
   const rows = options.hueBands * options.saturations.length;
-  const canvas = document.createElement("canvas");
-  canvas.width = sourceWidth * ASCII_LEVELS;
-  canvas.height = sourceHeight * rows;
-  const ctx = canvas.getContext("2d")!;
+  const canvas = createHiddenCanvas(
+    sourceWidth * ASCII_LEVELS,
+    sourceHeight * rows,
+  );
+  const ctx = canvas.getContext("2d") as Canvas2D;
   ctx.scale(dpr, dpr);
   ctx.font = options.font;
   ctx.textBaseline = "top";
@@ -190,7 +211,7 @@ const sharedCell: AsciiCell = {
  * Usado pelo planeta, retrato, thumbs dos projetos e campo do contato.
  */
 export function drawAsciiGrid(
-  ctx: CanvasRenderingContext2D,
+  ctx: Canvas2D,
   atlas: AsciiAtlas,
   {
     cols,

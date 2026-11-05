@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { MAX_DPR } from "../lib/motion";
 import { subscribe } from "../lib/ticker";
+import type { WorkerKind } from "../workers/canvasWorker";
 import { useQuality } from "./useQuality";
 
 export interface CanvasFrame {
@@ -52,9 +53,26 @@ function startWhenIdle(start: () => void) {
   }
 }
 
+/** Desenho dentro de um Web Worker com OffscreenCanvas (PERF-PLAN A8). */
+export interface CanvasWorkerOptions {
+  /** O que o worker desenha (src/workers/canvasWorker.ts). */
+  kind: WorkerKind;
+  /** Fonte que o worker precisa carregar (o planeta usa Geist Mono). */
+  fontUrl?: string;
+  /** Monta o estado de cada quadro, enviado ao worker (scroll, mouse...). */
+  frameData: (frame: Omit<CanvasFrame, "ctx">) => unknown;
+}
+
 interface CanvasAnimationOptions {
   /** Intervalo mínimo entre quadros em ms. 0 = todo frame (60fps). */
   frameInterval?: number;
+  /**
+   * Opcional: desenha num Web Worker (A8). Se o navegador não suportar
+   * OffscreenCanvas/fontes no worker, cai automaticamente para `draw` na
+   * página. Atenção: depois de transferido, o canvas não volta; quem usa
+   * deve remontar o <canvas> (key) quando o nível de qualidade mudar.
+   */
+  worker?: CanvasWorkerOptions;
 }
 
 /**
@@ -78,7 +96,7 @@ interface CanvasAnimationOptions {
  */
 export function useCanvasAnimation(
   draw: (frame: CanvasFrame) => void,
-  { frameInterval = 0 }: CanvasAnimationOptions = {},
+  { frameInterval = 0, worker: workerOptions }: CanvasAnimationOptions = {},
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Nível Baixo (inclui reduced motion): um quadro parado por canvas
@@ -91,10 +109,21 @@ export function useCanvasAnimation(
     drawRef.current = draw;
   }, [draw]);
 
+  // Idem para as opções do worker (a função frameData muda a cada render)
+  const workerOptionsRef = useRef(workerOptions);
+  useEffect(() => {
+    workerOptionsRef.current = workerOptions;
+  });
+
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return;
+    if (!canvas) return;
+
+    // Onde o desenho acontece: na página (ctx) ou num worker (A8).
+    // Só sabemos depois que o worker responde se tem suporte.
+    let ctx: CanvasRenderingContext2D | null = null;
+    let worker: Worker | null = null;
+    let modeReady = false;
 
     let width = 0;
     let height = 0;
@@ -113,17 +142,34 @@ export function useCanvasAnimation(
     let cancelled = false;
 
     function resize() {
-      if (!canvas || !ctx) return;
+      if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
       width = rect.width;
       height = rect.height;
+
+      // No worker, quem muda o tamanho do OffscreenCanvas é o próprio worker
+      if (worker) {
+        worker.postMessage({ type: "resize", width, height, dpr });
+        return;
+      }
+      if (!ctx) return;
       canvas.width = Math.max(1, Math.round(width * dpr));
       canvas.height = Math.max(1, Math.round(height * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
     function drawFrame(time: number) {
+      if (worker) {
+        const data = workerOptionsRef.current?.frameData({
+          width,
+          height,
+          time,
+          isStatic,
+        });
+        worker.postMessage({ type: "frame", data });
+        return;
+      }
       if (!ctx) return;
       drawRef.current({ ctx, width, height, time, isStatic });
     }
@@ -161,7 +207,7 @@ export function useCanvasAnimation(
      * ou perto (a ~1 tela). Longe da tela, nem começa.
      */
     function scheduleStart() {
-      if (scheduled || !fontsReady || !visibilityKnown) return;
+      if (scheduled || !modeReady || !fontsReady || !visibilityKnown) return;
       if (!isVisible && !isNear) return;
       scheduled = true;
       if (isVisible) {
@@ -169,6 +215,52 @@ export function useCanvasAnimation(
       } else {
         startWhenIdle(start);
       }
+    }
+
+    // Decide entre worker e página (A8)
+    const options = workerOptionsRef.current;
+    const canUseWorker =
+      options &&
+      typeof Worker !== "undefined" &&
+      typeof canvas.transferControlToOffscreen === "function";
+
+    /** Sem worker: desenha na página, como os outros canvases. */
+    function fallBackToMainThread() {
+      worker?.terminate();
+      worker = null;
+      ctx = canvas!.getContext("2d");
+      modeReady = true;
+      scheduleStart();
+    }
+
+    if (canUseWorker) {
+      worker = new Worker(
+        new URL("../workers/canvasWorker.ts", import.meta.url),
+        { type: "module" },
+      );
+      worker.onmessage = (event: MessageEvent) => {
+        if (cancelled || event.data.type !== "capabilities") return;
+        if (!event.data.ok) {
+          fallBackToMainThread();
+          return;
+        }
+        // Transfere o canvas para o worker (não tem volta)
+        const offscreen = canvas.transferControlToOffscreen();
+        worker!.postMessage(
+          { type: "init", canvas: offscreen, kind: options.kind },
+          [offscreen],
+        );
+        modeReady = true;
+        scheduleStart();
+      };
+      // Erro ao carregar o worker antes da transferência: volta para a página
+      worker.onerror = () => {
+        if (!cancelled && !modeReady) fallBackToMainThread();
+      };
+      worker.postMessage({ type: "check", fontUrl: options.fontUrl });
+    } else {
+      ctx = canvas.getContext("2d");
+      modeReady = true;
     }
 
     // Pausa quando o canvas sai da tela
@@ -212,6 +304,7 @@ export function useCanvasAnimation(
     return () => {
       cancelled = true;
       unsubscribe?.();
+      worker?.terminate();
       visibilityObserver.disconnect();
       nearObserver.disconnect();
       resizeObserver.disconnect();

@@ -3,7 +3,12 @@
  * Função "pura": recebe tudo que precisa por parâmetro e desenha no canvas.
  */
 import { UNIVERSE, clamp, lerp, smoothstep } from "./motion";
-import { drawAsciiGrid, getAsciiAtlas, getLevel } from "./asciiAtlas";
+import {
+  drawAsciiGrid,
+  getAsciiAtlas,
+  getLevel,
+  type Canvas2D,
+} from "./asciiAtlas";
 import type { PointerPosition } from "../hooks/usePointer";
 
 /** Números aleatórios fixos usados para espalhar os caracteres na dissolução. */
@@ -11,6 +16,8 @@ const SEEDS = new Float32Array(40000).map(() => Math.random() * 2 - 1);
 
 /** Ajustes por nível de qualidade (PERF-TIERS). */
 export interface PlanetOptions {
+  /** Densidade de pixels (obrigatório dentro do worker, A8). */
+  dpr?: number;
   /** Faixas de matiz do atlas: 6 no Alto, 4 no Médio. */
   hueBands?: number;
   /** Fator do tamanho da célula: 1 no Alto, 1.3 no Médio. */
@@ -60,14 +67,14 @@ function getPlanetPosition(progress: number, width: number, height: number) {
 }
 
 export function drawPlanet(
-  ctx: CanvasRenderingContext2D,
+  ctx: Canvas2D,
   width: number,
   height: number,
   time: number,
   progress: number,
   pointer: PointerPosition,
   light: PlanetLight,
-  { hueBands = 6, cellScale = 1 }: PlanetOptions = {},
+  { hueBands = 6, cellScale = 1, dpr }: PlanetOptions = {},
 ) {
   ctx.clearRect(0, 0, width, height);
 
@@ -118,6 +125,7 @@ export function drawPlanet(
     hueBands,
     saturations: [75, 100],
     lightness: (bright) => 50 + bright * 40,
+    dpr,
   });
 
   // Só as células em volta do planeta + anel (o anel vai até 2.05 × R):

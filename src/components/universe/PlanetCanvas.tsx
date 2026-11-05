@@ -5,6 +5,7 @@ import {
 } from "../../hooks/useCanvasAnimation";
 import { usePointer } from "../../hooks/usePointer";
 import { getScrollProgress } from "../../lib/motion";
+import { resolveAssetPath } from "../../utils/resolvePath";
 import { drawPlanet, type PlanetLight } from "../../lib/planet";
 import { useQuality } from "../../hooks/useQuality";
 
@@ -14,7 +15,17 @@ interface PlanetCanvasProps {
 }
 
 /** Canvas do planeta ASCII (fica atrás do texto da seção Universe). */
+/** Fonte que o worker do planeta carrega (o worker não enxerga as fontes da página). */
+const PLANET_FONT_URL = resolveAssetPath("/fonts/geist-mono-latin.woff2");
+
 export default function PlanetCanvas({ sectionRef }: PlanetCanvasProps) {
+  // O canvas vai para um Web Worker (A8) e não volta: quando o nível de
+  // qualidade muda, remontamos o <canvas> (key) para começar do zero.
+  const { quality } = useQuality();
+  return <PlanetCanvasInner key={quality} sectionRef={sectionRef} />;
+}
+
+function PlanetCanvasInner({ sectionRef }: PlanetCanvasProps) {
   const pointer = usePointer();
   // Parâmetros do nível de qualidade (células, faixas de matiz, fps)
   const { settings } = useQuality();
@@ -44,6 +55,21 @@ export default function PlanetCanvas({ sectionRef }: PlanetCanvasProps) {
 
   const canvasRef = useCanvasAnimation(draw, {
     frameInterval: settings.asciiInterval,
+    // Desenha num Web Worker quando o navegador suporta (A8); senão, `draw`
+    worker: {
+      kind: "planet",
+      fontUrl: PLANET_FONT_URL,
+      frameData: (frame) => {
+        const section = sectionRef?.current;
+        return {
+          ...frame,
+          progress: section && !frame.isStatic ? getScrollProgress(section) : 0,
+          pointer: { ...pointer.current },
+          hueBands: settings.hueBands,
+          cellScale: settings.cellScale,
+        };
+      },
+    },
   });
 
   return (

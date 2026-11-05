@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Minha Estreia aos Palcos · Francisco Entony</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<style>
+/* cabeçalho: data por extenso, título, abertura. Sem hash, sem pills, sem autor no topo. */
+.head{width:min(880px,100% - 48px);margin:0 auto;padding-top:88px}
+.dateline{font-size:15px;color:var(--secondary)}
+h1{margin-top:18px;font-size:clamp(34px,4.4vw,56px);line-height:1.06;letter-spacing:-.038em;font-weight:600;text-wrap:balance}
+.intro{margin-top:24px;max-width:34em;font-size:clamp(19px,1.9vw,24px);line-height:1.4;letter-spacing:-.018em;color:var(--secondary);text-wrap:pretty}
+
+/* capa: a foto sangra de ponta a ponta */
+.cover{margin-top:64px}
+.cover .media{aspect-ratio:21/9;max-height:78svh;width:100%}
+.cover figcaption{width:min(640px,100% - 48px);max-width:none;margin:14px auto 0}
+.dateline span{white-space:nowrap}
+.body{margin-top:72px}
+.body figure.mid figcaption,.body figure.col figcaption{margin-top:14px}
+
+/* assinatura: o retrato da ficha em miniatura, em ASCII */
+.sign{margin-top:88px;display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:end}
+/* o retrato da ficha em glifos, solto no céu: sem caixa, sem raio */
+.sign canvas{width:112px;height:112px;-webkit-mask:radial-gradient(circle at 50% 46%,#000 52%,transparent 71%);mask:radial-gradient(circle at 50% 46%,#000 52%,transparent 71%)}
+.sign p{font-size:15px;line-height:1.5;color:var(--secondary)}
+.sign p b{display:block;color:var(--text);font-weight:600;font-size:17px;letter-spacing:-.015em}
+.share{margin-top:28px;display:flex;flex-wrap:wrap;gap:8px 28px;font-size:15px;color:var(--prose)}
+.share a:hover,.share button:hover{color:var(--text)}
+@media (max-width:859px){.head{padding-top:56px}.cover .media{aspect-ratio:4/3}}
+@media (min-width:640px) and (max-width:859px){.cover .media{aspect-ratio:16/10}}
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<nav class="top" aria-label="Site"><div class="wrap">
+  <a class="logo" href="#"><i></i>entony</a>
+  <div class="links"><a href="#">Sobre</a><a href="#">Habilidades</a><a href="#">Projetos</a><a href="#">Experiência</a><a href="#" aria-current="page">Blog</a></div>
+  <a class="btn-nav" href="#">Contato</a>
+</div></nav>
+
+<!-- local nav: "Blog" é o voltar; o título do post aparece aqui depois que o h1 sai da tela; o filete mede a leitura -->
+<div class="lnav" role="navigation" aria-label="Post"><div class="wrap">
+  <a class="here" href="#">Blog <span aria-hidden="true">Minha Estreia aos Palcos</span></a>
+  <div class="acts"><button type="button" data-copy>Copiar link</button></div>
+</div><div class="rule" aria-hidden="true"><i></i></div></div>
+
+<main>
+<article data-read>
+  <header class="head">
+    <p class="dateline"><time datetime="2026-06-06">Sábado, 6 de junho de 2026</time> · <span>3 minutos de leitura</span></p>
+    <h1 data-title>Minha Estreia aos Palcos: Como Foi Palestrar no Google I/O Extended + Build with AI 2026 – Natal</h1>
+    <p class="intro">Como palestrei aos 19 anos, no terceiro período da faculdade, em um dos maiores eventos de tecnologia do RN, e o que aprendi com a experiência.</p>
+  </header>
+
+  <figure class="cover bleed">
+    <span class="media" data-media data-reveal><span class="media-skel" aria-hidden="true"></span><canvas class="reveal" aria-hidden="true"></canvas><img data-src="img/drone.jpg" alt="Foto aérea de centenas de participantes do Google I/O Extended Natal 2026 acenando em frente à sede do Sebrae" width="1400" height="933" fetchpriority="high"></span>
+    <figcaption class="ex">A foto oficial do drone. Estou em algum lugar perto da faixa amarela.</figcaption>
+  </figure>
+
+  <div class="body">
+    <div class="col prose">
+      <p>No sábado, dia 06 de junho de 2026, tive a oportunidade de palestrar no Google I/O Extended + Build with AI 2026 – Natal, evento realizado pela comunidade do Google Developer Groups (GDG) Natal.</p>
+      <p>Com o título "Como a Tecnologia Pode Mudar o Amanhã: Explorando o Cosmos das Oportunidades e do Conhecimento", usei minha palestra pra falar sobre temas pouco abordados no mundo da tecnologia — os desafios que enfrentei ao longo da minha trajetória e como transformei essas dificuldades em estratégia pra potencializar meus estudos e me destacar como estudante e futuro profissional.</p>
+    </div>
+
+    <figure class="mid">
+      <div class="pair">
+        <span class="media" data-media style="--ratio:742/1400;--r:.53"><span class="media-skel" aria-hidden="true"></span><img data-src="img/foto1.jpg" alt="Entony falando ao microfone durante a palestra, com uma pessoa da plateia em primeiro plano" width="742" height="1400" loading="lazy"></span>
+        <span class="media" data-media style="--ratio:960/1280;--r:.75"><span class="media-skel" aria-hidden="true"></span><img data-src="img/foto3.jpg" alt="Entony palestrando ao lado do telão que mostra o site do Núcleo de Inovação em Computação (NIC)" width="960" height="1280" loading="lazy"></span>
+      </div>
+      <figcaption class="ex">Os primeiros dois minutos foram os piores. Depois do primeiro riso da plateia, passou.</figcaption>
+    </figure>
+
+    <div class="col prose">
+      <p>Com o apoio de amigos da área e do meu professor no IFRN, <strong>Bruno Gomes</strong>, consegui transmitir essa mensagem e guiar novos estudantes rumo a um futuro promissor na tecnologia — mostrando que o caminho vai muito além da bolha do desenvolvimento web, alcançando a Ciência da Computação como um todo.</p>
+    </div>
+
+    <figure class="col">
+      <div class="pair">
+        <span class="media" data-media style="--ratio:1400/1050;--r:1.33"><span class="media-skel" aria-hidden="true"></span><img data-src="img/foto6.jpg" alt="Entony e amigos da área posando juntos com os crachás do evento" width="1400" height="1050" loading="lazy"></span>
+        <span class="media" data-media style="--ratio:1280/960;--r:1.33"><span class="media-skel" aria-hidden="true"></span><img data-src="img/foto4.jpg" alt="Entony com outros participantes do evento, posando lado a lado" width="1280" height="960" loading="lazy"></span>
+      </div>
+    </figure>
+
+    <div class="col prose">
+      <p>Aproveitei o espaço também pra falar sobre os alunos que oriento e como as experiências no Núcleo de Inovação em Computação (NIC) e na Bolsa de Tutoria de Aprendizagem em Laboratório me ajudaram a construir uma metodologia clara pra compartilhar com eles.</p>
+      <p>Falar em um dos maiores eventos de tecnologia do RN aos 19 anos, ainda no terceiro período da faculdade, foi uma virada de chave pra mim — um lembrete de que dá pra abrir espaço no mercado antes mesmo de terminar a graduação, desde que a gente saiba transformar as próprias dificuldades em direção.</p>
+    </div>
+
+    <div class="col">
+      <div class="sign">
+        <canvas id="sig" aria-hidden="true"></canvas>
+        <p><b>Francisco Entony</b>Arquivado em Palestras, Google I/O e IFRN.</p>
+      </div>
+      <div class="share">
+        <button type="button" data-copy>Copiar link</button>
+        <a href="#" target="_blank" rel="noopener">LinkedIn<svg class="arrow" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M2.5 7.5 7.5 2.5M3.5 2.5h4v4"/></svg></a>
+        <a href="#" target="_blank" rel="noopener">WhatsApp<svg class="arrow" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M2.5 7.5 7.5 2.5M3.5 2.5h4v4"/></svg></a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- próximo post: manchete em dois tons + a foto dele com a lente ASCII da ficha -->
+<div class="wrap">
+  <a class="onward" href="#" aria-label="Próximo post: Visita ao Ministério Público do RN (MPRN) e a VENX">
+    <p class="line" aria-hidden="true"><span class="dim">Próximo post.</span> <span class="t">Visita ao Ministério Público do RN (MPRN) e a VENX.</span></p>
+    <span class="media lens" data-media id="nextLens" style="--ratio:16/7;--lr:140px"><span class="media-skel" aria-hidden="true"></span><canvas class="ascii" aria-hidden="true"></canvas><img data-src="img/mprn.jpg" alt="" width="1600" height="1200"></span>
+  </a>
+  <!-- "Post anterior" só existe quando há um mais novo; este é o mais recente, então não aparece nada -->
+</div>
+</main>
+
+<footer><div class="wrap"><span>© 2026 Francisco Entony</span><div class="f"><a href="#">GitHub</a><a href="#">LinkedIn</a><a href="#">Blog</a><a href="#">Topo ↑</a></div></div></footer>
+
+<script src="base.js"></script>
+<script>
+(() => {
+  const P = V3;
+  /* copiar link: o rótulo se decodifica em ASCII até virar "Link copiado" e volta */
+  document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => P.copy(b, location.href, 'Link copiado', 'Copiar link')));
+  /* lente da próxima foto */
+  const nl = document.getElementById('nextLens'), img = nl.querySelector('img');
+  P.lens(nl, () => { if (img.complete && img.naturalWidth) P.asciiImage(nl.querySelector('canvas'), img, 8); });
+  /* assinatura: o retrato da ficha em ASCII, desenhado uma vez */
+  const av = new Image(); av.src = 'img/avatar.jpg';
+  document.fonts.ready.then(() => av.decode()).then(() => P.asciiImage(document.getElementById('sig'), av, 6, 1.6)).catch(() => {});
+  P.media(); P.start(); P.proto();
+})();
+</script>
+</body>
+</html>

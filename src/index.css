@@ -191,6 +191,12 @@
   --text-local-nav--font-weight: 600;
   --text-fact: 19px; /* valor da ficha (período, papel, status) */
   --text-fact--letter-spacing: -0.015em;
+  --text-reading: 19px; /* texto corrido (capítulos do projeto) */
+  --text-reading--line-height: 1.7;
+  --text-reading--letter-spacing: -0.012em;
+  --text-reading-sm: 18px; /* texto corrido abaixo de 860px */
+  --text-reading-sm--line-height: 1.7;
+  --text-reading-sm--letter-spacing: -0.012em;
   --text-caption: 14px; /* legendas das fotos */
   --text-caption--line-height: 1.5;
 

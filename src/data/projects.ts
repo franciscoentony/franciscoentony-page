@@ -6,19 +6,18 @@ export interface Project {
   topics: string[];
   url: string;
 
-  // ---- Campos opcionais da página do projeto (/projetos/:slug, adendo A) ----
-  // Todos opcionais e, por enquanto, sem valor: campo vazio = seção some.
+  // ---- Campos opcionais da página do projeto (/projetos/:slug, adendo v3) ----
+  // Todos opcionais e, por enquanto, sem valor: campo vazio = a parte some.
   tagline?: string; // até 180 caracteres; sem ela, a página usa description
   period?: string; // ex.: "mar 2025 — jun 2025"
   role?: string; // ex.: "Full-stack, solo"
-  status?: "Em produção" | "Em desenvolvimento" | "Arquivado";
-  demoUrl?: string;
-  results?: { value: string; label: string }[]; // até 3
-  problem?: string; // markdown curto (capítulo 01)
-  solution?: string; // capítulo 02
-  contribution?: string; // capítulo 03
-  learnings?: string; // capítulo 04
-  stack?: { group: string; items: string[] }[]; // sem ela: language + topics
+  status?: string; // ex.: "Em produção"
+  demoUrl?: string; // vira o botão "Ver no ar"
+  results?: { value: string; label: string }[]; // até 3, viram uma frase
+  /** Capítulos com títulos livres (ex.: "O problema"). Parágrafos separados por linha em branco. */
+  chapters?: { title: string; text: string }[];
+  /** Ficha técnica. Sem ela: Linguagem (language) + Ferramentas (topics). */
+  specs?: { label: string; value: string }[];
   screens?: {
     src: string;
     alt: string;

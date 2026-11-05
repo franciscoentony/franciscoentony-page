@@ -10,7 +10,8 @@
  *
  * Gera:
  *   dist/blog/index.html
- *   dist/blog/<slug>/index.html   (um para cada post de blog-data/index.json)
+ *   dist/blog/<slug>/index.html      (um para cada post de blog-data/index.json)
+ *   dist/projetos/<slug>/index.html  (um para cada projeto de src/data/projects.ts)
  *
  * Cada cópia recebe título, descrição e og:url/og:title/og:description
  * próprios, para os previews de link (WhatsApp, LinkedIn...) que não rodam JS.
@@ -183,6 +184,34 @@ for (const post of posts) {
   );
 }
 
+// /projetos/<slug>/ (adendo v3). Os projetos vêm de src/data/projects.ts:
+// lemos o name e a description de cada um direto do arquivo (sem rodar TS).
+const projectsSource = readFileSync(join("src", "data", "projects.ts"), "utf8");
+const projectsArray = projectsSource.slice(
+  projectsSource.indexOf("export const projects"),
+);
+const projects = [
+  ...projectsArray.matchAll(/name:\s*"([^"]+)",\s*description:\s*"([^"]*)"/g),
+].map(([, name, description]) => ({
+  name,
+  description,
+  // Igual a projectSlug() em src/data/projects.ts
+  slug: name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, ""),
+}));
+
+for (const project of projects) {
+  createRoute(
+    `projetos/${project.slug}`,
+    `${project.name}${titleSuffix}`,
+    shorten(project.description),
+  );
+}
+
 // sitemap.xml com as URLs reais do site (o sitemap do Hugo em blog-data
 // usa caminhos do Hugo, que não são as rotas do site). Citado no robots.txt.
 const urls = [
@@ -194,6 +223,9 @@ const urls = [
       loc: `${siteUrl}/blog/${post.slug}/`,
       lastmod: String(post.date ?? "").slice(0, 10),
     })),
+  ...projects.map((project) => ({
+    loc: `${siteUrl}/projetos/${project.slug}/`,
+  })),
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -208,5 +240,5 @@ ${urls
 writeFileSync(join(distDir, "sitemap.xml"), sitemap);
 
 console.log(
-  `[static-routes] ${posts.length} post(s) + /blog/ gerados (+ sitemap.xml).`,
+  `[static-routes] ${posts.length} post(s), ${projects.length} projeto(s) + /blog/ gerados (+ sitemap.xml).`,
 );

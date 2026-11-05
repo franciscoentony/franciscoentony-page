@@ -195,6 +195,33 @@ export const projects = {
   carouselLabel: "Projetos (use as setas para navegar)",
 };
 
+// ---------- Página do projeto (/projetos/:slug) ----------
+// Adendo v3: copy aprovada pelo Entony (D25). "Linguagem", "Ferramentas" e
+// "Não deu para copiar" vêm do protótipo v3.
+
+export const projectPage = {
+  /** Nome da seção na local nav (é o link de volta). */
+  section: "Projetos",
+  github: "GitHub",
+  demo: "Ver no ar",
+  /** Selo de missão (D2), em caixa normal; o ícone é SVG. */
+  rankMain: "Missão principal",
+  rankSide: "Missão secundária",
+  facts: { period: "Período", role: "Papel", status: "Status" },
+  specsTitle: "Ficha técnica",
+  /** Ficha técnica sem `specs`: os campos que já existem. */
+  specsLanguage: "Linguagem",
+  specsTools: "Ferramentas",
+  screensTitle: "Telas",
+  copy: "Copiar",
+  copied: "Copiado",
+  copyFailed: "Não deu para copiar",
+  next: "Próximo projeto.",
+  // PENDENTE de aprovação do Entony (D3): slug que não existe
+  notFoundTitle: "Projeto não encontrado.",
+  notFoundText: "O link pode estar quebrado ou o projeto mudou de nome.",
+};
+
 // ---------- Experiência / Campanha ----------
 
 export const experience = {

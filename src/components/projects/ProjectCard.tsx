@@ -1,6 +1,7 @@
 import { useRef } from "react";
+import { Link } from "react-router-dom";
 import { links, projects as projectsCopy } from "../../content/ui";
-import type { Project } from "../../data/projects";
+import { projectSlug, type Project } from "../../data/projects";
 import { getProjectShape } from "../../lib/asciiShapes";
 import HoloCard from "../ui/HoloCard";
 import ProjectThumb from "./ProjectThumb";
@@ -38,7 +39,16 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         >
           {isMain ? projectsCopy.rarityMain : projectsCopy.raritySide}
         </span>
-        <h3 className="text-title">{project.name}</h3>
+        {/* O card inteiro leva à página do projeto: o ::after do link
+            cobre o card (o HoloCard por dentro é relative) */}
+        <h3 className="text-title">
+          <Link
+            to={`/projetos/${projectSlug(project)}`}
+            className="after:absolute after:inset-0 after:content-['']"
+          >
+            {project.name}
+          </Link>
+        </h3>
         <p className="text-sm leading-[1.45] text-secondary">
           {project.description}
         </p>
@@ -49,7 +59,8 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
             href={project.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 text-paper hover:underline"
+            // relative z-10: fica acima do link do card (o GitHub é externo)
+            className="relative z-10 shrink-0 text-paper hover:underline"
           >
             {projectsCopy.cardGithubLink}
             <span className="sr-only">

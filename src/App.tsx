@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import ProjectPage from "./pages/ProjectPage";
 import ScrollToHash from "./components/ScrollToHash";
 import Starfield from "./components/layers/Starfield";
 import Grain from "./components/layers/Grain";
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/projetos/:slug" element={<ProjectPage />} />
           </Routes>
         </ToastProvider>
       </QualityProvider>

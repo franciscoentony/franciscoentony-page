@@ -132,8 +132,11 @@ function createRoute(
 
 // Preload do índice de posts: o navegador já começa a baixá-lo junto com o
 // HTML, em vez de esperar o JS da página pedir (A9)
+// Junto, o tile do skeleton das imagens (9 KB): sem ele, em rede lenta, o
+// skeleton fica vazio enquanto a foto carrega (SPEC-SKELETON-IMAGENS).
 const postsPreload =
-  '<link rel="preload" as="fetch" href="/blog-data/index.json" crossorigin="anonymous" />';
+  '<link rel="preload" as="fetch" href="/blog-data/index.json" crossorigin="anonymous" />\n    ' +
+  '<link rel="preload" as="image" href="/ui/skeleton-ascii.webp" />';
 
 // /blog (textos iguais a seo.blogTitle e blog.lead em src/content/ui.ts)
 createRoute(

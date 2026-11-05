@@ -325,6 +325,107 @@
   }
 }
 
+/* ---------- Skeleton ASCII das imagens (SPEC-SKELETON-IMAGENS) ----------
+ * Classes normais (não utilities) porque o HTML do corpo dos posts vem do
+ * Hugo (render hook). Estrutura:
+ *   <span class="media-frame" data-state="loading|loaded|error">
+ *     <span class="media-skel"></span>   ← glifos ASCII (tile) + varredura
+ *     <img …>
+ *   </span>
+ * Sem data-state (sem JS ou ainda fora da tela): tile parado e a imagem
+ * visível normalmente. O estado é ligado por src/lib/mediaLoader.ts.
+ */
+@layer components {
+  .media-frame {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-void);
+  }
+
+  /* Glifos lavanda: gradiente recortado pela máscara do tile (só CSS) */
+  .media-skel {
+    position: absolute;
+    inset: 0;
+    opacity: 0.7;
+    background: radial-gradient(
+      120% 90% at 50% 45%,
+      var(--color-accent-soft),
+      var(--color-accent) 55%,
+      rgb(139 108 255 / 0.4)
+    );
+    mask: var(--skeleton-mask) 0 0 / 320px 192px repeat;
+    transition:
+      opacity 600ms var(--ease-smooth),
+      visibility 0s 600ms;
+  }
+
+  /* Varredura: faixa clara que atravessa os glifos (só transform) */
+  .media-skel::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 60%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(245 245 247 / 0.9),
+      transparent
+    );
+    transform: translateX(-100%);
+  }
+  .media-frame[data-state="loading"] .media-skel::after {
+    animation: skeleton-sweep 1.8s var(--ease-smooth) infinite;
+  }
+
+  .media-frame > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition:
+      opacity 600ms var(--ease-smooth),
+      scale 800ms var(--ease-smooth);
+  }
+  .media-frame[data-state="loading"] > img {
+    opacity: 0;
+    scale: 1.02;
+  }
+  .media-frame[data-state="error"] > img {
+    visibility: hidden;
+  }
+
+  /* Carregou: a foto entra e a camada do skeleton sai da composição */
+  .media-frame[data-state="loaded"] .media-skel {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  /* Já estava em cache: sem transição (nada pisca) */
+  .media-frame[data-instant] > img,
+  .media-frame[data-instant] .media-skel {
+    transition: none;
+  }
+
+  /* Nível Baixo: sem varredura e sem zoom (fade simples continua) */
+  html[data-quality="baixo"] .media-frame .media-skel::after {
+    animation: none;
+  }
+  html[data-quality="baixo"] .media-frame > img {
+    scale: 1;
+  }
+  /* Reduced motion: a regra global já desliga animações e transições */
+}
+
+@keyframes skeleton-sweep {
+  to {
+    transform: translateX(270%);
+  }
+}
+
 /* Esconde a barra de rolagem (carrossel de projetos) */
 @utility scrollbar-hidden {
   scrollbar-width: none;
@@ -541,6 +642,23 @@
      segue a proporção (height: auto), então nada distorce. */
   & img.post-image-portrait {
     width: min(100%, calc(min(80svh, 720px) * var(--ratio, 0.75)));
+  }
+
+  /* Com o skeleton (render hook), a MOLDURA reserva o espaço pela proporção
+     (--ratio: largura/altura) e a imagem só preenche (CLS 0) */
+  & .media-frame {
+    width: 100%;
+    margin-inline: auto;
+    aspect-ratio: var(--ratio);
+  }
+  & .media-frame.post-image-portrait {
+    width: min(100%, calc(min(80svh, 720px) * (var(--ratio))));
+  }
+  & .media-frame > img {
+    max-width: none;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
   }
 }
 

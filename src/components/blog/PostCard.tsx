@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { blog } from "../../content/ui";
 import type { Post } from "../../data/posts";
 import { resolveAssetPath } from "../../lib/blog";
+import MediaFrame from "../ui/MediaFrame";
 import { formatShortDate } from "../../lib/date";
 import { decodeHtmlEntities } from "../../lib/text";
 
@@ -38,11 +39,10 @@ export default function PostCard({
       className={`flex h-full flex-col gap-3 rounded-lg ${compact ? "" : "min-h-[250px]"} border border-line bg-raised p-6.5 transition-[translate,border-color] duration-500 hover:-translate-y-1.5 hover:border-line-strong`}
     >
       {showCover && post.cover && (
-        <img
+        <MediaFrame
           src={resolveAssetPath(post.cover)}
           alt=""
-          loading="lazy"
-          className="mb-2 aspect-video w-full rounded-md border border-line object-cover"
+          className="mb-2"
         />
       )}
 

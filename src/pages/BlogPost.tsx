@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
@@ -13,6 +13,7 @@ import {
   resolveContentHtml,
 } from "../lib/blog";
 import { formatShortDate } from "../lib/date";
+import { watchMediaFrame } from "../lib/mediaLoader";
 import {
   decodeHtmlEntities,
   isSummaryRepeated,
@@ -47,6 +48,17 @@ export default function BlogPost() {
     cached ? slug : undefined,
   );
   const loading = loadedSlug !== slug;
+
+  // Skeleton das imagens do corpo: depois de injetar o HTML do Hugo, liga
+  // cada moldura (.media-frame) ao carregamento da sua imagem
+  const contentRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+    const frames = content.querySelectorAll<HTMLElement>(".media-frame");
+    const stops = Array.from(frames).map(watchMediaFrame);
+    return () => stops.forEach((stop) => stop());
+  }, [post, loading]);
 
   // Título da aba: o do post (ou "Post não encontrado")
   let pageTitle = seo.blogTitle;
@@ -152,6 +164,7 @@ export default function BlogPost() {
 
             {/* Corpo do post (HTML gerado pelo Hugo), estilizado por post-content */}
             <div
+              ref={contentRef}
               className="post-content mt-12 border-t border-line pt-12"
               dangerouslySetInnerHTML={{
                 __html: resolveContentHtml(post.content),

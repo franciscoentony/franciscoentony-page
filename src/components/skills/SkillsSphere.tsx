@@ -60,6 +60,9 @@ export default function SkillsSphere() {
   const rotation = useRef({ x: 0.3, y: 0 });
   const velocity = useRef({ x: SPHERE.baseVelX, y: SPHERE.baseVelY });
   const drag = useRef<{ x: number; y: number } | null>(null);
+  // Mouse dentro da esfera, em px relativos a ela (null = fora). Vem dos
+  // eventos de ponteiro, sem getBoundingClientRect a cada quadro (P5 S-C).
+  const hoverPoint = useRef<{ x: number; y: number } | null>(null);
   const lastFrameTime = useRef(-Infinity);
   const colors = useRef<{ paper: string; gold: string } | null>(null);
   // Largura de cada tag no tamanho base (medida uma vez só)
@@ -150,10 +153,10 @@ export default function SkillsSphere() {
 
     // Tag sob o mouse (a mais da frente) fica dourada com brilho
     let hovered: ProjectedTag | null = null;
-    if (!isStatic) {
-      const rect = ctx.canvas.getBoundingClientRect();
-      const mouseX = pointer.current.x - rect.left;
-      const mouseY = pointer.current.y - rect.top;
+    const mouse = hoverPoint.current;
+    if (!isStatic && mouse) {
+      const mouseX = mouse.x;
+      const mouseY = mouse.y;
       for (const tag of projected) {
         const inside =
           Math.abs(mouseX - tag.x) <= tag.halfWidth &&
@@ -207,6 +210,11 @@ export default function SkillsSphere() {
   }
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    hoverPoint.current = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
     if (!drag.current) return;
     velocity.current.y = (event.clientX - drag.current.x) * SPHERE.dragSpeed;
     velocity.current.x = (event.clientY - drag.current.y) * -SPHERE.dragSpeed;
@@ -225,6 +233,9 @@ export default function SkillsSphere() {
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
+      onPointerLeave={() => {
+        hoverPoint.current = null;
+      }}
       className="relative mt-10 h-[min(560px,70vw)] cursor-grab touch-pan-y select-none active:cursor-grabbing"
     >
       <canvas ref={canvasRef} className="absolute inset-0 size-full" />

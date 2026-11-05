@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   useCanvasAnimation,
   type CanvasFrame,
@@ -7,6 +7,7 @@ import { usePointer } from "../../hooks/usePointer";
 import { useQuality } from "../../hooks/useQuality";
 import { ASCII_FRAME_INTERVAL, warpState } from "../../lib/motion";
 import { drawStars, type StarsState } from "../../lib/stars";
+import { createSmoothedValue } from "../../lib/smoothing";
 
 /**
  * Fundo de estrelas com parallax (HANDOFF §4, "Fundo de estrelas").
@@ -26,13 +27,32 @@ function StarfieldCanvas() {
   const { settings } = useQuality();
   const state = useRef<StarsState>({ stars: [], key: "" });
 
+  // Parallax com o scroll SUAVIZADO (mesmo amortecimento do planeta): com a
+  // roda do mouse, as estrelas deslizam em vez de saltar em degraus.
+  // Suavizamos scrollY / 1000 para o critério de "assentou" valer ~0,5px.
+  const smoothScroll = useRef(window.scrollY);
+  useEffect(() => {
+    const smooth = createSmoothedValue((value) => {
+      smoothScroll.current = value * 1000;
+    });
+    function handleScroll() {
+      smooth.setTarget(window.scrollY / 1000);
+    }
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      smooth.dispose();
+    };
+  }, []);
+
   function draw({ ctx, width, height, time, isStatic }: CanvasFrame) {
     drawStars(ctx, state.current, {
       width,
       height,
       time,
       isStatic,
-      scrollY: window.scrollY,
+      scrollY: isStatic ? window.scrollY : smoothScroll.current,
       pointerNx: pointer.current.nx,
       warpValue: warpState.value,
       settings,
@@ -47,7 +67,7 @@ function StarfieldCanvas() {
       kind: "stars",
       frameData: (frame) => ({
         ...frame,
-        scrollY: window.scrollY,
+        scrollY: frame.isStatic ? window.scrollY : smoothScroll.current,
         pointerNx: pointer.current.nx,
         warpValue: warpState.value,
         settings: {

@@ -32,6 +32,16 @@ export default function Navbar() {
 
     document.body.style.overflow = "hidden";
 
+    // O resto da página fica inerte enquanto o menu cobre a tela (P5 S-D):
+    // nem foco nem leitor de tela chegam lá
+    const outside = [
+      document.querySelector("main"),
+      document.querySelector("footer"),
+    ];
+    outside.forEach((element) => {
+      if (element) element.inert = true;
+    });
+
     // Leva o foco para o primeiro link do menu
     overlayRef.current?.querySelector("a")?.focus();
 
@@ -68,6 +78,9 @@ export default function Navbar() {
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       document.body.style.overflow = "";
+      outside.forEach((element) => {
+        if (element) element.inert = false;
+      });
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [menuOpen]);

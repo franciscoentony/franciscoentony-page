@@ -133,3 +133,20 @@ O plano começa **depois** da rodada final de correções em andamento. Os itens
 1. Aprovar o plano e a regra de que **performance é critério de merge**: o redesign só vai para a `main` quando as metas da §2 passarem.
 2. Botão manual de "modo leve" (por exemplo, no footer)? **Recomendação: não.** A detecção automática + o reduced motion do sistema cobrem os casos, e o botão é mais copy e UI para manter.
 3. Há um Android de entrada disponível para o teste real (P4)? Se não houver, ficamos com a emulação e o Lighthouse.
+
+## 6. Resultado da P2+P3+A8 (6d34967, perf mobile com CPU 6× e Médio por detecção)
+
+| Métrica | Baseline | Final |
+|---|---|---|
+| Scroll | 33 fps, 29 quadros > 50ms | **56 fps, 1 quadro** (100ms) |
+| INP e-mail / menu | 272 / 144 ms | **56 / 56 ms** |
+| Página parada (topo, projetos, experiência, blog) | 15–65% | **2,7–9,8%** ✓ |
+| Página parada (sobre / contato / habilidades) | 89 / 64 / 97% | 18 / 15 / 29% |
+| Lighthouse mobile Home / Post | 100 / 67 | **100 / 96** |
+
+**Decisão do Tech Lead:** a otimização fecha aqui. Os 3 casos acima de 10% ficam como **exceção aceita**:
+- **Sobre:** o custo é transitório; só existe até a foto aparecer.
+- **Habilidades:** é raster de GPU; o script é só 13 ms/s.
+- **Contato:** o designer decide na P5 se o campo vai a 15fps no Médio.
+
+A meta principal ("rodar sem travar": scroll, INP, long tasks e carregamento) está batida.

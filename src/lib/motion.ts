@@ -198,3 +198,18 @@ export const CURSOR = {
 export function afterNextPaint(callback: () => void) {
   requestAnimationFrame(() => setTimeout(callback, 0));
 }
+
+// ---------- Suavização do scroll (feedback do Entony, estilo Apple) ----------
+
+export const SCROLL_SMOOTHING = {
+  /** Constante de tempo do amortecimento (ms): quanto maior, mais "macio". */
+  tau: 140,
+  /** Diferença abaixo da qual o valor exibido é considerado assentado. */
+  epsilon: 0.0005,
+};
+
+/** Textos disparados (hero e capítulos): duração e atraso entre título e subtítulo. */
+export const TEXT_TRIGGER = {
+  /** Folga nas bordas das janelas, para o texto não piscar no limite. */
+  hysteresis: 0.008,
+};

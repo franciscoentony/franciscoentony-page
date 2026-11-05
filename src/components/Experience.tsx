@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createSmoothedValue, type SmoothedValue } from "../lib/smoothing";
 import { useScrollWhileVisible } from "../hooks/useScrollWhileVisible";
 import { experience as experienceCopy, sectionIds } from "../content/ui";
 import { experience } from "../data/experience";
@@ -34,16 +35,26 @@ export default function Experience() {
 
   // Só escuta o scroll com a timeline na tela; a altura da linha é escrita
   // direto no estilo (sem setState a cada quadro, A6 / S-3)
+  // A linha dourada acompanha o scroll com amortecimento (continua
+  // completando o movimento depois que a rolagem para) e só usa transform
+  const fillSmooth = useRef<SmoothedValue | null>(null);
+  useEffect(() => {
+    const smooth = createSmoothedValue((progress) => {
+      if (fillRef.current) {
+        fillRef.current.style.transform = `scaleY(${progress})`;
+      }
+    });
+    fillSmooth.current = smooth;
+    return smooth.dispose;
+  }, []);
+
   useScrollWhileVisible(timelineRef, () => {
     const timeline = timelineRef.current;
     if (!timeline) return;
 
     const line = window.innerHeight * TIMELINE.activeLine;
     const rect = timeline.getBoundingClientRect();
-    const progress = clamp((line - rect.top) / rect.height);
-    if (fillRef.current) {
-      fillRef.current.style.height = `${progress * (rect.height - 12)}px`;
-    }
+    fillSmooth.current?.setTarget(clamp((line - rect.top) / rect.height));
 
     // Conta quantas fases já passaram da linha (o React só re-renderiza
     // quando o número muda)
@@ -86,9 +97,9 @@ export default function Experience() {
         />
         <span
           aria-hidden="true"
-          className="absolute top-1.5 left-[5px] w-px bg-linear-to-b from-gold to-accent shadow-glow-gold"
+          className="absolute top-1.5 bottom-1.5 left-[5px] w-px origin-top bg-linear-to-b from-gold to-accent shadow-glow-gold"
           ref={fillRef}
-          style={{ height: 0 }}
+          style={{ transform: "scaleY(0)" }}
         />
 
         {experience.map((item, index) => (

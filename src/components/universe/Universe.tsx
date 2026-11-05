@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { chapters, hero, sectionIds } from "../../content/ui";
 import { useQuality } from "../../hooks/useQuality";
 import { useScrollWhileVisible } from "../../hooks/useScrollWhileVisible";
+import { createSmoothedValue, type SmoothedValue } from "../../lib/smoothing";
 import {
   UNIVERSE,
   clamp,
@@ -131,52 +132,64 @@ function UniverseAnimated() {
   const hintRef = useRef<HTMLDivElement>(null);
   const chapterRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // A cada quadro de scroll, escreve opacidade/posição direto nos elementos
-  // (sem setState: a seção não re-renderiza enquanto rola, A6)
-  useScrollWhileVisible(sectionRef, () => {
-    const section = sectionRef.current;
-    if (!section) return;
-    const progress = getScrollProgress(section);
+  // Progresso suavizado (0 a 1), lido também pelo canvas do planeta
+  const progressRef = useRef(0);
+  const smoothRef = useRef<SmoothedValue | null>(null);
 
-    // Passa o warp para o fundo de estrelas
-    warpState.value = getWarp(progress);
-
-    // Headline + CTAs: só opacity (sem visibility: hidden), para o h1
-    // continuar existindo para leitores de tela (QA I1)
-    const heroFade = clamp(progress / UNIVERSE.heroFadeEnd);
-    const hero = heroRef.current;
-    if (hero) {
-      hero.style.opacity = `${1 - heroFade}`;
-      hero.style.transform = `translateY(${-heroFade * UNIVERSE.heroShift}px) scale(${1 - heroFade * 0.04})`;
-      hero.style.pointerEvents = heroFade >= 1 ? "none" : "auto";
-    }
-    // CTAs invisíveis não recebem foco nem clique
-    if (ctaRef.current) ctaRef.current.inert = heroFade >= 1;
-
-    if (hintRef.current) {
-      hintRef.current.style.opacity = `${1 - clamp(progress / UNIVERSE.hintFadeEnd)}`;
-    }
-
-    chapterRefs.current.forEach((chapter, index) => {
-      if (!chapter) return;
-      const [start, end] = UNIVERSE.chapterWindows[index];
-      const opacity = getChapterOpacity(progress, start, end);
-      chapter.style.opacity = `${opacity}`;
-      chapter.style.transform = `translateY(${(1 - opacity) * UNIVERSE.chapterShift}px)`;
-    });
-  });
-
-  // Ao sair da Home, desliga o warp
+  // O progresso cru da rolagem vira um alvo; o valor exibido o persegue com
+  // amortecimento (lib/smoothing.ts) e continua andando depois que a rolagem
+  // para. Tudo é escrito direto nos elementos via ref (sem re-render).
   useEffect(() => {
+    function apply(progress: number) {
+      progressRef.current = progress;
+
+      // Passa o warp para o fundo de estrelas
+      warpState.value = getWarp(progress);
+
+      // Headline + CTAs: só opacity (sem visibility: hidden), para o h1
+      // continuar existindo para leitores de tela (QA I1)
+      const heroFade = clamp(progress / UNIVERSE.heroFadeEnd);
+      const hero = heroRef.current;
+      if (hero) {
+        hero.style.opacity = `${1 - heroFade}`;
+        hero.style.transform = `translateY(${-heroFade * UNIVERSE.heroShift}px) scale(${1 - heroFade * 0.04})`;
+        hero.style.pointerEvents = heroFade >= 1 ? "none" : "auto";
+      }
+      // CTAs invisíveis não recebem foco nem clique
+      if (ctaRef.current) ctaRef.current.inert = heroFade >= 1;
+
+      if (hintRef.current) {
+        hintRef.current.style.opacity = `${1 - clamp(progress / UNIVERSE.hintFadeEnd)}`;
+      }
+
+      chapterRefs.current.forEach((chapter, index) => {
+        if (!chapter) return;
+        const [start, end] = UNIVERSE.chapterWindows[index];
+        const opacity = getChapterOpacity(progress, start, end);
+        chapter.style.opacity = `${opacity}`;
+        chapter.style.transform = `translateY(${(1 - opacity) * UNIVERSE.chapterShift}px)`;
+      });
+    }
+
+    const smooth = createSmoothedValue(apply);
+    smoothRef.current = smooth;
     return () => {
+      smooth.dispose();
+      // Ao sair da Home, desliga o warp
       warpState.value = 0;
     };
   }, []);
 
+  // Só escuta o scroll com a seção na tela; cada scroll vira um novo alvo
+  useScrollWhileVisible(sectionRef, () => {
+    const section = sectionRef.current;
+    if (section) smoothRef.current?.setTarget(getScrollProgress(section));
+  });
+
   return (
     <section ref={sectionRef} id="universe" className="relative h-[520vh]">
       <div className="sticky top-0 h-svh overflow-hidden">
-        <PlanetCanvas sectionRef={sectionRef} />
+        <PlanetCanvas progressRef={progressRef} />
 
         {/* Headline + CTAs (estilos de scroll aplicados via ref) */}
         <div

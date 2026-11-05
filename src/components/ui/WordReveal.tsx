@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createSmoothedValue, type SmoothedValue } from "../../lib/smoothing";
 import { useScrollWhileVisible } from "../../hooks/useScrollWhileVisible";
 import { useQuality } from "../../hooks/useQuality";
 import { WORDS, clamp } from "../../lib/motion";
@@ -21,6 +22,17 @@ export default function WordReveal({ text, className = "" }: WordRevealProps) {
 
   // Só escuta o scroll com o parágrafo na tela (A6). O React só
   // re-renderiza quando o número de palavras acesas muda.
+  // O número de palavras acesas segue o scroll com amortecimento: continua
+  // acendendo até o ponto certo depois que a rolagem para
+  const smoothRef = useRef<SmoothedValue | null>(null);
+  useEffect(() => {
+    const smooth = createSmoothedValue((progress) => {
+      setLitCount(Math.floor(progress * words.length * 1.05));
+    });
+    smoothRef.current = smooth;
+    return smooth.dispose;
+  }, [words.length]);
+
   useScrollWhileVisible(ref, () => {
     if (reducedMotion || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
@@ -29,7 +41,7 @@ export default function WordReveal({ text, className = "" }: WordRevealProps) {
     const progress = clamp(
       (vh * WORDS.startAt - rect.top) / (rect.height + vh * WORDS.extra),
     );
-    setLitCount(Math.floor(progress * words.length * 1.05));
+    smoothRef.current?.setTarget(progress);
   });
 
   const count = reducedMotion ? words.length : litCount;

@@ -9,11 +9,11 @@
     DF-7), para o espaço reservado já ter a forma certa.
   Imagem que não estiver no JSON sai sem width/height (rode o script).
 */ -}}
-{{- $info := index site.Data "post-images" .Destination -}}
+{{- $info := index hugo.Data "post-images" .Destination -}}
 {{- $isFirst := eq .Ordinal 0 -}}
 <img
   src="{{ .Destination | safeURL }}"
-  alt="{{ .Text }}"
+  alt="{{ .PlainText }}"
   {{- with .Title }} title="{{ . }}"{{ end }}
   {{- with $info }}
   {{- if gt .height .width }}

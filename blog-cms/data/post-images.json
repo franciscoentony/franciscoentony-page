@@ -1,0 +1,69 @@
+{
+  "/blog/images/posts/visita-mprn-venx/ganhando-livro.jpeg": {
+    "width": 720,
+    "height": 935
+  },
+  "/blog/images/posts/visita-mprn-venx/visita-mprn.jpeg": {
+    "width": 1600,
+    "height": 1200,
+    "small": {
+      "src": "/blog/images/posts/visita-mprn-venx/visita-mprn-800w.jpg",
+      "width": 800,
+      "height": 600
+    }
+  },
+  "/blog/images/posts/visita-mprn-venx/visita-venx.jpeg": {
+    "width": 2400,
+    "height": 1800,
+    "small": {
+      "src": "/blog/images/posts/visita-mprn-venx/visita-venx-800w.jpg",
+      "width": 800,
+      "height": 600
+    }
+  },
+  "/blog/images/posts/palestra-google-io-extended/drone.jpg": {
+    "width": 2400,
+    "height": 1600,
+    "small": {
+      "src": "/blog/images/posts/palestra-google-io-extended/drone-800w.jpg",
+      "width": 800,
+      "height": 533
+    }
+  },
+  "/blog/images/posts/palestra-google-io-extended/foto1.JPG": {
+    "width": 1272,
+    "height": 2400,
+    "small": {
+      "src": "/blog/images/posts/palestra-google-io-extended/foto1-800w.jpg",
+      "width": 800,
+      "height": 1509
+    }
+  },
+  "/blog/images/posts/palestra-google-io-extended/foto3.JPG": {
+    "width": 960,
+    "height": 1280,
+    "small": {
+      "src": "/blog/images/posts/palestra-google-io-extended/foto3-800w.jpg",
+      "width": 800,
+      "height": 1067
+    }
+  },
+  "/blog/images/posts/palestra-google-io-extended/foto4.JPG": {
+    "width": 1280,
+    "height": 960,
+    "small": {
+      "src": "/blog/images/posts/palestra-google-io-extended/foto4-800w.jpg",
+      "width": 800,
+      "height": 600
+    }
+  },
+  "/blog/images/posts/palestra-google-io-extended/foto6.JPG": {
+    "width": 2400,
+    "height": 1800,
+    "small": {
+      "src": "/blog/images/posts/palestra-google-io-extended/foto6-800w.jpg",
+      "width": 800,
+      "height": 600
+    }
+  }
+}

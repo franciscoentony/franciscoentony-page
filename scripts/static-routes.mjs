@@ -82,7 +82,35 @@ function setMeta(html, key, value) {
 }
 
 /** Cria dist/<pasta>/index.html com o título e a descrição da página. */
-function createRoute(folder, title, description, type = "website") {
+/**
+ * Preload da 1ª imagem do post (é o LCP): o navegador começa a baixá-la
+ * junto com o HTML, sem esperar o JS buscar o index.json (A9).
+ */
+function firstImagePreload(contentHtml) {
+  const img = /<img\b[^>]*>/i.exec(contentHtml ?? "")?.[0];
+  if (!img) return "";
+  const attr = (name) => new RegExp(`${name}="([^"]*)"`).exec(img)?.[1];
+  const toSite = (url) =>
+    url.replace(/\/blog\/images\//g, "/blog-data/images/");
+  const src = attr("src");
+  if (!src) return "";
+  const srcset = attr("srcset");
+  const sizes = attr("sizes");
+  return (
+    `<link rel="preload" as="image" fetchpriority="high" href="${escapeHtml(toSite(src))}"` +
+    (srcset ? ` imagesrcset="${escapeHtml(toSite(srcset))}"` : "") +
+    (sizes ? ` imagesizes="${escapeHtml(sizes)}"` : "") +
+    " />"
+  );
+}
+
+function createRoute(
+  folder,
+  title,
+  description,
+  type = "website",
+  extraHead = "",
+) {
   let html = baseHtml.replace(
     /<title>[^<]*<\/title>/,
     `<title>${escapeHtml(title)}</title>`,
@@ -94,6 +122,7 @@ function createRoute(folder, title, description, type = "website") {
   html = setMeta(html, "og:description", description);
   html = setMeta(html, "twitter:title", title);
   html = setMeta(html, "twitter:description", description);
+  if (extraHead) html = html.replace("</head>", `    ${extraHead}\n  </head>`);
 
   const targetDir = join(distDir, folder);
   mkdirSync(targetDir, { recursive: true });
@@ -101,11 +130,18 @@ function createRoute(folder, title, description, type = "website") {
   console.log(`[static-routes] /${folder}/`);
 }
 
+// Preload do índice de posts: o navegador já começa a baixá-lo junto com o
+// HTML, em vez de esperar o JS da página pedir (A9)
+const postsPreload =
+  '<link rel="preload" as="fetch" href="/blog-data/index.json" crossorigin="anonymous" />';
+
 // /blog (textos iguais a seo.blogTitle e blog.lead em src/content/ui.ts)
 createRoute(
   "blog",
   `Blog${titleSuffix}`,
   "Registros do que vou construindo e aprendendo — de projetos pessoais a bastidores dos sistemas que desenvolvo no IFRN.",
+  "website",
+  postsPreload,
 );
 
 const posts = existsSync(postsJson)
@@ -128,6 +164,7 @@ for (const post of posts) {
     `${title}${titleSuffix}`,
     description,
     "article",
+    `${postsPreload}\n    ${firstImagePreload(post.content)}`,
   );
 }
 

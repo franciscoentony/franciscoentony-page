@@ -84,7 +84,7 @@ export default function BlogPost() {
     <div id="top">
       <Navbar />
 
-      <main className="pt-[calc(var(--spacing-nav)+64px)] pb-section">
+      <main className="min-h-svh pt-[calc(var(--spacing-nav)+64px)] pb-section">
         {loading && (
           <p role="status" className={`${readingColumn} text-secondary`}>
             {blog.loadingPost}

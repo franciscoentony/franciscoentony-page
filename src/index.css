@@ -473,15 +473,25 @@
 
   /* Imagens: ocupam no máximo a coluna; as verticais ficam com no máximo
      80% da tela (ou 720px) de altura, centralizadas (DF-7) */
+  /* Imagens: o width/height do HTML (render hook do Hugo, A9) dá a
+     proporção, então o espaço já fica reservado antes de a foto chegar.
+     Horizontais ocupam a coluna; verticais (.post-image-portrait) têm
+     altura de no máximo 80% da tela ou 720px, centralizadas (DF-7). */
   & img {
     display: block;
-    width: auto;
+    width: 100%;
     max-width: 100%;
     height: auto;
-    max-height: min(80svh, 720px);
     margin-inline: auto;
     border: 1px solid var(--color-line);
     border-radius: var(--radius-md);
+  }
+
+  /* --ratio (largura/altura) vem do render hook. A largura é calculada para
+     a altura caber em min(80svh, 720px), sem passar da coluna; a altura
+     segue a proporção (height: auto), então nada distorce. */
+  & img.post-image-portrait {
+    width: min(100%, calc(min(80svh, 720px) * var(--ratio, 0.75)));
   }
 }
 

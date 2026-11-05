@@ -1,0 +1,37 @@
+{{- /*
+  Render hook das imagens dos posts (PERF-PLAN A9).
+  - width/height vêm de data/post-images.json (gerado por
+    scripts/post-images.py): o navegador reserva o espaço e a página não
+    "pula" enquanto as fotos carregam (CLS).
+  - srcset com a versão de 800px (-800w.jpg) para celulares.
+  - A 1ª imagem do post carrega com prioridade (é o LCP); as outras são lazy.
+  - Imagens verticais ganham a classe post-image-portrait (altura limitada,
+    DF-7), para o espaço reservado já ter a forma certa.
+  Imagem que não estiver no JSON sai sem width/height (rode o script).
+*/ -}}
+{{- $info := index site.Data "post-images" .Destination -}}
+{{- $isFirst := eq .Ordinal 0 -}}
+<img
+  src="{{ .Destination | safeURL }}"
+  alt="{{ .Text }}"
+  {{- with .Title }} title="{{ . }}"{{ end }}
+  {{- with $info }}
+  {{- if gt .height .width }}
+  class="post-image-portrait"
+  style="--ratio: {{ div (float .width) .height }}"
+  {{- end }}
+  width="{{ .width }}"
+  height="{{ .height }}"
+  {{- with .small }}
+  srcset="{{ .src | safeURL }} {{ .width }}w, {{ $.Destination | safeURL }} {{ $info.width }}w"
+  sizes="(min-width: 860px) 640px, calc(100vw - 48px)"
+  {{- end }}
+  {{- end }}
+  {{- if $isFirst }}
+  loading="eager"
+  fetchpriority="high"
+  {{- else }}
+  loading="lazy"
+  {{- end }}
+  decoding="async"
+>

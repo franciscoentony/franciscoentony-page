@@ -63,7 +63,11 @@ export function resolveContentHtml(html: string): string {
     .replace(/src="\/blog\/images\//g, `src="${base}/blog-data/images/`)
     .replace(/src="\/blog-data\/images\//g, `src="${base}/blog-data/images/`)
     .replace(/src="\/blog\//g, `src="${base}/blog-data/`)
-    .replace(/src="\/blog-data\//g, `src="${base}/blog-data/`);
+    .replace(/src="\/blog-data\//g, `src="${base}/blog-data/`)
+    // srcset (versões de 800px do render hook do Hugo, A9): várias URLs
+    .replace(/srcset="[^"]*"/g, (srcset) =>
+      srcset.replace(/\/blog\/images\//g, `${base}/blog-data/images/`),
+    );
 
   // O visual das imagens (raio, borda) vem da classe post-content em
   // src/index.css (D14), não mais de estilo inline.

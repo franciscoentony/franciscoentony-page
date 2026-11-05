@@ -3,6 +3,7 @@ import { skills } from "../../content/ui";
 import { usePointer } from "../../hooks/usePointer";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { SPHERE, lerp } from "../../lib/motion";
+import { subscribe } from "../../lib/ticker";
 
 /** Posição de cada tag na superfície de uma esfera de raio 1 (distribuição de Fibonacci). */
 const tagPositions = skills.sphereTags.map((_, index) => {
@@ -36,8 +37,8 @@ export default function SkillsSphere() {
     const container = containerRef.current;
     if (!container) return;
 
-    let isVisible = false;
-    let frameId = 0;
+    // Função para sair do ticker (null = não inscrito)
+    let unsubscribe: (() => void) | null = null;
 
     function placeTags() {
       if (!container) return;
@@ -71,9 +72,6 @@ export default function SkillsSphere() {
     }
 
     function tick() {
-      frameId = requestAnimationFrame(tick);
-      if (!isVisible) return;
-
       // Sem arrastar, a velocidade volta aos poucos para a base (e o mouse influencia)
       if (!drag.current) {
         velocity.current.x = lerp(
@@ -99,15 +97,20 @@ export default function SkillsSphere() {
       return () => window.removeEventListener("resize", placeTags);
     }
 
+    // Só gira (inscrita no ticker único, A2) enquanto estiver na tela
     const observer = new IntersectionObserver(([entry]) => {
-      isVisible = entry.isIntersecting;
+      if (entry.isIntersecting && !unsubscribe) {
+        unsubscribe = subscribe(tick);
+      } else if (!entry.isIntersecting && unsubscribe) {
+        unsubscribe();
+        unsubscribe = null;
+      }
     });
     observer.observe(container);
     placeTags();
-    frameId = requestAnimationFrame(tick);
 
     return () => {
-      cancelAnimationFrame(frameId);
+      unsubscribe?.();
       observer.disconnect();
     };
   }, [reducedMotion, pointer]);

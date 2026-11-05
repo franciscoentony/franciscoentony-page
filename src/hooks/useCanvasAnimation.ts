@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { MAX_DPR } from "../lib/motion";
+import { subscribe } from "../lib/ticker";
 import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
 
 export interface CanvasFrame {
@@ -64,7 +65,8 @@ interface CanvasAnimationOptions {
  * - só começa depois das fontes carregadas e do primeiro paint (D9);
  * - começa escalonado: 1 canvas por frame, e os fora da tela só quando
  *   chegam a ~1 tela de distância E o navegador está ocioso (BL1, A3);
- * - pausa quando o canvas sai da tela (IntersectionObserver) (D9);
+ * - desenha pelo ticker único (A2): fora da tela, cancela a inscrição e
+ *   não agenda mais nenhum quadro (D9);
  * - com prefers-reduced-motion desenha um único quadro parado (D8).
  *
  * Exemplo:
@@ -104,7 +106,8 @@ export function useCanvasAnimation(
     let isVisible = false;
     // "Perto": a até ~1 tela de distância (A3)
     let isNear = false;
-    let frameId = 0;
+    // Função para sair do ticker (null = não inscrito)
+    let unsubscribe: (() => void) | null = null;
     let lastDrawTime = -Infinity;
     let cancelled = false;
 
@@ -125,8 +128,6 @@ export function useCanvasAnimation(
     }
 
     function tick(time: number) {
-      frameId = requestAnimationFrame(tick);
-      if (!isVisible) return;
       if (time - lastDrawTime < frameInterval) return;
       lastDrawTime = time;
       drawFrame(time);
@@ -139,7 +140,18 @@ export function useCanvasAnimation(
       if (isStatic) {
         drawFrame(0);
       } else {
-        frameId = requestAnimationFrame(tick);
+        updateSubscription();
+      }
+    }
+
+    /** Entra no ticker quando está visível e sai quando deixa de estar. */
+    function updateSubscription() {
+      const shouldRun = started && !isStatic && isVisible && !cancelled;
+      if (shouldRun && !unsubscribe) {
+        unsubscribe = subscribe(tick);
+      } else if (!shouldRun && unsubscribe) {
+        unsubscribe();
+        unsubscribe = null;
       }
     }
 
@@ -166,6 +178,7 @@ export function useCanvasAnimation(
         scheduleStart();
         // Ficou visível antes do ócio chegar? Começa já no próximo frame livre.
         if (isVisible && scheduled && !started) startOnNextFrame(start);
+        updateSubscription();
       },
       { rootMargin: "100px" },
     );
@@ -197,7 +210,7 @@ export function useCanvasAnimation(
 
     return () => {
       cancelled = true;
-      cancelAnimationFrame(frameId);
+      unsubscribe?.();
       visibilityObserver.disconnect();
       nearObserver.disconnect();
       resizeObserver.disconnect();

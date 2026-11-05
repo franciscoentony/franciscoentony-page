@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useInView } from "../../hooks/useInView";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { COUNTER, clamp, smoothstep } from "../../lib/motion";
+import { subscribe } from "../../lib/ticker";
 
 interface CounterProps {
   value: number;
@@ -27,16 +28,15 @@ export default function Counter({
     if (!inView || reducedMotion) return;
 
     const startTime = performance.now();
-    let frameId = 0;
 
-    function step(now: number) {
+    // Conta pelo ticker único (A2) e sai dele quando termina
+    const unsubscribe = subscribe((now) => {
       const t = smoothstep(clamp((now - startTime) / COUNTER.duration));
       setCurrent(Math.round(value * t));
-      if (t < 1) frameId = requestAnimationFrame(step);
-    }
+      if (t >= 1) unsubscribe();
+    });
 
-    frameId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frameId);
+    return unsubscribe;
   }, [inView, reducedMotion, value]);
 
   const shown = reducedMotion ? value : current;

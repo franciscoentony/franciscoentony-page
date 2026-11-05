@@ -2,11 +2,20 @@
  * Desenho do planeta ASCII da seção Universe (porte de drawPlanet do protótipo).
  * Função "pura": recebe tudo que precisa por parâmetro e desenha no canvas.
  */
-import { ASCII_RAMP, UNIVERSE, clamp, lerp, smoothstep } from "./motion";
+import { UNIVERSE, clamp, lerp, smoothstep } from "./motion";
+import { drawAsciiGrid, getAsciiAtlas, getLevel } from "./asciiAtlas";
 import type { PointerPosition } from "../hooks/usePointer";
 
 /** Números aleatórios fixos usados para espalhar os caracteres na dissolução. */
 const SEEDS = new Float32Array(40000).map(() => Math.random() * 2 - 1);
+
+/** Ajustes por nível de qualidade (PERF-TIERS). */
+export interface PlanetOptions {
+  /** Faixas de matiz do atlas: 6 no Alto, 4 no Médio. */
+  hueBands?: number;
+  /** Fator do tamanho da célula: 1 no Alto, 1.3 no Médio. */
+  cellScale?: number;
+}
 
 /** Posição atual da luz (segue o mouse devagar). Guardada entre os quadros. */
 export interface PlanetLight {
@@ -58,12 +67,14 @@ export function drawPlanet(
   progress: number,
   pointer: PointerPosition,
   light: PlanetLight,
+  { hueBands = 6, cellScale = 1 }: PlanetOptions = {},
 ) {
   ctx.clearRect(0, 0, width, height);
 
-  const fontSize = width < 700 ? 8 : 10;
-  ctx.font = `500 ${fontSize}px "Geist Mono", monospace`;
-  ctx.textBaseline = "top";
+  // Células maiores no nível Médio (fator 1.3: 13px, ou 10px abaixo de 700px)
+  const fontSize = Math.round((width < 700 ? 8 : 10) * cellScale);
+  const font = `500 ${fontSize}px "Geist Mono", monospace`;
+  ctx.font = font;
   const cellWidth = ctx.measureText("M").width;
   const cellHeight = fontSize * 1.18;
   const cols = Math.ceil(width / cellWidth);
@@ -98,21 +109,33 @@ export function drawPlanet(
   const Lz = 0.75 / lightLength;
 
   const hueBase = 250 + Math.sin(time * 0.0004) * 8;
-  let index = 0;
-  let lastStyle = "";
 
-  for (let j = 0; j < rows; j++) {
-    const py = (j * cellHeight + cellHeight / 2 - cy) / R;
+  // Atlas do planeta: luminosidade 50% a 90%, saturação em 2 faixas
+  // (miolo ~75%, borda iridescente 100%)
+  const atlas = getAsciiAtlas({
+    font,
+    fontSize,
+    hueBands,
+    saturations: [75, 100],
+    lightness: (bright) => 50 + bright * 40,
+  });
 
-    for (let i = 0; i < cols; i++, index++) {
+  drawAsciiGrid(ctx, atlas, {
+    cols,
+    rows,
+    cellWidth,
+    cellHeight,
+    cell: (i, j, out) => {
       const px = (i * cellWidth + cellWidth / 2 - cx) / R;
+      const py = (j * cellHeight + cellHeight / 2 - cy) / R;
       const d2 = px * px + py * py;
 
-      let char: string | null = null;
+      let hasChar = false;
       let bright = 0;
       let hue = hueBase;
       let depth = -9;
       let sat = 80;
+      let minLevel = 0;
 
       // Esfera
       if (d2 < 1) {
@@ -132,7 +155,7 @@ export function drawPlanet(
         );
         hue = hueBase + rim * 110 - land * 25 + px * 20;
         sat = 70 + rim * 30;
-        char = ASCII_RAMP[Math.round(bright * (ASCII_RAMP.length - 1))];
+        hasChar = getLevel(bright) > 0;
         depth = pz;
       }
 
@@ -142,7 +165,7 @@ export function drawPlanet(
       const w = uy / sinElev;
       const ringRadius = Math.hypot(ux, w);
       const ringDepth = w * cosElev;
-      const ringInFront = char === null || char === " " || ringDepth > depth;
+      const ringInFront = !hasChar || ringDepth > depth;
 
       if (ringRadius > 1.45 && ringRadius < 2.05 && ringInFront) {
         const band = Math.sin(ringRadius * 30) * 0.5 + 0.5;
@@ -150,43 +173,37 @@ export function drawPlanet(
 
         if (band > 0.2 && !isGap) {
           const shadow = ringDepth < 0 && Math.abs(ux) < 1 ? 0.35 : 1;
-          const lit = clamp(
+          bright = clamp(
             (0.28 + band * 0.4) *
               shadow *
               (0.6 + 0.4 * Math.max(0, ux * Lx + 0.5)),
           );
-          char =
-            ASCII_RAMP[Math.max(1, Math.round(lit * (ASCII_RAMP.length - 1)))];
-          bright = lit;
           hue = hueBase + 20 + (ringRadius - 1.45) * 60;
           sat = 75;
+          minLevel = 1; // o anel nunca vira espaço
+          hasChar = true;
         }
       }
 
-      if (!char || char === " ") continue;
+      if (!hasChar) return false;
 
-      let x = i * cellWidth;
-      let y = j * cellHeight;
-      let alpha = 0.25 + bright * 0.75;
+      out.bright = bright;
+      out.hue = hue;
+      out.saturation = sat >= 85 ? 1 : 0;
+      out.minLevel = minLevel;
+      out.alpha = 0.25 + bright * 0.75;
 
       // Cada caractere se espalha e some na dissolução
       if (dissolve > 0) {
-        x += SEEDS[index % 40000] * dissolve * width * 0.7;
-        y +=
+        const index = j * cols + i;
+        out.offsetX = SEEDS[index % 40000] * dissolve * width * 0.7;
+        out.offsetY =
           SEEDS[(index * 7) % 40000] * dissolve * height * 0.7 - dissolve * 60;
-        alpha *= (1 - dissolve) * (1 - dissolve);
+        out.alpha *= (1 - dissolve) * (1 - dissolve);
       }
-
-      // Arredonda as cores para trocar fillStyle menos vezes (mais rápido)
-      const lightness = Math.round(50 + bright * 40);
-      const style = `hsla(${Math.round(hue / 6) * 6},${Math.round(sat / 10) * 10}%,${lightness - (lightness % 5)}%,${Math.round(alpha * 10) / 10})`;
-      if (style !== lastStyle) {
-        ctx.fillStyle = style;
-        lastStyle = style;
-      }
-      ctx.fillText(char, x, y);
-    }
-  }
+      return true;
+    },
+  });
 
   // Brilho suave em volta
   const glow = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R * 2.2);

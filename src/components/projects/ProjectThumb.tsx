@@ -4,12 +4,8 @@ import {
   type CanvasFrame,
 } from "../../hooks/useCanvasAnimation";
 import { shapes, type ShapeName } from "../../lib/asciiShapes";
-import {
-  ASCII_FRAME_INTERVAL,
-  ASCII_RAMP,
-  clamp,
-  lerp,
-} from "../../lib/motion";
+import { ASCII_FRAME_INTERVAL, clamp, lerp } from "../../lib/motion";
+import { drawAsciiGrid, getAsciiAtlas } from "../../lib/asciiAtlas";
 
 interface ProjectThumbProps {
   shape: ShapeName;
@@ -23,9 +19,6 @@ export default function ProjectThumb({ shape, activeRef }: ProjectThumbProps) {
 
   function draw({ ctx, width, height, time, isStatic }: CanvasFrame) {
     ctx.clearRect(0, 0, width, height);
-    ctx.font = '600 9px "Geist Mono", monospace';
-    ctx.textBaseline = "top";
-
     heat.current = lerp(heat.current, activeRef.current ? 1 : 0, 0.08);
     const t = isStatic ? 0 : time;
     const distanceTo = shapes[shape];
@@ -36,8 +29,20 @@ export default function ProjectThumb({ shape, activeRef }: ProjectThumbProps) {
     const rows = Math.ceil(height / cellHeight);
     const scale = Math.min(width, height) * 0.62;
 
-    for (let j = 0; j < rows; j++) {
-      for (let i = 0; i < cols; i++) {
+    const atlas = getAsciiAtlas({
+      font: '600 9px "Geist Mono", monospace',
+      fontSize: 9,
+      hueBands: 6,
+      saturations: [90],
+      lightness: (bright) => 55 + bright * 35,
+    });
+
+    drawAsciiGrid(ctx, atlas, {
+      cols,
+      rows,
+      cellWidth,
+      cellHeight,
+      cell: (i, j, out) => {
         const x = (i * cellWidth - width / 2) / scale;
         const y = (j * cellHeight - height / 2) / scale;
         const wobble =
@@ -55,17 +60,14 @@ export default function ProjectThumb({ shape, activeRef }: ProjectThumbProps) {
                 0.6 *
                   Math.sin(t * 0.002 + i * 0.7) *
                   Math.cos(j * 0.9 + t * 0.001));
-        if (bright < 0.08) continue;
+        if (bright < 0.08) return false;
 
-        const hue = 255 + x * 40 + heat.current * 60 * Math.sin(t * 0.002 + j);
-        ctx.fillStyle = `hsla(${hue},90%,${55 + bright * 35}%,${0.25 + bright * 0.75})`;
-        ctx.fillText(
-          ASCII_RAMP[Math.round(bright * (ASCII_RAMP.length - 1))],
-          i * cellWidth,
-          j * cellHeight,
-        );
-      }
-    }
+        out.bright = bright;
+        out.hue = 255 + x * 40 + heat.current * 60 * Math.sin(t * 0.002 + j);
+        out.alpha = 0.25 + bright * 0.75;
+        return true;
+      },
+    });
   }
 
   const canvasRef = useCanvasAnimation(draw, {

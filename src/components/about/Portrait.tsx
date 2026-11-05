@@ -7,12 +7,8 @@ import {
 import { useInView } from "../../hooks/useInView";
 import { usePointer } from "../../hooks/usePointer";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
-import {
-  ASCII_FRAME_INTERVAL,
-  ASCII_RAMP,
-  PORTRAIT,
-  clamp,
-} from "../../lib/motion";
+import { ASCII_FRAME_INTERVAL, PORTRAIT, clamp } from "../../lib/motion";
+import { drawAsciiGrid, getAsciiAtlas } from "../../lib/asciiAtlas";
 import { resolveAssetPath } from "../../utils/resolvePath";
 
 const PHOTO_JPG = resolveAssetPath("/home/foto-entony.jpg");
@@ -127,16 +123,27 @@ export default function Portrait({ cardActive }: PortraitProps) {
     boxRef.current?.style.setProperty("--px", `${mouseX * 100}%`);
     boxRef.current?.style.setProperty("--py", `${mouseY * 100}%`);
 
-    ctx.font = '600 8px "Geist Mono", monospace';
-    ctx.textBaseline = "top";
     const cellWidth = 5.2;
     const cellHeight = 8;
     const cols = Math.ceil(width / cellWidth);
     const rows = Math.ceil(height / cellHeight);
     const wave = isStatic ? 0 : time;
+    const hueShift = Math.sin(wave * 0.001) * 20;
 
-    for (let j = 0; j < rows; j++) {
-      for (let i = 0; i < cols; i++) {
+    const atlas = getAsciiAtlas({
+      font: '600 8px "Geist Mono", monospace',
+      fontSize: 8,
+      hueBands: 6,
+      saturations: [90],
+      lightness: (bright) => 55 + bright * 35,
+    });
+
+    drawAsciiGrid(ctx, atlas, {
+      cols,
+      rows,
+      cellWidth,
+      cellHeight,
+      cell: (i, j, out) => {
         const u = i / cols;
         const v = j / rows;
         const px = Math.min(photo.width - 1, Math.floor(u * photo.width));
@@ -154,17 +161,14 @@ export default function Portrait({ cardActive }: PortraitProps) {
         if (bright > 0.05) bright += Math.max(0, 0.25 - distance) * 1.2;
         bright = clamp(bright);
         if (!isStatic) bright *= 0.85 + Math.sin(wave * 0.004 + j * 0.5) * 0.08;
-        if (bright < 0.06) continue;
+        if (bright < 0.06) return false;
 
-        const hue = 250 + u * 40 + Math.sin(wave * 0.001) * 20;
-        ctx.fillStyle = `hsla(${hue},90%,${55 + bright * 35}%,${0.4 + bright * 0.6})`;
-        ctx.fillText(
-          ASCII_RAMP[Math.round(bright * (ASCII_RAMP.length - 1))],
-          i * cellWidth,
-          j * cellHeight,
-        );
-      }
-    }
+        out.bright = bright;
+        out.hue = 250 + u * 40 + hueShift;
+        out.alpha = 0.4 + bright * 0.6;
+        return true;
+      },
+    });
   }
 
   const canvasRef = useCanvasAnimation(draw, {

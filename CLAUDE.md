@@ -103,7 +103,9 @@ Ordem de implementação: **tokens → componentes base (Navbar, Footer, botões
 - **D16. Artefatos de QA:** são versionados o código de teste e os relatórios em texto (`qa/baseline/RELATORIO.md`, `playwright-summary.md`). Screenshots, Lighthouse bruto e `results.json` ficam só locais.
 - **D17. Contraste:** texto em estado final nunca usa `muted`. Datas, labels, hash e footer usam `secondary` (#86868B). O `muted` fica restrito a estados transitórios e decoração.
 
-**Pendências com o Entony:** aprovar o restante da copy nova (D3); autorizar a limpeza de arquivos soltos em `public/blog-data` (imagens `WhatsApp*.jpeg` e `*.mp`); dizer se os `alt` genéricos das imagens dos posts (conteúdo) podem ser reescritos.
+- **D24. Aprovações do Entony (04–05/11/2026):** a copy de interface de `src/content/ui.ts` está **aprovada por completo** (D3), incluindo a copy de SEO; a limpeza de arquivos soltos de `public/blog-data` foi feita (1c82205, 4b4af83); a compressão das fotos dos posts e os novos `alt` descritivos foram feitos (4b4af83); o plano de desempenho (`docs/redesign/PERF-PLAN.md`) foi aprovado, e desempenho é critério de merge.
+
+**Pendências com o Entony:** nenhuma. Alterações futuras de copy em `ui.ts` voltam a precisar de aprovação.
 
 ### Critérios de aceite (Definition of Done)
 

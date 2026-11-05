@@ -120,9 +120,17 @@ export function drawPlanet(
     lightness: (bright) => 50 + bright * 40,
   });
 
+  // Só as células em volta do planeta + anel (o anel vai até 2.05 × R):
+  // o resto da tela é vazio e não precisa ser calculado (A1b)
+  const extent = R * 2.1;
+
   drawAsciiGrid(ctx, atlas, {
     cols,
     rows,
+    fromCol: Math.floor((cx - extent) / cellWidth),
+    toCol: Math.ceil((cx + extent) / cellWidth) + 1,
+    fromRow: Math.floor((cy - extent) / cellHeight),
+    toRow: Math.ceil((cy + extent) / cellHeight) + 1,
     cellWidth,
     cellHeight,
     cell: (i, j, out) => {

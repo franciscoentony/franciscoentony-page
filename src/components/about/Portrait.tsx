@@ -81,6 +81,8 @@ export default function Portrait({ cardActive }: PortraitProps) {
     once: true,
   });
   const [revealed, setRevealed] = useState(false);
+  // true quando a foto terminou de aparecer (o fade dura 1.4s)
+  const [photoSettled, setPhotoSettled] = useState(false);
 
   const image = useRef<HTMLImageElement | null>(null);
   const sample = useRef<PhotoSample | null>(null);
@@ -104,7 +106,19 @@ export default function Portrait({ cardActive }: PortraitProps) {
     return () => window.clearTimeout(timeoutId);
   }, [inView]);
 
+  // Depois do fade da foto, o ASCII fica escondido por baixo dela
+  useEffect(() => {
+    if (!revealed) return;
+    const timeoutId = window.setTimeout(() => setPhotoSettled(true), 1600);
+    return () => window.clearTimeout(timeoutId);
+  }, [revealed]);
+
   function draw({ ctx, width, height, time, isStatic }: CanvasFrame) {
+    // Com a foto já visível, o ASCII só aparece pela lente (mouse em cima).
+    // Sem lente, não redesenha: o último quadro fica escondido sob a foto
+    // (PERF-TIERS: retrato "só redesenha durante a lente").
+    if (photoSettled && !cardActive && !isStatic) return;
+
     ctx.clearRect(0, 0, width, height);
     if (!image.current || width === 0 || height === 0) return;
 

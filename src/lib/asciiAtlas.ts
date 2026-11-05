@@ -156,6 +156,14 @@ export interface AsciiCell {
 interface GridOptions {
   cols: number;
   rows: number;
+  /**
+   * Opcional: só percorre este retângulo de células (ex.: em volta do
+   * planeta). Fora dele nada é desenhado. Padrão: a grade inteira.
+   */
+  fromCol?: number;
+  toCol?: number;
+  fromRow?: number;
+  toRow?: number;
   cellWidth: number;
   cellHeight: number;
   /**
@@ -184,12 +192,24 @@ const sharedCell: AsciiCell = {
 export function drawAsciiGrid(
   ctx: CanvasRenderingContext2D,
   atlas: AsciiAtlas,
-  { cols, rows, cellWidth, cellHeight, cell }: GridOptions,
+  {
+    cols,
+    rows,
+    fromCol = 0,
+    toCol = cols,
+    fromRow = 0,
+    toRow = rows,
+    cellWidth,
+    cellHeight,
+    cell,
+  }: GridOptions,
 ) {
   const satCount = atlas.saturations.length;
+  const lastCol = Math.min(cols, toCol);
+  const lastRow = Math.min(rows, toRow);
 
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
+  for (let row = Math.max(0, fromRow); row < lastRow; row++) {
+    for (let col = Math.max(0, fromCol); col < lastCol; col++) {
       sharedCell.saturation = 0;
       sharedCell.alpha = 1;
       sharedCell.offsetX = 0;

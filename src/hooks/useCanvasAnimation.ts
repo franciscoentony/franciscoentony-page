@@ -62,7 +62,8 @@ interface CanvasAnimationOptions {
  * O que ele já resolve para você:
  * - ajusta o tamanho do canvas ao elemento, com DPR limitado a 2 (D9);
  * - só começa depois das fontes carregadas e do primeiro paint (D9);
- * - começa escalonado: 1 canvas por frame, e os fora da tela só no ócio (BL1);
+ * - começa escalonado: 1 canvas por frame, e os fora da tela só quando
+ *   chegam a ~1 tela de distância E o navegador está ocioso (BL1, A3);
  * - pausa quando o canvas sai da tela (IntersectionObserver) (D9);
  * - com prefers-reduced-motion desenha um único quadro parado (D8).
  *
@@ -101,6 +102,8 @@ export function useCanvasAnimation(
     // Começa como "fora da tela": nada é desenhado antes de o
     // IntersectionObserver responder (BL1).
     let isVisible = false;
+    // "Perto": a até ~1 tela de distância (A3)
+    let isNear = false;
     let frameId = 0;
     let lastDrawTime = -Infinity;
     let cancelled = false;
@@ -140,9 +143,13 @@ export function useCanvasAnimation(
       }
     }
 
-    /** Agenda o início quando já sabemos das fontes E da visibilidade. */
+    /**
+     * Agenda o início quando as fontes carregaram e o canvas está visível
+     * ou perto (a ~1 tela). Longe da tela, nem começa.
+     */
     function scheduleStart() {
       if (scheduled || !fontsReady || !visibilityKnown) return;
+      if (!isVisible && !isNear) return;
       scheduled = true;
       if (isVisible) {
         startOnNextFrame(start);
@@ -164,6 +171,16 @@ export function useCanvasAnimation(
     );
     visibilityObserver.observe(canvas);
 
+    // Avisa quando o canvas chega a ~1 tela de distância (A3)
+    const nearObserver = new IntersectionObserver(
+      ([entry]) => {
+        isNear = entry.isIntersecting;
+        scheduleStart();
+      },
+      { rootMargin: "100% 0px" },
+    );
+    nearObserver.observe(canvas);
+
     // Recalcula o tamanho quando o canvas muda de tamanho
     const resizeObserver = new ResizeObserver(() => {
       if (!started) return;
@@ -182,6 +199,7 @@ export function useCanvasAnimation(
       cancelled = true;
       cancelAnimationFrame(frameId);
       visibilityObserver.disconnect();
+      nearObserver.disconnect();
       resizeObserver.disconnect();
     };
   }, [isStatic, frameInterval]);

@@ -16,17 +16,31 @@ export default function ScrollToHash() {
   useEffect(() => {
     if (navigationType === "POP" && !location.hash) return;
 
-    // Espera um frame para a página nova estar montada.
-    const frameId = requestAnimationFrame(() => {
-      if (location.hash) {
-        const id = decodeURIComponent(location.hash.slice(1));
-        document.getElementById(id)?.scrollIntoView();
-      } else {
+    let frameId = 0;
+    let attempts = 0;
+
+    // Espera a página nova estar montada. Algumas seções da Home chegam um
+    // pouco depois (React.lazy), então tentamos achar a âncora por até ~2s.
+    function scrollToTarget() {
+      if (!location.hash) {
         // "instant": sem herdar o scroll-behavior: smooth do <html> (QA I3)
         window.scrollTo({ top: 0, behavior: "instant" });
+        return;
       }
-    });
+      const id = decodeURIComponent(location.hash.slice(1));
+      const target = document.getElementById(id);
+      // Espera também as seções lazy chegarem (senão a página "cresce" depois
+      // do scroll e a âncora sai do lugar)
+      const stillLoading = document.querySelector("[data-placeholder]");
+      if (target && !stillLoading) {
+        target.scrollIntoView();
+      } else if (attempts < 120) {
+        attempts++;
+        frameId = requestAnimationFrame(scrollToTarget);
+      }
+    }
 
+    frameId = requestAnimationFrame(scrollToTarget);
     return () => cancelAnimationFrame(frameId);
   }, [location.pathname, location.hash, location.key, navigationType]);
 

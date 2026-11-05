@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Post: protótipo v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600;700&family=Doto:wght@500;800;900&display=swap" rel="stylesheet" />
+<style>
+/* ===== base v3 (igual ao index.html) ===== */
+:root{
+  --bg:#000; --bg-2:#0a0a0c; --card:#111114; --void:#050508; --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.18);
+  --text:#f5f5f7; --prose:#d2d2d7; --muted:#86868b; --dim:#48484d;
+  --violet:#8b6cff; --lav:#c9bcff; --gold:#ffd25e;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --sans:'Geist',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
+  --mono:'Geist Mono',ui-monospace,monospace; --dot:'Doto','Geist Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{font-family:var(--sans);font-size:17px;line-height:1.47;letter-spacing:-.011em;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+::selection{background:var(--violet);color:#fff}
+.wrap{width:min(1080px,100% - 48px);margin-inline:auto}
+.grad{background:linear-gradient(100deg,#fff 0%,var(--lav) 45%,var(--violet) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+main,nav,footer,.progress{position:relative;z-index:1}
+nav.top{position:fixed;top:0;left:0;right:0;height:48px;z-index:50;display:flex;align-items:center;background:rgba(0,0,0,.55);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line);transition:transform .5s var(--ease)}
+nav.top.hide{transform:translateY(-100%)}
+nav.top .wrap{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.02em;display:flex;gap:8px;align-items:center}
+.logo i{width:8px;height:8px;background:var(--gold);display:inline-block;box-shadow:0 0 12px var(--gold)}
+.links{display:flex;gap:32px;font-size:12.5px;color:#d2d2d7}.links a{opacity:.8}.links a[aria-current]{opacity:1}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:980px;font-size:14px;font-weight:500;padding:10px 20px;transition:transform .3s var(--ease),background .3s,box-shadow .3s,border-color .3s}
+.btn-sm{font-size:12px;padding:5px 13px}
+.btn-primary{background:var(--text);color:#000}.btn-primary:hover{transform:scale(1.03);box-shadow:0 0 0 6px rgba(255,255,255,.08)}
+.btn-link{color:var(--lav);padding-inline:6px}.btn-link:hover{text-decoration:underline}
+.btn-ghost{border:1px solid var(--line);color:var(--prose);font-size:13px;padding:8px 14px}.btn-ghost:hover{border-color:var(--line-strong);color:var(--text)}
+:focus-visible{outline:2px solid var(--lav);outline-offset:3px;border-radius:6px}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:12px;color:var(--muted);margin-top:120px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}footer .f{display:flex;gap:22px}
+@media (max-width:860px){.links{display:none}}
+
+/* ===== C: skeleton ASCII das imagens ===== */
+.media{position:relative;display:block;overflow:hidden;border-radius:16px;border:1px solid var(--line);background:var(--void);aspect-ratio:var(--ratio,16/9);width:100%;margin-inline:auto}
+.media-skel{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,var(--lav),var(--violet) 55%,rgba(139,108,255,.4));opacity:.7;-webkit-mask:url(img/skeleton-ascii.webp) 0 0/320px 192px repeat;mask:url(img/skeleton-ascii.webp) 0 0/320px 192px repeat;transition:opacity .6s var(--ease),visibility 0s .6s}
+.media[data-state=loading] .media-skel::after{content:"";position:absolute;inset:0 auto 0 0;width:60%;background:linear-gradient(90deg,transparent,rgba(245,245,247,.9),transparent);transform:translateX(-100%);animation:sweep 1.8s var(--ease) infinite}
+@keyframes sweep{to{transform:translateX(270%)}}
+.media img,.media canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.media[data-state=loading] img{opacity:0;scale:1.02}
+.media img{transition:opacity .6s var(--ease),scale .8s var(--ease)}
+.media[data-state=loaded] .media-skel{opacity:0;visibility:hidden}
+.media[data-instant] img,.media[data-instant] .media-skel{transition:none}
+
+/* ===== B: detalhe do post ===== */
+.progress{position:fixed;top:48px;left:0;right:0;height:2px;z-index:49;pointer-events:none}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--lav) 50%,var(--violet));box-shadow:0 0 10px rgba(255,210,94,.6);transform-origin:0 50%;transform:scaleX(0)}
+nav.top.hide ~ .progress{transform:translateY(-48px);transition:transform .5s var(--ease)}
+.progress{transition:transform .5s var(--ease)}
+
+.p-head{padding-top:calc(48px + 72px);max-width:880px}
+.back{font-size:14px;margin-left:-6px}
+.meta{margin-top:40px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 10px}
+.meta .hash{color:var(--gold)}
+.p-title{margin-top:16px;font-size:clamp(32px,4vw,52px);line-height:1.08;letter-spacing:-.035em;font-weight:600;text-wrap:balance}
+.p-lead{margin-top:20px;font-size:clamp(17px,1.6vw,21px);line-height:1.45;color:var(--muted);letter-spacing:-.015em;max-width:40em;text-wrap:pretty}
+.byline{margin-top:28px;display:flex;align-items:center;justify-content:space-between;gap:16px 24px;flex-wrap:wrap}
+.author{display:flex;align-items:center;gap:12px}
+.author img{width:36px;height:36px;border-radius:50%;border:1px solid var(--line-strong);object-fit:cover}
+.author b{display:block;font-size:14px;font-weight:500;letter-spacing:-.01em}
+.author span{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
+.tags{display:flex;flex-wrap:wrap;gap:6px;list-style:none}
+.tags li{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+.cover{margin-top:48px}
+.cover .media{--ratio:21/9;border-radius:22px}
+.cap{margin-top:12px;font-family:var(--mono);font-size:12px;line-height:1.5;color:var(--muted);letter-spacing:.02em;text-wrap:pretty}
+.cap b{color:var(--gold);font-weight:500;margin-right:8px}
+
+/* grade do corpo: wide = 880, conteúdo = 640 */
+.body{position:relative;margin-top:72px;display:grid;grid-template-columns:[full-start] minmax(24px,1fr) [wide-start] minmax(0,120px) [content-start] min(640px,100% - 48px) [content-end] minmax(0,120px) [wide-end] minmax(24px,1fr) [full-end]}
+.body > *{grid-column:content}
+.body > .wide{grid-column:wide}
+.prose p{font-size:19px;line-height:1.7;color:var(--prose);letter-spacing:-.012em;margin-top:28px;text-wrap:pretty}
+.prose p:first-of-type{margin-top:0}
+.prose strong{color:var(--text);font-weight:600}
+.prose a{color:var(--lav);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(201,188,255,.4)}
+.prose h2{font-size:28px;line-height:1.2;letter-spacing:-.03em;font-weight:600;margin-top:64px;scroll-margin-top:96px}
+.prose blockquote{margin-top:32px;padding-left:20px;border-left:2px solid var(--lav);font-size:21px;line-height:1.5;color:var(--text)}
+figure.fig{margin-top:48px;margin-bottom:8px}
+.fig.portrait .media{width:min(100%,calc(min(80svh,720px) * var(--ratio)))}
+.fig.portrait .cap{text-align:center}
+/* par de imagens: alturas iguais, larguras proporcionais (--r = largura/altura) */
+.row2{display:flex;gap:16px}
+.row2 .media{flex:var(--r) 1 0;width:auto;min-width:0}
+.endmark{margin-top:72px;text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.6em;color:var(--dim)}
+.endmark i{display:inline-block;width:8px;height:8px;background:var(--gold);box-shadow:0 0 12px var(--gold);margin:0 .3em 0 0;vertical-align:1px}
+
+/* trilho lateral (>= 1280): compartilhar + índice */
+.body > .rail{grid-column:full;grid-row:1 / 99;position:absolute;top:0;bottom:0;left:calc(50% - 440px - 72px);width:40px;display:none}
+.rail .stick{position:sticky;top:120px;display:flex;flex-direction:column;gap:10px}
+.rail .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.ico{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--prose);transition:border-color .3s,color .3s,transform .3s var(--ease)}
+.ico:hover{border-color:var(--line-strong);color:var(--text);transform:translateY(-2px)}
+.ico svg{width:15px;height:15px}
+@media (min-width:1280px){.body > .rail{display:block}}
+
+.share{margin-top:56px;padding-top:28px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.share .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.share .b{display:flex;gap:8px;flex-wrap:wrap}
+
+/* próximo / anterior */
+.next{margin-top:120px}
+.next .eyebrow{font-size:14px;font-weight:500;color:var(--muted)}
+.ngrid{margin-top:20px;display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+.ncard{position:relative;border:1px solid var(--line);border-radius:22px;background:var(--bg-2);overflow:hidden;display:flex;flex-direction:column;transition:transform .5s var(--ease),border-color .5s}
+.ncard:hover{transform:translateY(-6px);border-color:var(--line-strong)}
+.ncard .media{border:0;border-radius:0;border-bottom:1px solid var(--line);--ratio:16/7}
+.ncard .in{padding:22px 24px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
+.ncard .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--lav)}
+.ncard .hash{font-family:var(--mono);font-size:11px;color:var(--gold)}
+.ncard h3{font-size:22px;line-height:1.2;letter-spacing:-.025em;font-weight:600;text-wrap:balance}
+.ncard p{font-size:14px;color:var(--muted);line-height:1.45}
+.ncard .m{margin-top:auto;padding-top:10px;font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;justify-content:space-between}
+.ncard.small .media{--ratio:16/9}
+.ncard.invite{border-style:dashed;background:transparent;justify-content:center;align-items:flex-start;padding:24px}
+.backrow{margin-top:40px;display:flex;justify-content:center}
+
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;z-index:60;background:#1c1c1f;border:1px solid var(--line);border-radius:999px;padding:10px 18px 10px 10px;font-size:13px;display:flex;gap:10px;align-items:center;transition:all .4s var(--ease);pointer-events:none}
+.toast b{font-family:var(--dot);font-weight:900;color:#000;background:var(--gold);border-radius:999px;padding:2px 8px;font-size:12px}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:1279px){.body{grid-template-columns:[full-start] minmax(24px,1fr) [wide-start content-start] min(640px,100% - 48px) [content-end wide-end] minmax(24px,1fr) [full-end]}}
+@media (max-width:859px){
+  .p-head{padding-top:calc(48px + 40px)}
+  .meta{margin-top:28px}
+  .prose p{font-size:18px}
+  .cover .media{--ratio:4/3;border-radius:16px}
+  .body{margin-top:48px}
+  .ngrid{grid-template-columns:1fr}
+}
+@media (min-width:640px) and (max-width:859px){.cover .media{--ratio:16/10}}
+/* par com alguma horizontal empilha abaixo de 640 (pares de verticais ficam lado a lado) */
+@media (max-width:639px){.row2.mixed{flex-direction:column}.row2.mixed .media{width:100%}}
+.row2{gap:clamp(8px,1.5vw,16px)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.media[data-state=loading] img{opacity:1;scale:1}}
+html[data-quality=baixo] .media-skel::after{display:none}
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+
+<nav class="top" id="nav"><div class="wrap">
+  <a class="logo" href="index.html"><i></i>entony</a>
+  <div class="links"><a href="index.html#about">Sobre</a><a href="index.html#skills">Habilidades</a><a href="index.html#projects">Projetos</a><a href="index.html#campaign">Experiência</a><a href="#" aria-current="page">Blog</a></div>
+  <a class="btn btn-primary btn-sm" href="index.html#contact">Contato</a>
+</div></nav>
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+
+<main>
+<article>
+  <header class="wrap p-head">
+    <a class="btn btn-link back" href="#">‹ Voltar pro blog</a>
+    <p class="meta"><span class="hash">#7be21f0</span><span aria-hidden="true">·</span><time datetime="2026-06-06">06 jun 2026</time><span aria-hidden="true">·</span><span>3 min de leitura</span></p>
+    <h1 class="p-title">Minha Estreia aos Palcos: Como Foi Palestrar no Google I/O Extended + Build with AI 2026 – Natal</h1>
+    <p class="p-lead">Como palestrei aos 19 anos, no terceiro período da faculdade, em um dos maiores eventos de tecnologia do RN — e o que aprendi com a experiência.</p>
+    <div class="byline">
+      <div class="author"><img src="img/avatar.jpg" alt="" width="36" height="36"><div><b>Francisco Entony</b><span>Desenvolvedor Full-Stack</span></div></div>
+      <ul class="tags" aria-label="Tags"><li>Palestras</li><li>Google I/O</li><li>IFRN</li></ul>
+    </div>
+  </header>
+
+  <!-- Capa: campo `cover` do post; sem ele, a 1ª imagem do corpo (se o corpo começar com ela) sobe para cá; sem nenhuma, capa ASCII gerada pelo hash -->
+  <figure class="wrap cover">
+    <span class="media" data-media><span class="media-skel" aria-hidden="true"></span>
+      <img data-src="img/drone.jpg" alt="Foto aérea de centenas de participantes do Google I/O Extended Natal 2026 acenando em frente à sede do Sebrae" width="1400" height="933" fetchpriority="high"></span>
+    <figcaption class="cap">[LEGENDA OPCIONAL — título da imagem no Markdown]</figcaption>
+  </figure>
+
+  <div class="body">
+    <aside class="rail" aria-label="Compartilhar">
+      <div class="stick">
+        <p class="lbl">Compartilhar</p>
+        <button class="ico" data-copy aria-label="Copiar link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>
+        <a class="ico" href="#" aria-label="Compartilhar no LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.9 8.6H3.6V20h3.3V8.6ZM5.2 3.5a1.9 1.9 0 1 0 0 3.8 1.9 1.9 0 0 0 0-3.8ZM20.4 13.6c0-3-1.6-5.2-4.6-5.2-1.5 0-2.6.8-3 1.6V8.6H9.6V20h3.3v-5.9c0-1.6.6-2.8 2.1-2.8s1.9 1.3 1.9 2.9V20h3.4v-6.4Z"/></svg></a>
+        <a class="ico" href="#" aria-label="Compartilhar no WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4 20l1.2-3.6A8 8 0 1 1 8 19.1L4 20Z"/><path d="M9.2 8.6c.2-.4.5-.4.7-.4h.5c.2 0 .4.1.5.4l.6 1.5c.1.2 0 .4-.1.6l-.5.6c.6 1.1 1.5 2 2.6 2.6l.6-.5c.2-.1.4-.2.6-.1l1.5.6c.3.1.4.3.4.5v.5c0 .3-.1.5-.4.7-.6.4-1.5.6-2.5.2a9 9 0 0 1-4.7-4.7c-.4-1-.2-1.9.2-2.5Z"/></svg></a>
+      </div>
+    </aside>
+
+    <div class="prose">
+      <p>No sábado, dia 06 de junho de 2026, tive a oportunidade de palestrar no Google I/O Extended + Build with AI 2026 – Natal, evento realizado pela comunidade do Google Developer Groups (GDG) Natal.</p>
+      <p>Com o título "Como a Tecnologia Pode Mudar o Amanhã: Explorando o Cosmos das Oportunidades e do Conhecimento", usei minha palestra pra falar sobre temas pouco abordados no mundo da tecnologia — os desafios que enfrentei ao longo da minha trajetória e como transformei essas dificuldades em estratégia pra potencializar meus estudos e me destacar como estudante e futuro profissional.</p>
+    </div>
+
+    <!-- 2 imagens seguidas = par lado a lado (largura wide) -->
+    <figure class="fig wide">
+      <div class="row2">
+        <span class="media" data-media style="--ratio:742/1400;--r:.53"><span class="media-skel" aria-hidden="true"></span><img data-src="img/foto1.jpg" alt="Entony falando ao microfone durante a palestra, com uma pessoa da plateia em primeiro plano" width="742" height="1400" loading="lazy"></span>
+        <span class="media" data-media style="--ratio:960/1280;--r:.75"><span class="media-skel" aria-hidden="true"></span><img data-src="img/foto3.jpg" alt="Entony palestrando ao lado do telão que mostra o site do Núcleo de Inovação em Computação (NIC)" width="960" height="1280" loading="lazy"></span>
+      </div>
+      <figcaption class="cap">[LEGENDA OPCIONAL] Uma legenda por par, ou nenhuma.</figcaption>
+    </figure>
+
+    <div class="prose" style="margin-top:48px">
+      <p>Com o apoio de amigos da área e do meu professor no IFRN, <strong>Bruno Gomes</strong>, consegui transmitir essa mensagem e guiar novos estudantes rumo a um futuro promissor na tecnologia — mostrando que o caminho vai muito além da bolha do desenvolvimento web, alcançando a Ciência da Computação como um todo.</p>
+    </div>
+
+    <!-- imagem única horizontal = wide (880) -->
+    <figure class="fig wide">
+      <span class="media" data-media style="--ratio:1400/1050"><span class="media-skel" aria-hidden="true"></span><img data-src="img/foto6.jpg" alt="Entony e amigos da área posando juntos com os crachás do evento" width="1400" height="1050" loading="lazy"></span>
+      <figcaption class="cap">[LEGENDA OPCIONAL] Amigos da área no evento.</figcaption>
+    </figure>
+
+    <div class="prose" style="margin-top:48px">
+      <p>Aproveitei o espaço também pra falar sobre os alunos que oriento e como as experiências no Núcleo de Inovação em Computação (NIC) e na Bolsa de Tutoria de Aprendizagem em Laboratório me ajudaram a construir uma metodologia clara pra compartilhar com eles.</p>
+      <blockquote>[EXEMPLO DE CITAÇÃO — estilo do &gt; no Markdown] Dá pra abrir espaço no mercado antes mesmo de terminar a graduação.</blockquote>
+      <p>Falar em um dos maiores eventos de tecnologia do RN aos 19 anos, ainda no terceiro período da faculdade, foi uma virada de chave pra mim — um lembrete de que dá pra abrir espaço no mercado antes mesmo de terminar a graduação, desde que a gente saiba transformar as próprias dificuldades em direção.</p>
+    </div>
+
+    <p class="endmark" aria-hidden="true">· · <i></i>· ·</p>
+
+    <div class="share">
+      <p class="lbl">Compartilhar</p>
+      <div class="b">
+        <button class="btn btn-ghost" data-copy>Copiar link</button>
+        <a class="btn btn-ghost" href="#">LinkedIn</a>
+        <a class="btn btn-ghost" href="#">WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<section class="wrap next" aria-labelledby="nextTitle">
+  <p class="eyebrow" id="nextTitle">Continue no diário</p>
+  <div class="ngrid">
+    <a class="ncard" href="#">
+      <span class="media" style="--ratio:16/7"><canvas data-ascii-cover="a3f9c1d" aria-hidden="true"></canvas></span>
+      <div class="in"><span class="k">PRÓXIMO REGISTRO ›</span><span class="hash">#a3f9c1d</span><h3>Visita ao Ministério Público do RN (MPRN) e a VENX</h3><p>Como fui destaque na visita a um dos maiores orgãos públicos do Estado do RN.</p><div class="m"><span>30 mai 2026</span><span>5 min de leitura</span></div></div>
+    </a>
+    <a class="ncard invite" href="#">
+      <span class="k" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--muted)">‹ REGISTRO ANTERIOR</span>
+      <h3 style="margin-top:10px;font-size:20px;font-weight:600;letter-spacing:-.025em">Mais registros no diário</h3>
+      <span class="btn btn-link" style="margin-top:14px;margin-left:-6px">Todos os posts ›</span>
+    </a>
+  </div>
+  <div class="backrow"><a class="btn btn-link" href="#">‹ Voltar pro blog</a></div>
+</section>
+</main>
+
+<footer><div class="wrap"><span>© 2026 Francisco Entony</span><div class="f"><a href="#">GitHub</a><a href="#">LinkedIn</a><a href="#">Blog</a><a href="#">Topo ↑</a></div></div></footer>
+<div class="toast" id="toast" role="status"><b>+1</b><span>Link copiado para o inventário</span></div>
+
+<script>
+(() => {
+const q = new URLSearchParams(location.search);
+const TIER = q.get('quality') || 'alto'; document.documentElement.dataset.quality = TIER;
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const DPR = Math.min(devicePixelRatio || 1, 2), RAMP = ' .,:;-=+*#%@';
+const fit = c => { const r = c.getBoundingClientRect(); c.width = Math.max(1, r.width*DPR); c.height = Math.max(1, r.height*DPR); const x = c.getContext('2d'); x.setTransform(DPR,0,0,DPR,0,0); return {x, w:r.width, h:r.height}; };
+
+/* estrelas (mesma regra do v3; Médio/Baixo: metade, sem halo) */
+const st = document.getElementById('stars'); let S, SW, SH, L = [];
+const init = () => { ({x:S, w:SW, h:SH} = fit(st)); L = Array.from({length: Math.round(SW*SH/(TIER==='alto'?4200:8400))}, () => ({x:Math.random()*SW, y:Math.random()*SH*3, z:Math.random()**2*.9+.1, t:Math.random()*6})); };
+const draw = t => { S.clearRect(0,0,SW,SH); for (const s of L){ const y = ((s.y - scrollY*s.z*.35) % (SH*3) + SH*3) % (SH*3) - SH; if (y<-10||y>SH+10) continue; const tw = TIER==='baixo'||RM ? 1 : .7+.3*Math.sin(t*.002+s.t); S.fillStyle = `rgba(235,230,255,${(.35+.6*s.z)*tw})`; const r = .7+s.z*1.9; S.fillRect(s.x, y, r, r); } };
+
+/* barra de progresso de leitura (só transform) */
+const bar = document.getElementById('bar'), art = document.querySelector('article');
+const prog = () => { const r = art.getBoundingClientRect(); const p = Math.min(1, Math.max(0, -r.top / (r.height - innerHeight))); bar.style.transform = `scaleX(${p})`; };
+
+/* nav some ao rolar para baixo */
+const nav = document.getElementById('nav'); let lastY = 0;
+addEventListener('scroll', () => { const y = scrollY; nav.classList.toggle('hide', y > lastY && y > 200); lastY = y; prog(); if (TIER==='baixo'||RM) draw(0); }, {passive:true});
+
+/* C: skeleton — simula rede lenta (600–1800ms) para ver o estado loading */
+const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; io.unobserve(e.target);
+  const fr = e.target, img = fr.querySelector('img'); fr.dataset.state = 'loading';
+  setTimeout(() => { img.onload = () => { fr.dataset.state = 'loaded'; }; img.src = img.dataset.src; }, 600 + Math.random()*1200);
+}), {rootMargin:'200px'});
+document.querySelectorAll('[data-media]').forEach(f => io.observe(f));
+
+/* capa ASCII gerada pelo hash (para posts sem imagem) — desenhada 1x, estática em todos os níveis */
+function hashSeed(h){ let s = 0; for (const c of h) s = (s*31 + c.charCodeAt(0)) >>> 0; return () => (s = (s*1664525 + 1013904223) >>> 0) / 4294967296; }
+document.fonts.ready.then(() => document.querySelectorAll('[data-ascii-cover]').forEach(c => {
+  const {x, w, h} = fit(c), rnd = hashSeed(c.dataset.asciiCover); x.font = '600 9px "Geist Mono", monospace'; x.textBaseline = 'top';
+  const p = Array.from({length:6}, () => rnd()*6.28), f = [2+rnd()*3, 2+rnd()*3, 4+rnd()*4];
+  const cw = 6, ch = 10, k = w/h;
+  for (let j=0;j*ch<h;j++) for (let i=0;i*cw<w;i++){ const u=i*cw/w, v=j*ch/h;
+    let b = .5 + .3*Math.sin(u*k*f[0]+p[0])*Math.sin(v*f[1]+p[1]) + .2*Math.sin((u*k+v)*f[2]+p[2]);
+    b = (b - .35) * 1.6 * (.35 + .65*Math.sin(Math.PI*v)) ; b = Math.min(1, b + (rnd()-.5)*.08); if (b < .06) continue;
+    x.fillStyle = `hsla(${250 + u*50},90%,${55+b*35}%,${.25+b*.75})`; x.fillText(RAMP[Math.round(b*(RAMP.length-1))], i*cw, j*ch); }
+  c.closest('.media').dataset.state = 'loaded';
+}));
+
+/* copiar link */
+const toast = document.getElementById('toast');
+document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => { navigator.clipboard?.writeText(location.href); toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2200); }));
+
+init(); prog(); addEventListener('resize', init);
+if (TIER==='baixo'||RM) draw(0); else { let last = 0; const loop = t => { draw(t); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+})();
+</script>
+</body>
+</html>

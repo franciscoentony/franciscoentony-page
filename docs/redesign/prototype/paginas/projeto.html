@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Projeto: protótipo v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600;700&family=Doto:wght@500;800;900&display=swap" rel="stylesheet" />
+<style>
+/* ===== base v3 (igual ao index.html) ===== */
+:root{
+  --bg:#000; --bg-2:#0a0a0c; --card:#111114; --void:#050508; --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.18);
+  --text:#f5f5f7; --prose:#d2d2d7; --muted:#86868b; --dim:#48484d;
+  --violet:#8b6cff; --lav:#c9bcff; --gold:#ffd25e;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --sans:'Geist',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
+  --mono:'Geist Mono',ui-monospace,monospace; --dot:'Doto','Geist Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{font-family:var(--sans);font-size:17px;line-height:1.47;letter-spacing:-.011em;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+::selection{background:var(--violet);color:#fff}
+.wrap{width:min(1080px,100% - 48px);margin-inline:auto}
+.grad{background:linear-gradient(100deg,#fff 0%,var(--lav) 45%,var(--violet) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+main,nav,footer,.progress{position:relative;z-index:1}
+nav.top{position:fixed;top:0;left:0;right:0;height:48px;z-index:50;display:flex;align-items:center;background:rgba(0,0,0,.55);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line);transition:transform .5s var(--ease)}
+nav.top.hide{transform:translateY(-100%)}
+nav.top .wrap{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.02em;display:flex;gap:8px;align-items:center}
+.logo i{width:8px;height:8px;background:var(--gold);display:inline-block;box-shadow:0 0 12px var(--gold)}
+.links{display:flex;gap:32px;font-size:12.5px;color:#d2d2d7}.links a{opacity:.8}.links a[aria-current]{opacity:1}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:980px;font-size:14px;font-weight:500;padding:10px 20px;transition:transform .3s var(--ease),background .3s,box-shadow .3s,border-color .3s}
+.btn-sm{font-size:12px;padding:5px 13px}
+.btn-primary{background:var(--text);color:#000}.btn-primary:hover{transform:scale(1.03);box-shadow:0 0 0 6px rgba(255,255,255,.08)}
+.btn-link{color:var(--lav);padding-inline:6px}.btn-link:hover{text-decoration:underline}
+.btn-ghost{border:1px solid var(--line);color:var(--prose);font-size:13px;padding:8px 14px}.btn-ghost:hover{border-color:var(--line-strong);color:var(--text)}
+:focus-visible{outline:2px solid var(--lav);outline-offset:3px;border-radius:6px}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:12px;color:var(--muted);margin-top:120px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}footer .f{display:flex;gap:22px}
+@media (max-width:860px){.links{display:none}}
+
+/* ===== C: skeleton ASCII das imagens ===== */
+.media{position:relative;display:block;overflow:hidden;border-radius:16px;border:1px solid var(--line);background:var(--void);aspect-ratio:var(--ratio,16/9);width:100%;margin-inline:auto}
+.media-skel{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,var(--lav),var(--violet) 55%,rgba(139,108,255,.4));opacity:.7;-webkit-mask:url(img/skeleton-ascii.webp) 0 0/320px 192px repeat;mask:url(img/skeleton-ascii.webp) 0 0/320px 192px repeat;transition:opacity .6s var(--ease),visibility 0s .6s}
+.media[data-state=loading] .media-skel::after{content:"";position:absolute;inset:0 auto 0 0;width:60%;background:linear-gradient(90deg,transparent,rgba(245,245,247,.9),transparent);transform:translateX(-100%);animation:sweep 1.8s var(--ease) infinite}
+@keyframes sweep{to{transform:translateX(270%)}}
+.media img,.media canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.media[data-state=loading] img{opacity:0;scale:1.02}
+.media img{transition:opacity .6s var(--ease),scale .8s var(--ease)}
+.media[data-state=loaded] .media-skel{opacity:0;visibility:hidden}
+.media[data-instant] img,.media[data-instant] .media-skel{transition:none}
+
+/* ===== A: página do projeto ===== */
+.eyebrow{font-size:14px;font-weight:500;color:var(--muted);letter-spacing:-.01em}
+.h2{font-size:clamp(34px,4.6vw,60px);line-height:1.05;font-weight:600;letter-spacing:-.04em;text-wrap:balance}
+.ph{display:none;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#000;background:var(--gold);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:2px}
+html.show-ph .ph{display:inline-block}
+.todo{outline:1px dashed rgba(255,210,94,.45);outline-offset:4px;border-radius:4px}
+html:not(.show-ph) .todo{outline:0}
+
+.hero{padding-top:calc(48px + 64px);display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center;min-height:min(100svh,920px)}
+.back{font-size:14px;margin-left:-6px}
+.rar{display:block;margin-top:36px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--gold)}
+.rar.s{color:var(--lav)}
+.p-name{margin-top:14px;font-size:clamp(40px,5.4vw,72px);line-height:1.02;font-weight:600;letter-spacing:-.045em;overflow-wrap:anywhere;hyphens:none}
+.tagline{margin-top:20px;font-size:clamp(17px,1.6vw,21px);line-height:1.45;color:var(--muted);letter-spacing:-.015em;max-width:34em;text-wrap:pretty}
+.facts{margin-top:36px;padding-top:24px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.facts dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.facts dd{margin-top:6px;font-size:15px;color:var(--text);letter-spacing:-.01em}
+.cta{margin-top:36px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+
+/* emblema: cartão holo com o ASCII do projeto (mesmo SDF do card da Home) */
+.holo{perspective:900px;--mx:50%;--my:50%;--rx:0deg;--ry:0deg;--o:0}
+.holo__in{position:relative;border-radius:22px;overflow:hidden;transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .6s var(--ease),box-shadow .6s var(--ease);background:linear-gradient(160deg,#16131f,#0b0a10 60%);border:1px solid rgba(255,255,255,.09);box-shadow:0 30px 80px -30px rgba(0,0,0,.8)}
+.holo.active .holo__in{transition:transform .08s linear,box-shadow .4s;box-shadow:0 40px 120px -30px rgba(139,108,255,.45)}
+.holo__foil{position:absolute;inset:0;pointer-events:none;mix-blend-mode:color-dodge;opacity:calc(.12 + var(--o)*.5);background:repeating-linear-gradient(115deg,#ff7ad9 0%,#ffd25e 6%,#7dffcf 12%,#6ec3ff 18%,#b38bff 24%,#ff7ad9 30%);background-size:300% 300%;background-position:var(--mx) var(--my);filter:saturate(1.3) brightness(.75);-webkit-mask:radial-gradient(farthest-corner circle at var(--mx) var(--my),#000 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,.15) 100%);mask:radial-gradient(farthest-corner circle at var(--mx) var(--my),#000 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,.15) 100%)}
+html[data-quality=medio] .holo__foil{mix-blend-mode:normal;opacity:.18}
+html[data-quality=baixo] .holo__foil{display:none}
+.holo__glare{position:absolute;inset:0;pointer-events:none;mix-blend-mode:overlay;opacity:var(--o);transition:opacity .4s;background:radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.55),rgba(255,255,255,0) 45%)}
+.emblem{aspect-ratio:4/5;width:min(440px,100%);margin-inline:auto}
+.emblem .holo__in{height:100%;display:flex;flex-direction:column}
+.emblem canvas{flex:1;width:100%;display:block}
+.emblem .foot{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
+.lang{display:inline-flex;align-items:center;gap:8px;color:var(--text)}
+.lang i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+
+section.blk{padding-block:clamp(80px,12vh,140px)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;padding-top:28px;border-top:1px solid var(--line)}
+.stat .n{font-family:var(--dot);font-weight:900;font-size:clamp(40px,4.4vw,56px);line-height:1;letter-spacing:-.02em}
+.stat .l{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.4;max-width:24ch}
+
+.chaps{margin-top:56px;display:grid;gap:0}
+.chap{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;padding-block:40px;border-top:1px solid var(--line)}
+.chap .num{font-family:var(--dot);font-weight:800;font-size:15px;letter-spacing:.2em;color:var(--lav)}
+.chap h3{margin-top:12px;font-size:28px;line-height:1.15;font-weight:600;letter-spacing:-.03em}
+.chap p{font-size:19px;line-height:1.7;color:var(--prose);letter-spacing:-.012em;max-width:640px;text-wrap:pretty}
+.chap p + p{margin-top:20px}
+
+.stack{margin-top:40px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.sgroup{border:1px solid var(--line);border-radius:22px;background:var(--bg-2);padding:22px 24px}
+.sgroup dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.sgroup dd{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-family:var(--mono);font-size:12px;color:var(--prose);display:inline-flex;align-items:center;gap:8px}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+
+.gal{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.gal figure:first-child{grid-column:1/-1}
+.gal .media{border-radius:22px}
+.cap{margin-top:12px;font-family:var(--mono);font-size:12px;line-height:1.5;color:var(--muted);letter-spacing:.02em}
+.media .phl{position:absolute;inset:auto 16px 14px;font-family:var(--mono);font-size:11px;color:var(--lav);letter-spacing:.06em}
+
+.links2{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.lcard{border:1px solid var(--line);border-radius:22px;background:var(--bg-2);padding:26px;display:flex;flex-direction:column;gap:10px;min-height:180px;transition:transform .5s var(--ease),border-color .5s}
+.lcard:hover{transform:translateY(-6px);border-color:var(--line-strong)}
+.lcard .k{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.04em}
+.lcard h3{font-size:22px;font-weight:600;letter-spacing:-.03em}
+.lcard .u{margin-top:auto;font-family:var(--mono);font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+
+.nextm{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;margin-top:20px}
+.ncard{position:relative;border:1px solid var(--line);border-radius:22px;background:var(--bg-2);overflow:hidden;display:grid;grid-template-columns:200px 1fr;min-height:220px;transition:transform .5s var(--ease),border-color .5s}
+.ncard:hover{transform:translateY(-6px);border-color:var(--line-strong)}
+.ncard canvas{width:100%;height:100%;display:block;border-right:1px solid var(--line)}
+.ncard .in{padding:22px 24px;display:flex;flex-direction:column;gap:8px}
+.ncard .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--lav)}
+.ncard h3{font-size:22px;font-weight:600;letter-spacing:-.03em}
+.ncard p{font-size:14px;color:var(--muted);line-height:1.45}
+.ncard .m{margin-top:auto;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.ncard.all{display:flex;flex-direction:column;justify-content:center;padding:24px;border-style:dashed;background:transparent}
+
+@media (max-width:859px){
+  .hero{grid-template-columns:1fr;gap:40px;padding-top:calc(48px + 32px);min-height:0}
+  .hero .art{order:-1}.emblem{aspect-ratio:1/1;width:100%}
+  .rar{margin-top:0}
+  .facts{grid-template-columns:1fr 1fr}
+  .chap{grid-template-columns:1fr;gap:16px;padding-block:32px}
+  .chap p{font-size:18px}
+  .stack,.links2,.nextm{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr 1fr;gap:16px}.stat .l{font-size:12px}
+  .gal{grid-template-columns:1fr}
+  .ncard{grid-template-columns:120px 1fr}
+}
+@media (min-width:640px) and (max-width:859px){.stack{grid-template-columns:1fr 1fr}.gal{grid-template-columns:1fr 1fr}.emblem{aspect-ratio:16/10}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+html[data-quality=baixo] .media-skel::after{display:none}
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<nav class="top" id="nav"><div class="wrap">
+  <a class="logo" href="index.html"><i></i>entony</a>
+  <div class="links"><a href="#">Sobre</a><a href="#">Habilidades</a><a href="#" aria-current="page">Projetos</a><a href="#">Experiência</a><a href="post.html">Blog</a></div>
+  <a class="btn btn-primary btn-sm" href="#">Contato</a>
+</div></nav>
+
+<main id="app"></main>
+
+<footer><div class="wrap"><span>© 2026 Francisco Entony</span><div class="f"><a href="#">GitHub</a><a href="#">LinkedIn</a><a href="#">Blog</a><a href="#">Topo ↑</a></div></div></footer>
+
+<script>
+(() => {
+const q = new URLSearchParams(location.search);
+const TIER = q.get('quality') || 'alto'; document.documentElement.dataset.quality = TIER;
+if (q.has('ph')) document.documentElement.classList.add('show-ph');
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches, STATIC = RM || TIER === 'baixo';
+const DPR = Math.min(devicePixelRatio || 1, 2), RAMP = ' .,:;-=+*#%@', CELL = TIER === 'alto' ? 1 : 1.3, FRAME = TIER === 'alto' ? 33 : 50;
+const clamp = (v,a=0,b=1) => Math.max(a, Math.min(b, v)), lerp = (a,b,t) => a + (b-a)*t;
+const fit = c => { const r = c.getBoundingClientRect(); c.width = Math.max(1, r.width*DPR); c.height = Math.max(1, r.height*DPR); const x = c.getContext('2d'); x.setTransform(DPR,0,0,DPR,0,0); return {x, w:r.width, h:r.height}; };
+const PH = t => `<span class="todo">${t}</span><span class="ph">PLACEHOLDER</span>`;
+
+/* ---- dados: campos atuais de projects.ts + CAMPOS NOVOS (placeholders) ---- */
+const P = [
+ {slug:'petca', name:'petca', main:true, shape:'paw', language:'JavaScript', languageColor:'#F1E05A', topics:['react-native','drf','pytest'],
+  url:'https://github.com/franciscoentony/petca', description:'Conecta cidadãos que avistam animais em situação de rua a ONGs de resgate.'},
+ {slug:'connect-responsibly', name:'connect-responsibly', main:true, shape:'gift', language:'Python', languageColor:'#3572A5', topics:['django','mysql'],
+  url:'https://github.com/franciscoentony/connect-responsibily', description:'Conecta doadores a donatários, facilitando a chegada de doações à pessoa certa.'},
+ {slug:'franciscoentony-page', name:'franciscoentony-page', main:false, shape:'planet', language:'TypeScript', languageColor:'#3178C6', topics:['vite','go','hugo'],
+  url:'https://github.com/franciscoentony/franciscoentony-page', description:'Página pessoal com projetos, palestras e aulas ministradas, com blog próprio.'},
+ {slug:'fullstack-filmes', name:'fullstack-filmes', main:false, shape:'film', language:'JavaScript', languageColor:'#F1E05A', topics:['node','mongodb','jwt'],
+  url:'https://github.com/franciscoentony/fullstack-filmes', description:'Autenticação, CRUD, permissões e rotas privadas em uma aplicação completa.'},
+];
+const i0 = Math.max(0, P.findIndex(p => p.slug === (q.get('p') || 'petca'))), p = P[i0], nx = P[(i0+1) % P.length];
+const dot = c => `<i style="--c:${c}"></i>`;
+
+document.title = `${p.name}: protótipo v3`;
+document.getElementById('app').innerHTML = `
+<section class="wrap hero">
+  <div>
+    <a class="btn btn-link back" href="index.html#projects">‹ Todas as missões</a>
+    <span class="rar ${p.main ? '' : 's'}">${p.main ? '★ MISSÃO PRINCIPAL' : '◇ MISSÃO SECUNDÁRIA'}</span>
+    <h1 class="p-name">${p.name}</h1>
+    <p class="tagline">${PH('[tagline — 1 a 2 frases, até 180 caracteres. Sem ela, usa a description:] ' + p.description)}</p>
+    <dl class="facts">
+      <div><dt>Período</dt><dd>${PH('[mar 2025 — jun 2025]')}</dd></div>
+      <div><dt>Papel</dt><dd>${PH('[Full-stack, solo]')}</dd></div>
+      <div><dt>Status</dt><dd>${PH('[Em produção]')}</dd></div>
+    </dl>
+    <div class="cta">
+      <a class="btn btn-primary" href="${p.url}" target="_blank" rel="noopener">GitHub ›</a>
+      <a class="btn btn-link" href="#">Ver demo ›</a><span class="ph">só com demoUrl</span>
+    </div>
+  </div>
+  <div class="art"><article class="holo emblem" data-tilt aria-hidden="true"><div class="holo__in">
+    <canvas data-shape="${p.shape}"></canvas>
+    <div class="foot"><span class="lang">${dot(p.languageColor)}${p.language}</span><span>${String(i0+1).padStart(2,'0')} / ${String(P.length).padStart(2,'0')}</span></div>
+    <div class="holo__foil"></div><div class="holo__glare"></div></div></article></div>
+</section>
+
+<section class="wrap blk" style="padding-top:0">
+  <div class="stats">
+    <div class="stat"><div class="n grad">${PH('[00]')}</div><p class="l">${PH('[resultado 1 — ex.: ONGs cadastradas]')}</p></div>
+    <div class="stat"><div class="n grad">${PH('[00]')}</div><p class="l">${PH('[resultado 2]')}</p></div>
+    <div class="stat"><div class="n grad">${PH('[00]')}</div><p class="l">${PH('[resultado 3]')}</p></div>
+  </div>
+</section>
+
+<section class="wrap blk" aria-labelledby="hist">
+  <p class="eyebrow">Diário da missão</p>
+  <h2 class="h2" id="hist" style="margin-top:12px;max-width:16ch">Do problema ao código.</h2>
+  <div class="chaps">
+    <div class="chap"><div><p class="num">01</p><h3>O problema</h3></div><div><p>${PH('[problem — 1 a 2 parágrafos: quem sofria com o quê, e por que importava.]')}</p></div></div>
+    <div class="chap"><div><p class="num">02</p><h3>A solução</h3></div><div><p>${PH('[solution — 1 a 2 parágrafos: o que o sistema faz e a decisão técnica mais importante.]')}</p></div></div>
+    <div class="chap"><div><p class="num">03</p><h3>O que eu fiz</h3></div><div><p>${PH('[role — o que foi seu: telas, API, banco, deploy, testes; com quem trabalhou.]')}</p></div></div>
+    <div class="chap"><div><p class="num">04</p><h3>O que aprendi</h3></div><div><p>${PH('[learnings — opcional; sem ele, o capítulo 04 some.]')}</p></div></div>
+  </div>
+</section>
+
+<section class="wrap blk" aria-labelledby="stk" style="padding-top:0">
+  <p class="eyebrow">Inventário</p>
+  <h2 class="h2" id="stk" style="margin-top:12px">Stack da missão.</h2>
+  <dl class="stack">
+    <div class="sgroup"><dt>${PH('[Front-end]')}</dt><dd><span class="pill">${dot(p.languageColor)}${p.language}</span><span class="pill">${p.topics[0]}</span></dd></div>
+    <div class="sgroup"><dt>${PH('[Back-end]')}</dt><dd>${p.topics.slice(1).map(t => `<span class="pill">${t}</span>`).join('')}</dd></div>
+    <div class="sgroup"><dt>${PH('[Infra]')}</dt><dd><span class="pill">${PH('[docker]')}</span></dd></div>
+  </dl>
+  <p class="cap" style="margin-top:14px">Sem o campo stack: um grupo só, com language + topics (o que existe hoje).</p>
+</section>
+
+<section class="blk" aria-labelledby="gal" style="padding-top:0"><div class="wrap">
+  <p class="eyebrow">Telas</p>
+  <h2 class="h2" id="gal" style="margin-top:12px">Por dentro do sistema.</h2>
+  <div class="gal">
+    ${['16/9','4/3','4/3'].map((r,k) => `<figure><span class="media" data-media style="--ratio:${r}"><span class="media-skel" aria-hidden="true"></span><span class="phl">[PLACEHOLDER — screen ${k+1}, ${r.replace('/',':')}]</span></span><figcaption class="cap">${PH('[legenda da tela ' + (k+1) + ']')}</figcaption></figure>`).join('')}
+  </div>
+</div></section>
+
+<section class="wrap blk" style="padding-top:0" aria-label="Links">
+  <div class="links2">
+    <a class="lcard" href="${p.url}" target="_blank" rel="noopener"><span class="k">GitHub ›</span><h3>Código-fonte</h3><span class="u">${p.url.replace('https://','')}</span></a>
+    <a class="lcard" href="#"><span class="k">Ver demo ›</span><h3>Versão no ar</h3><span class="u">${PH('[demoUrl]')}</span></a>
+  </div>
+</section>
+
+<section class="wrap" aria-labelledby="nxt">
+  <p class="eyebrow" id="nxt">Continue explorando</p>
+  <div class="nextm">
+    <a class="ncard" href="?p=${nx.slug}${location.search.includes('quality')?'&quality='+TIER:''}"><canvas data-shape="${nx.shape}" aria-hidden="true"></canvas>
+      <div class="in"><span class="k">PRÓXIMA MISSÃO ›</span><h3>${nx.name}</h3><p>${nx.description}</p><span class="m">${[nx.language.toLowerCase(), ...nx.topics].join(' · ')}</span></div></a>
+    <a class="ncard all" href="index.html#projects"><span class="k" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--muted)">‹ VOLTAR</span><h3 style="margin-top:10px;font-size:20px;font-weight:600;letter-spacing:-.025em">Todas as missões</h3><span class="btn btn-link" style="margin-top:14px;margin-left:-6px">Ver tudo no GitHub ›</span></a>
+  </div>
+</section>`;
+
+/* ---- estrelas ---- */
+const st = document.getElementById('stars'); let S, SW, SH, L = [];
+const initS = () => { ({x:S, w:SW, h:SH} = fit(st)); L = Array.from({length: Math.round(SW*SH/(TIER==='alto'?4200:8400))}, () => ({x:Math.random()*SW, y:Math.random()*SH*3, z:Math.random()**2*.9+.1, t:Math.random()*6})); };
+const drawS = t => { S.clearRect(0,0,SW,SH); for (const s of L){ const y = ((s.y - scrollY*s.z*.35) % (SH*3) + SH*3) % (SH*3) - SH; if (y<-10||y>SH+10) continue; const tw = STATIC ? 1 : .7+.3*Math.sin(t*.002+s.t); S.fillStyle = `rgba(235,230,255,${(.35+.6*s.z)*tw})`; const r = .7+s.z*1.9; S.fillRect(s.x, y, r, r); } };
+
+/* ---- emblema ASCII (SDF do card da Home, maior) ---- */
+const shapes = {
+  paw:(x,y)=>{ const c=(a,b,r)=>Math.hypot(x-a,y-b)-r; return Math.min(c(0,.18,.28), c(-.42,-.2,.13), c(-.15,-.42,.13), c(.15,-.42,.13), c(.42,-.2,.13)); },
+  gift:(x,y)=>{ const box=Math.max(Math.abs(x)-.42, Math.abs(y-.12)-.34); const lid=Math.max(Math.abs(x)-.5, Math.abs(y+.3)-.1); const bow=Math.min(Math.hypot(x+.15,y+.5)-.13, Math.hypot(x-.15,y+.5)-.13); return Math.min(box,lid,bow); },
+  planet:(x,y)=>{ const s=Math.hypot(x,y)-.38; const rx=x, ry=(y+x*.25)/.28; const r=Math.abs(Math.hypot(rx,ry)-.68)-.06; return Math.min(s, Math.max(r, -(s-.06)*(ry<0?1:-1e3))); },
+  film:(x,y)=>{ const o=Math.hypot(x,y)-.5; let h=1; for(let k=0;k<5;k++){const a=k/5*Math.PI*2; h=Math.min(h, Math.hypot(x-Math.cos(a)*.27,y-Math.sin(a)*.27)-.1);} return Math.max(o, -h, -(Math.hypot(x,y)-.05)); }
+};
+const vis = new WeakMap(), io = new IntersectionObserver(es => es.forEach(e => vis.set(e.target, e.isIntersecting)), {rootMargin:'100px'});
+const thumbs = [...document.querySelectorAll('canvas[data-shape]')].map(c => ({c, f:shapes[c.dataset.shape], card:c.closest('.holo,.ncard'), big:!!c.closest('.emblem')}));
+const initT = () => thumbs.forEach(o => { Object.assign(o, fit(o.c)); o.fs = (o.big ? 10 : 8) * CELL; o.x.font = `600 ${o.fs}px "Geist Mono", monospace`; o.x.textBaseline = 'top'; io.observe(o.c); });
+function drawT(o, t){
+  const {x:ctx, w, h, f} = o; ctx.clearRect(0,0,w,h);
+  o.heat = lerp(o.heat||0, o.card.classList.contains('active') || o.card.matches(':hover') ? 1 : 0, .08);
+  const cw = o.fs*.62, ch = o.fs*1.12, cols = Math.ceil(w/cw), rows = Math.ceil(h/ch), sc = Math.min(w,h)*(o.big ? .7 : .62);
+  for (let j=0;j<rows;j++) for (let i=0;i<cols;i++){
+    const x = (i*cw - w/2)/sc, y = (j*ch - h/2)/sc;
+    const wob = Math.sin(t*.003 + i*.3 + j*.2) * .03 * (1+o.heat*3);
+    const d = f(x+wob, y);
+    let b = d < 0 ? clamp(.55 - d*1.2) : clamp(.25 - d*.9) * (.4 + .6*Math.sin(t*.002 + i*.7)*Math.cos(j*.9 + t*.001));
+    if (b < .08) continue;
+    ctx.fillStyle = `hsla(${255 + x*40 + o.heat*60*Math.sin(t*.002+j)},90%,${55+b*35}%,${.25+b*.75})`;
+    ctx.fillText(RAMP[Math.round(b*(RAMP.length-1))], i*cw, j*ch);
+  }
+}
+
+/* ---- tilt holo (Alto/Médio; Baixo/RM sem tilt) ---- */
+if (!STATIC) document.querySelectorAll('[data-tilt]').forEach(el => {
+  el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(), x = (e.clientX-r.left)/r.width, y = (e.clientY-r.top)/r.height;
+    el.classList.add('active'); el.style.setProperty('--mx', x*100+'%'); el.style.setProperty('--my', y*100+'%');
+    el.style.setProperty('--rx', (.5-y)*14+'deg'); el.style.setProperty('--ry', (x-.5)*18+'deg'); el.style.setProperty('--o', Math.min(1, Math.hypot(x-.5,y-.5)*1.6+.3)); });
+  el.addEventListener('pointerleave', () => { el.classList.remove('active'); el.style.setProperty('--rx','0deg'); el.style.setProperty('--ry','0deg'); el.style.setProperty('--o',0); });
+});
+
+/* ---- nav ---- */
+const nav = document.getElementById('nav'); let lastY = 0;
+addEventListener('scroll', () => { const y = scrollY; nav.classList.toggle('hide', y > lastY && y > 200); lastY = y; if (STATIC) drawS(0); }, {passive:true});
+
+/* ---- C: skeleton nas telas (placeholders ficam em loading) ---- */
+document.querySelectorAll('[data-media]').forEach(m => { if (!STATIC) m.dataset.state = 'loading'; });
+
+document.fonts.ready.then(() => {
+  initS(); initT();
+  if (STATIC){ drawS(0); thumbs.forEach(o => drawT(o, 0)); return; }
+  let last = 0;
+  const loop = t => { drawS(t); if (t - last > FRAME){ last = t; thumbs.forEach(o => vis.get(o.c) && drawT(o, t)); } requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+});
+let rs; addEventListener('resize', () => { clearTimeout(rs); rs = setTimeout(() => { initS(); initT(); if (STATIC) thumbs.forEach(o => drawT(o, 0)); }, 150); });
+})();
+</script>
+</body>
+</html>

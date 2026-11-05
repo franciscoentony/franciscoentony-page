@@ -121,7 +121,7 @@ export default function ContactField() {
   }
 
   const canvasRef = useCanvasAnimation(draw, {
-    frameInterval: settings.asciiInterval,
+    frameInterval: settings.fieldInterval,
   });
 
   return (

@@ -5,7 +5,8 @@ import {
   type CanvasFrame,
 } from "../../hooks/useCanvasAnimation";
 import { usePointer } from "../../hooks/usePointer";
-import { ASCII_FRAME_INTERVAL, SPHERE, lerp } from "../../lib/motion";
+import { SPHERE, lerp } from "../../lib/motion";
+import { useQuality } from "../../hooks/useQuality";
 
 /** Posição de cada tag na superfície de uma esfera de raio 1 (distribuição de Fibonacci). */
 const tagPositions = skills.sphereTags.map((_, index) => {
@@ -53,6 +54,7 @@ function readColorToken(name: string): string {
  */
 export default function SkillsSphere() {
   const pointer = usePointer();
+  const { settings } = useQuality();
 
   // Estado da rotação (fica em refs porque muda a cada quadro)
   const rotation = useRef({ x: 0.3, y: 0 });
@@ -194,9 +196,9 @@ export default function SkillsSphere() {
     ctx.shadowBlur = 0;
   }
 
-  // 30 quadros por segundo bastam para a rotação lenta (A4)
+  // 60fps no Alto, 30 no Médio, parada no Baixo (DS-P5a)
   const canvasRef = useCanvasAnimation(draw, {
-    frameInterval: ASCII_FRAME_INTERVAL,
+    frameInterval: settings.sphereInterval,
   });
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {

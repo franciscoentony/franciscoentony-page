@@ -16,6 +16,10 @@ export type Motion = "full" | "reduced";
 export interface QualitySettings {
   /** Intervalo entre quadros dos canvases ASCII (ms). */
   asciiInterval: number;
+  /** Intervalo entre quadros do campo ASCII do contato (ms, DS-P5b). */
+  fieldInterval: number;
+  /** Intervalo entre quadros da esfera de skills (ms; 0 = todo quadro, DS-P5a). */
+  sphereInterval: number;
   /** Fator do tamanho das células ASCII (planeta, retrato, thumbs). */
   cellScale: number;
   /** Fator das células do campo do contato (1.2 no Médio: 1.3 engrossava demais). */
@@ -43,6 +47,8 @@ export interface QualitySettings {
 export const QUALITY_SETTINGS: Record<Quality, QualitySettings> = {
   alto: {
     asciiInterval: 33, // 30fps
+    fieldInterval: 33,
+    sphereInterval: 0, // 60fps (ticker)
     cellScale: 1,
     fieldCellScale: 1,
     hueBands: 6,
@@ -57,6 +63,8 @@ export const QUALITY_SETTINGS: Record<Quality, QualitySettings> = {
   },
   medio: {
     asciiInterval: 50, // 20fps
+    fieldInterval: 66, // 15fps: só o campo do contato
+    sphereInterval: 33, // 30fps
     cellScale: 1.3,
     fieldCellScale: 1.2,
     hueBands: 4,
@@ -73,6 +81,8 @@ export const QUALITY_SETTINGS: Record<Quality, QualitySettings> = {
   // por quem usa: useCanvasAnimation, Universe, esfera, cursor...)
   baixo: {
     asciiInterval: 50,
+    fieldInterval: 66,
+    sphereInterval: 33, // (no Baixo a esfera fica parada)
     cellScale: 1.3,
     fieldCellScale: 1.2,
     hueBands: 4,

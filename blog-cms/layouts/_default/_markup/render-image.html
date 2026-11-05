@@ -8,6 +8,8 @@
     é ligado no navegador por src/lib/mediaLoader.ts. É <span> porque o
     Markdown coloca a imagem dentro de um <p>.
   - Verticais: a moldura ganha post-image-portrait (altura limitada, DF-7).
+  - Legenda opcional = o título da imagem no Markdown, ![alt](src "legenda"),
+    exposta em data-caption para a página do post usar (adendo B).
   - srcset com a versão de 800px (-800w.jpg) para celulares.
   - A 1ª imagem do post carrega com prioridade (é o LCP); as outras são lazy.
   Imagem que não estiver no JSON sai sozinha, sem moldura (rode o script).
@@ -18,6 +20,7 @@
 <span
   class="media-frame{{ if gt .height .width }} post-image-portrait{{ end }}"
   style="--ratio: {{ .width }}/{{ .height }}"
+  {{- with $.Title }} data-caption="{{ . }}"{{ end }}
 ><span class="media-skel" aria-hidden="true"></span>
 {{- end -}}
 <img

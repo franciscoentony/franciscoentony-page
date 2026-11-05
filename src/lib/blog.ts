@@ -47,6 +47,24 @@ export async function fetchPost(slug: string): Promise<Post | null> {
   return posts.find((p) => p.slug === slug) ?? null;
 }
 
+/**
+ * Vizinhos de um post na lista (o index.json vem do mais novo para o mais
+ * antigo): `next` = o registro mais antigo, `prev` = o mais novo. null quando
+ * não existe (ex.: o primeiro post não tem `next`). Usado no "Continue no
+ * diário" do detalhe do post (adendo B).
+ */
+export function getAdjacentPosts(
+  posts: Post[],
+  slug: string,
+): { prev: Post | null; next: Post | null } {
+  const index = posts.findIndex((p) => p.slug === slug);
+  if (index === -1) return { prev: null, next: null };
+  return {
+    prev: posts[index - 1] ?? null,
+    next: posts[index + 1] ?? null,
+  };
+}
+
 /** Reescreve o caminho de uma imagem de capa pra apontar pra pasta gerada pelo Hugo. */
 export function resolveAssetPath(path: string): string {
   if (!path) return "";

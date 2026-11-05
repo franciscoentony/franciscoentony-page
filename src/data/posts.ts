@@ -8,6 +8,8 @@ export interface Post {
   readTime: string;
   tags: string[];
   cover: string;
+  /** Legenda opcional da capa (front matter coverCaption, adendo B). */
+  coverCaption?: string;
   content: string;
 }
 

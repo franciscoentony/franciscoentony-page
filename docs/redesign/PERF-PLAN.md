@@ -117,6 +117,12 @@ O plano começa **depois** da rodada final de correções em andamento. Os itens
 
 **Ordem dentro de P2, por ganho:** A1 (atlas) → A3 (inicialização) → A2 (ticker) → A5 (camadas fixas) → A4 (esfera) → A6 → A7.
 
+**Processo enxuto (Entony, 05/11/2026, para economizar tokens):**
+- O Front-End mede só ao fim de cada frente, e não a cada item, sempre filtrando as saídas.
+- Designer, Revisor e QA tiveram o contexto limpo (`/clear`). Cada nova tarefa deles começa pelos arquivos do repo (`CLAUDE.md`, `docs/redesign/*`, `qa/rodadas/*`).
+- QA no modelo Sonnet.
+- Revisão final enxuta: só o Revisor e o designer, olhando **apenas o diff desde a última revisão** de cada um, com relatórios curtos.
+
 **Riscos e cuidados**
 - O atlas de glifos pode mudar levemente a aparência do ASCII (antialiasing). O designer compara com o protótipo em P5.
 - `deviceMemory` e `hardwareConcurrency` não existem no Safari. Lá vale o governador de FPS (B2) mais o tamanho de tela.

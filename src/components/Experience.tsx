@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useScrollWhileVisible } from "../hooks/useScrollWhileVisible";
 import { experience as experienceCopy, sectionIds } from "../content/ui";
 import { experience } from "../data/experience";
 import { TIMELINE, clamp } from "../lib/motion";
@@ -28,44 +29,30 @@ function Checkpoint({ on }: { on: boolean }) {
 export default function Experience() {
   const timelineRef = useRef<HTMLOListElement>(null);
   const stepRefs = useRef<(HTMLLIElement | null)[]>([]);
-  const [fillHeight, setFillHeight] = useState(0);
+  const fillRef = useRef<HTMLSpanElement>(null);
   const [activeSteps, setActiveSteps] = useState(0);
 
-  useEffect(() => {
-    let frameId = 0;
+  // Só escuta o scroll com a timeline na tela; a altura da linha é escrita
+  // direto no estilo (sem setState a cada quadro, A6 / S-3)
+  useScrollWhileVisible(timelineRef, () => {
+    const timeline = timelineRef.current;
+    if (!timeline) return;
 
-    function update() {
-      frameId = 0;
-      const timeline = timelineRef.current;
-      if (!timeline) return;
-
-      const line = window.innerHeight * TIMELINE.activeLine;
-      const rect = timeline.getBoundingClientRect();
-      const progress = clamp((line - rect.top) / rect.height);
-      setFillHeight(progress * (rect.height - 12));
-
-      // Conta quantas fases já passaram da linha
-      let count = 0;
-      stepRefs.current.forEach((step) => {
-        if (step && step.getBoundingClientRect().top < line) count++;
-      });
-      setActiveSteps(count);
+    const line = window.innerHeight * TIMELINE.activeLine;
+    const rect = timeline.getBoundingClientRect();
+    const progress = clamp((line - rect.top) / rect.height);
+    if (fillRef.current) {
+      fillRef.current.style.height = `${progress * (rect.height - 12)}px`;
     }
 
-    function handleScroll() {
-      if (frameId === 0) frameId = requestAnimationFrame(update);
-    }
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-
-    return () => {
-      cancelAnimationFrame(frameId);
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-    };
-  }, []);
+    // Conta quantas fases já passaram da linha (o React só re-renderiza
+    // quando o número muda)
+    let count = 0;
+    stepRefs.current.forEach((step) => {
+      if (step && step.getBoundingClientRect().top < line) count++;
+    });
+    setActiveSteps(count);
+  });
 
   return (
     <Section
@@ -100,7 +87,8 @@ export default function Experience() {
         <span
           aria-hidden="true"
           className="absolute top-1.5 left-[5px] w-px bg-linear-to-b from-gold to-accent shadow-glow-gold"
-          style={{ height: fillHeight }}
+          ref={fillRef}
+          style={{ height: 0 }}
         />
 
         {experience.map((item, index) => (

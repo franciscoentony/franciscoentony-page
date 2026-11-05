@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useScrollWhileVisible } from "../../hooks/useScrollWhileVisible";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { WORDS, clamp } from "../../lib/motion";
 
@@ -18,37 +19,18 @@ export default function WordReveal({ text, className = "" }: WordRevealProps) {
   const words = text.split(" ");
   const [litCount, setLitCount] = useState(0);
 
-  useEffect(() => {
-    if (reducedMotion) return;
-
-    let frameId = 0;
-
-    function update() {
-      frameId = 0;
-      if (!ref.current) return;
-      const rect = ref.current.getBoundingClientRect();
-      const vh = window.innerHeight;
-      // progress = clamp((0.85·vh − top) / (altura + 0.35·vh))
-      const progress = clamp(
-        (vh * WORDS.startAt - rect.top) / (rect.height + vh * WORDS.extra),
-      );
-      setLitCount(Math.floor(progress * words.length * 1.05));
-    }
-
-    function handleScroll() {
-      if (frameId === 0) frameId = requestAnimationFrame(update);
-    }
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-
-    return () => {
-      cancelAnimationFrame(frameId);
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-    };
-  }, [reducedMotion, words.length]);
+  // Só escuta o scroll com o parágrafo na tela (A6). O React só
+  // re-renderiza quando o número de palavras acesas muda.
+  useScrollWhileVisible(ref, () => {
+    if (reducedMotion || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const vh = window.innerHeight;
+    // progress = clamp((0.85·vh − top) / (altura + 0.35·vh))
+    const progress = clamp(
+      (vh * WORDS.startAt - rect.top) / (rect.height + vh * WORDS.extra),
+    );
+    setLitCount(Math.floor(progress * words.length * 1.05));
+  });
 
   const count = reducedMotion ? words.length : litCount;
 

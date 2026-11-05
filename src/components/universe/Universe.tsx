@@ -1,8 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { chapters, hero, sectionIds } from "../../content/ui";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
-import { useScrollProgress } from "../../hooks/useScrollProgress";
-import { UNIVERSE, clamp, getWarp, warpState } from "../../lib/motion";
+import { useScrollWhileVisible } from "../../hooks/useScrollWhileVisible";
+import {
+  UNIVERSE,
+  clamp,
+  getScrollProgress,
+  getWarp,
+  warpState,
+} from "../../lib/motion";
 import Button from "../ui/Button";
 import Container from "../ui/Container";
 import { GradientText, RichText } from "../ui/RichText";
@@ -24,10 +30,10 @@ export default function Universe() {
 
 /**
  * Eyebrow, h1 e CTAs do hero.
- * ctaHidden: quando o hero já sumiu no scroll, os CTAs ficam "inert" (não
- * recebem foco nem clique). O h1 continua na árvore de acessibilidade.
+ * ctaRef: na versão animada, o scroll marca os CTAs como "inert" quando o
+ * hero some (não recebem foco nem clique). O h1 continua acessível.
  */
-function HeroCopy({ ctaHidden = false }: { ctaHidden?: boolean }) {
+function HeroCopy({ ctaRef }: { ctaRef?: RefObject<HTMLDivElement | null> }) {
   return (
     <>
       <p className="mb-3.5 text-eyebrow text-secondary">{hero.eyebrow}</p>
@@ -35,7 +41,7 @@ function HeroCopy({ ctaHidden = false }: { ctaHidden?: boolean }) {
         <GradientText title={hero.title} />
       </h1>
       <div
-        inert={ctaHidden}
+        ref={ctaRef}
         className="mt-6.5 flex items-center justify-center gap-3.5"
       >
         <Button to={`/#${sectionIds.projects}`}>{hero.primaryCta}</Button>
@@ -112,12 +118,45 @@ const chapterPositions = [
 
 function UniverseAnimated() {
   const sectionRef = useRef<HTMLElement>(null);
-  const progress = useScrollProgress(sectionRef);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const hintRef = useRef<HTMLDivElement>(null);
+  const chapterRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Passa o warp para o fundo de estrelas
-  useEffect(() => {
+  // A cada quadro de scroll, escreve opacidade/posição direto nos elementos
+  // (sem setState: a seção não re-renderiza enquanto rola, A6)
+  useScrollWhileVisible(sectionRef, () => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const progress = getScrollProgress(section);
+
+    // Passa o warp para o fundo de estrelas
     warpState.value = getWarp(progress);
-  }, [progress]);
+
+    // Headline + CTAs: só opacity (sem visibility: hidden), para o h1
+    // continuar existindo para leitores de tela (QA I1)
+    const heroFade = clamp(progress / UNIVERSE.heroFadeEnd);
+    const hero = heroRef.current;
+    if (hero) {
+      hero.style.opacity = `${1 - heroFade}`;
+      hero.style.transform = `translateY(${-heroFade * UNIVERSE.heroShift}px) scale(${1 - heroFade * 0.04})`;
+      hero.style.pointerEvents = heroFade >= 1 ? "none" : "auto";
+    }
+    // CTAs invisíveis não recebem foco nem clique
+    if (ctaRef.current) ctaRef.current.inert = heroFade >= 1;
+
+    if (hintRef.current) {
+      hintRef.current.style.opacity = `${1 - clamp(progress / UNIVERSE.hintFadeEnd)}`;
+    }
+
+    chapterRefs.current.forEach((chapter, index) => {
+      if (!chapter) return;
+      const [start, end] = UNIVERSE.chapterWindows[index];
+      const opacity = getChapterOpacity(progress, start, end);
+      chapter.style.opacity = `${opacity}`;
+      chapter.style.transform = `translateY(${(1 - opacity) * UNIVERSE.chapterShift}px)`;
+    });
+  });
 
   // Ao sair da Home, desliga o warp
   useEffect(() => {
@@ -126,59 +165,45 @@ function UniverseAnimated() {
     };
   }, []);
 
-  const heroFade = clamp(progress / UNIVERSE.heroFadeEnd);
-  const hintOpacity = 1 - clamp(progress / UNIVERSE.hintFadeEnd);
-
   return (
     <section ref={sectionRef} id="universe" className="relative h-[520vh]">
       <div className="sticky top-0 h-svh overflow-hidden">
         <PlanetCanvas sectionRef={sectionRef} />
 
-        {/* Headline + CTAs */}
+        {/* Headline + CTAs (estilos de scroll aplicados via ref) */}
         <div
+          ref={heroRef}
           className="absolute inset-x-0 top-hero-top px-6 text-center"
-          style={{
-            opacity: 1 - heroFade,
-            transform: `translateY(${-heroFade * UNIVERSE.heroShift}px) scale(${1 - heroFade * 0.04})`,
-            // Só opacity (sem visibility: hidden), para o h1 continuar
-            // existindo para leitores de tela (QA I1)
-            pointerEvents: heroFade >= 1 ? "none" : "auto",
-          }}
         >
-          <HeroCopy ctaHidden={heroFade >= 1} />
+          <HeroCopy ctaRef={ctaRef} />
         </div>
 
         {/* Dica "Role para explorar" (sombra preta para ler sobre o planeta no mobile, QA S1) */}
         <div
+          ref={hintRef}
           aria-hidden="true"
           className="absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5 font-mono text-label tracking-label-wide text-secondary uppercase text-shadow-chapter"
-          style={{ opacity: hintOpacity }}
         >
           {hero.scrollHint}
           <span className="h-9 w-px animate-drip bg-linear-to-b from-secondary to-transparent" />
         </div>
 
-        {/* Capítulos */}
-        {chapters.map((chapter, index) => {
-          const [start, end] = UNIVERSE.chapterWindows[index];
-          const opacity = getChapterOpacity(progress, start, end);
-
-          return (
-            <div
-              key={chapter.number}
-              className={`pointer-events-none absolute text-shadow-chapter ${chapterPositions[index]}`}
-              style={{
-                opacity,
-                transform: `translateY(${(1 - opacity) * UNIVERSE.chapterShift}px)`,
-              }}
-            >
-              <ChapterCopy
-                index={index}
-                align={index < 2 ? "side" : "center"}
-              />
-            </div>
-          );
-        })}
+        {/* Capítulos: começam invisíveis; o scroll controla a opacidade */}
+        {chapters.map((chapter, index) => (
+          <div
+            key={chapter.number}
+            ref={(element) => {
+              chapterRefs.current[index] = element;
+            }}
+            className={`pointer-events-none absolute text-shadow-chapter ${chapterPositions[index]}`}
+            style={{
+              opacity: 0,
+              transform: `translateY(${UNIVERSE.chapterShift}px)`,
+            }}
+          >
+            <ChapterCopy index={index} align={index < 2 ? "side" : "center"} />
+          </div>
+        ))}
       </div>
     </section>
   );

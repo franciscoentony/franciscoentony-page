@@ -103,6 +103,10 @@ O plano começa **depois** da rodada final de correções em andamento. Os itens
 | P5. Revisão | Revisor + Designer | Código (vazamentos, ticker, fallback do worker) e visual dos 3 níveis | — |
 | (A8) | Front-End | Só se P4 não bater as metas | Condicional |
 
+**Itens adicionados depois da rodada final (Tech Lead, 05/11/2026):**
+- **A9. CLS do post (0,14–0,18):** render hook de imagem no Hugo (`blog-cms/layouts/_default/_markup/render-image.html`) que emite `width`, `height`, `loading="lazy"` e `decoding="async"` (a 1ª imagem fica `eager` + `fetchpriority="high"`). É template, não conteúdo, então está liberado. Meta: CLS < 0,1 no post.
+- **Capa 16:9 nos cards do `/blog` (DF-11):** sem fallback para a 1ª imagem do corpo por enquanto, porque exigiria miniaturas geradas no build. Vai para o backlog pós-lançamento, junto com a OG por post.
+
 **Ordem dentro de P2, por ganho:** A1 (atlas) → A3 (inicialização) → A2 (ticker) → A5 (camadas fixas) → A4 (esfera) → A6 → A7.
 
 **Riscos e cuidados**

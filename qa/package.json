@@ -10,7 +10,9 @@
     "report": "playwright show-report reports/html",
     "summary": "node scripts/summarize.mjs",
     "test:redesign": "playwright test --grep @redesign",
-    "test:dod": "playwright test --grep @dod"
+    "test:dod": "playwright test --grep @dod",
+    "test:perf": "QA_PERF=1 playwright test --project=perf-mobile --project=perf-desktop --workers=1",
+    "perf-report": "node scripts/perf-report.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

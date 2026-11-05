@@ -29,6 +29,8 @@ bun install
 | `bun run test:prod` | Atalho para produção |
 | `bun run test:dod` | Só os critérios do DoD (`@dod`) |
 | `bun run test:redesign` | Só os comportamentos específicos do HANDOFF (`@redesign`) |
+| `QA_PERF=1 QA_BASE_URL=... bun run test:perf` | Orçamento de desempenho (PERF-PLAN §2): perfis `perf-mobile` (412×915, DPR 2.75, toque, CPU 6×) e `perf-desktop` (1440, sem throttling). Fora da suíte padrão |
+| `bun run perf-report` | Tabela markdown do último `test:perf` (`QA_PERF_BASE=<pasta>` acrescenta a coluna "antes") |
 | `bun run lighthouse` | Lighthouse (mobile + desktop) nas 3 rotas. Sai com código 1 se Performance ou A11y < 90 |
 | `bun run summary` | Gera `reports/playwright-summary.md` a partir do último run |
 | `bun run report` | Abre o relatório HTML do Playwright |
@@ -53,6 +55,9 @@ bunx playwright test -g "RM-03"                # só um caso
 | `QA_BROWSER` | `chrome` | `chromium` para o navegador do Playwright |
 | `QA_SLUG` | *(post mais recente)* | Slug usado na rota `/blog/:slug` |
 | `QA_LH_MIN` | `90` | Nota mínima no Lighthouse |
+| `QA_LH_PRESETS` | `mobile,desktop` | Perfis do Lighthouse |
+| `QA_PERF` | — | `1` ativa os projetos `perf-*` |
+| `QA_PERF_CPU` | `6` | Throttling de CPU do `perf-mobile` |
 | `QA_LH_RUNS` | `1` | Execuções por página (usa a mediana; use 3 para decidir aprovação) |
 
 ## Saídas
@@ -75,6 +80,7 @@ baseline/                    mesma estrutura, contra produção (versionado)
 | `tests/a11y.spec.ts` | A11Y-01 axe-core WCAG 2.1 AA · A11Y-02 texto final em muted `#48484D` · A11Y-03 semântica |
 | `tests/keyboard.spec.ts` | KB-01 ordem de Tab e foco visível (+ padrão D8 lavanda) · KB-02 âncoras · KB-03 carrossel |
 | `tests/navigation.spec.ts` | RT-08 Voltar mantém o scroll · KB-04 menu mobile · KB-05 navbar escondida reaparece com foco |
+| `tests/perf.spec.ts` | PERF-01..04 e DF-15: TBT, long tasks, % da main thread parada por seção, FPS no scroll, INP |
 | `tests/motion.spec.ts` | RM-01..05 reduced-motion · PF-01 canvas pausado fora da viewport · PF-02 DPR ≤ 2 · PF-03 FPS no scroll |
 | `scripts/lighthouse.mjs` | PF-LH: Performance, Acessibilidade, Best Practices e SEO |
 

@@ -1,7 +1,8 @@
 // Lighthouse nas 3 rotas, perfis mobile e desktop. DoD: Performance e Acessibilidade >= 90.
 // Uso: node scripts/lighthouse.mjs          (local: build + preview)
 //      QA_BASE_URL=https://... node scripts/lighthouse.mjs
-// Variáveis: QA_OUT (pasta de saída), QA_LH_MIN (padrão 90), QA_LH_RUNS (padrão 1; usa a mediana de performance)
+// Variáveis: QA_OUT (pasta de saída), QA_LH_MIN (padrão 90), QA_LH_RUNS (padrão 1; usa a mediana de performance),
+//            QA_LH_PRESETS (padrão "mobile,desktop")
 import fs from "node:fs";
 import path from "node:path";
 import lighthouse from "lighthouse";
@@ -36,7 +37,8 @@ const ROUTES = [
   ["blog", "/blog"],
   ["post", `/blog/${s}`],
 ];
-const PRESETS = ["mobile", "desktop"];
+// QA_LH_PRESETS=mobile para só o perfil mobile (padrão: mobile,desktop)
+const PRESETS = (process.env.QA_LH_PRESETS ?? "mobile,desktop").split(",").map((x) => x.trim()).filter(Boolean);
 const CATS = ["performance", "accessibility", "best-practices", "seo"];
 
 const chrome = await chromeLauncher.launch({ chromeFlags: ["--headless=new", "--no-sandbox"] });

@@ -1,6 +1,7 @@
 // Configuração central do QA. Tudo pode ser sobrescrito por variáveis de ambiente.
 export const LOCAL_PORT = Number(process.env.QA_PORT ?? 4173);
-// 127.0.0.1 e não localhost: o fetch do Node tenta ::1 (IPv6) e o vite preview só escuta em IPv4
+// Sempre IPv4: o preview sobe com --host 127.0.0.1 (abaixo). Sem isso o vite escuta em
+// [::1] ou 127.0.0.1 conforme a resolução de "localhost" do sistema, e a espera trava.
 export const LOCAL_URL = `http://127.0.0.1:${LOCAL_PORT}`;
 
 /** URL alvo. Sem QA_BASE_URL, sobe `bun run build && bun run preview` na raiz. */
@@ -26,5 +27,5 @@ export const TOKENS = {
 
 /** Comando do servidor local (padrão pedido: build + preview). QA_SKIP_BUILD=1 só serve o dist/ existente. */
 export const SERVER_COMMAND = process.env.QA_SKIP_BUILD
-  ? `bun run preview --port ${LOCAL_PORT} --strictPort`
-  : `bun run build && bun run preview --port ${LOCAL_PORT} --strictPort`;
+  ? `bun run preview --host 127.0.0.1 --port ${LOCAL_PORT} --strictPort`
+  : `bun run build && bun run preview --host 127.0.0.1 --port ${LOCAL_PORT} --strictPort`;

@@ -4,8 +4,8 @@ import { useQuality } from "../../hooks/useQuality";
 import { useScrollWhileVisible } from "../../hooks/useScrollWhileVisible";
 import { createSmoothedValue, type SmoothedValue } from "../../lib/smoothing";
 import {
+  TEXT_TRIGGER,
   UNIVERSE,
-  clamp,
   getScrollProgress,
   getWarp,
   warpState,
@@ -102,18 +102,6 @@ function ChapterCopy({
 
 // ---------- Versão animada ----------
 
-/** Opacidade de um capítulo: entra com fade, fica visível e sai com fade. */
-function getChapterOpacity(
-  progress: number,
-  start: number,
-  end: number,
-): number {
-  const fade = UNIVERSE.chapterFade;
-  const fadeIn = clamp((progress - start) / fade);
-  const fadeOut = 1 - clamp((progress - (end - fade)) / fade);
-  return fadeIn * fadeOut;
-}
-
 // Posição de cada capítulo no palco.
 // Abaixo de 860px todos ficam centralizados embaixo.
 const chapterPositions = [
@@ -124,6 +112,24 @@ const chapterPositions = [
   // 3: centralizado embaixo
   "inset-x-0 bottom-[9vh] px-6 text-center",
 ];
+
+/**
+ * Decide se um texto disparado fica ligado, com histerese: para LIGAR, o
+ * progresso precisa entrar um pouco além da borda da janela; para DESLIGAR,
+ * sair um pouco além. Assim o texto não pisca com a rolagem parada no limite.
+ */
+function updateTrigger(
+  state: { current: boolean },
+  progress: number,
+  from: number,
+  to: number,
+): boolean {
+  const margin = state.current
+    ? -TEXT_TRIGGER.hysteresis
+    : TEXT_TRIGGER.hysteresis;
+  state.current = progress >= from + margin && progress <= to - margin;
+  return state.current;
+}
 
 function UniverseAnimated() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -140,34 +146,52 @@ function UniverseAnimated() {
   // amortecimento (lib/smoothing.ts) e continua andando depois que a rolagem
   // para. Tudo é escrito direto nos elementos via ref (sem re-render).
   useEffect(() => {
+    // Estado ligado/desligado de cada texto (com histerese, ver updateTrigger)
+    const heroOn = { current: true };
+    const hintOn = { current: true };
+    const chapterOn = chapters.map(() => ({ current: false }));
+
     function apply(progress: number) {
       progressRef.current = progress;
 
       // Passa o warp para o fundo de estrelas
       warpState.value = getWarp(progress);
 
-      // Headline + CTAs: só opacity (sem visibility: hidden), para o h1
-      // continuar existindo para leitores de tela (QA I1)
-      const heroFade = clamp(progress / UNIVERSE.heroFadeEnd);
-      const hero = heroRef.current;
-      if (hero) {
-        hero.style.opacity = `${1 - heroFade}`;
-        hero.style.transform = `translateY(${-heroFade * UNIVERSE.heroShift}px) scale(${1 - heroFade * 0.04})`;
-        hero.style.pointerEvents = heroFade >= 1 ? "none" : "auto";
-      }
-      // CTAs invisíveis não recebem foco nem clique
-      if (ctaRef.current) ctaRef.current.inert = heroFade >= 1;
+      // Textos DISPARADOS (não acompanham o scroll quadro a quadro): cada
+      // bloco liga/desliga quando o progresso entra/sai da janela do
+      // HANDOFF §4, e a transição em CSS (text-trigger) sempre completa,
+      // mesmo se a rolagem parar no meio.
+      const heroIsOn = updateTrigger(
+        heroOn,
+        progress,
+        -1,
+        UNIVERSE.heroFadeEnd / 2,
+      );
+      if (heroRef.current) heroRef.current.dataset.on = String(heroIsOn);
+      // CTAs invisíveis não recebem foco nem clique (o h1 continua
+      // acessível: só opacity, sem visibility: hidden, QA I1)
+      if (ctaRef.current) ctaRef.current.inert = !heroIsOn;
 
-      if (hintRef.current) {
-        hintRef.current.style.opacity = `${1 - clamp(progress / UNIVERSE.hintFadeEnd)}`;
-      }
+      const hintIsOn = updateTrigger(
+        hintOn,
+        progress,
+        -1,
+        UNIVERSE.hintFadeEnd / 2,
+      );
+      if (hintRef.current) hintRef.current.dataset.on = String(hintIsOn);
 
       chapterRefs.current.forEach((chapter, index) => {
         if (!chapter) return;
         const [start, end] = UNIVERSE.chapterWindows[index];
-        const opacity = getChapterOpacity(progress, start, end);
-        chapter.style.opacity = `${opacity}`;
-        chapter.style.transform = `translateY(${(1 - opacity) * UNIVERSE.chapterShift}px)`;
+        // A janela "ligada" é o meio de cada fade de entrada/saída
+        const fade = UNIVERSE.chapterFade / 2;
+        const isOn = updateTrigger(
+          chapterOn[index],
+          progress,
+          start + fade,
+          end - fade,
+        );
+        chapter.dataset.on = String(isOn);
       });
     }
 
@@ -194,7 +218,9 @@ function UniverseAnimated() {
         {/* Headline + CTAs (estilos de scroll aplicados via ref) */}
         <div
           ref={heroRef}
-          className="absolute inset-x-0 top-hero-top px-6 text-center"
+          data-on="true"
+          // Ao sumir, sobe 60px (como antes)
+          className="text-trigger absolute inset-x-0 top-hero-top px-6 text-center [--trigger-shift:-60px] data-[on=false]:pointer-events-none"
         >
           <HeroCopy ctaRef={ctaRef} />
         </div>
@@ -203,7 +229,8 @@ function UniverseAnimated() {
         <div
           ref={hintRef}
           aria-hidden="true"
-          className="absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5 font-mono text-label tracking-label-wide text-secondary uppercase text-shadow-chapter"
+          data-on="true"
+          className="transition-opacity duration-700 data-[on=false]:opacity-0 absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5 font-mono text-label tracking-label-wide text-secondary uppercase text-shadow-chapter"
         >
           {hero.scrollHint}
           <span className="h-9 w-px animate-drip bg-linear-to-b from-secondary to-transparent" />
@@ -216,11 +243,8 @@ function UniverseAnimated() {
             ref={(element) => {
               chapterRefs.current[index] = element;
             }}
-            className={`pointer-events-none absolute text-shadow-chapter ${chapterPositions[index]}`}
-            style={{
-              opacity: 0,
-              transform: `translateY(${UNIVERSE.chapterShift}px)`,
-            }}
+            data-on="false"
+            className={`text-trigger pointer-events-none absolute text-shadow-chapter ${chapterPositions[index]}`}
           >
             <ChapterCopy index={index} align={index < 2 ? "side" : "center"} />
           </div>

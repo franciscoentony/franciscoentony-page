@@ -298,6 +298,31 @@
   color: transparent;
 }
 
+/*
+ * Textos disparados pelo scroll (hero e capítulos do Universe). O JS só
+ * marca data-on="true|false"; a transição é sempre completa (700ms,
+ * --ease-smooth), com 60ms de atraso entre os filhos (número → título →
+ * subtítulo). --trigger-shift: para onde o texto vai ao sumir (padrão 30px
+ * para baixo; o hero usa -60px, para cima).
+ */
+@utility text-trigger {
+  & > * {
+    transition:
+      opacity 700ms var(--ease-smooth),
+      translate 700ms var(--ease-smooth);
+  }
+  & > * + * {
+    transition-delay: 60ms;
+  }
+  & > * + * + * {
+    transition-delay: 120ms;
+  }
+  &[data-on="false"] > * {
+    opacity: 0;
+    translate: 0 var(--trigger-shift, 30px);
+  }
+}
+
 /* Esconde a barra de rolagem (carrossel de projetos) */
 @utility scrollbar-hidden {
   scrollbar-width: none;

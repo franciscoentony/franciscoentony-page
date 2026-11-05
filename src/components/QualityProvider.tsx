@@ -54,7 +54,8 @@ export function QualityProvider({ children }: { children: ReactNode }) {
       if (average <= GOVERNOR.maxAverageFrameMs) return;
 
       const next = lowerQuality(detected);
-      // Para Baixo, espera a pessoa sair do Universe
+      // Para Baixo, espera a pessoa sair do Universe (o layout dele só
+      // muda na próxima navegação, ver Universe.tsx)
       if (next === "baixo" && isUniverseOnScreen()) return;
       setDetected(next);
     });

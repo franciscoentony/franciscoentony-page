@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { chapters, hero, sectionIds } from "../../content/ui";
 import { useQuality } from "../../hooks/useQuality";
 import { useScrollWhileVisible } from "../../hooks/useScrollWhileVisible";
@@ -21,10 +21,17 @@ import PlanetCanvas from "./PlanetCanvas";
  *   o planeta se dissolve e as estrelas fazem o efeito "velocidade da luz".
  * - Nível Baixo (e reduced motion): sem pin. Hero e capítulos viram blocos
  *   empilhados.
+ *
+ * O layout (com ou sem pin) é decidido quando a seção monta. Se o governador
+ * de FPS baixar o nível no meio da visita, os canvases ficam estáticos, mas
+ * o pin continua até a próxima navegação: trocar o layout com a pessoa na
+ * página faria o conteúdo pular (P5 I-A). Reduced motion troca na hora.
  */
 export default function Universe() {
-  const isLowQuality = useQuality().quality === "baixo";
-  return isLowQuality ? <UniverseStatic /> : <UniverseAnimated />;
+  const { quality, motion } = useQuality();
+  const [startedLowQuality] = useState(quality === "baixo");
+  const isStaticLayout = motion === "reduced" || startedLowQuality;
+  return isStaticLayout ? <UniverseStatic /> : <UniverseAnimated />;
 }
 
 // ---------- Partes reutilizadas nas duas versões ----------

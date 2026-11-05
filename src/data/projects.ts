@@ -5,6 +5,37 @@ export interface Project {
   languageColor: string; // hex, matches GitHub's real language colors
   topics: string[];
   url: string;
+
+  // ---- Campos opcionais da página do projeto (/projetos/:slug, adendo A) ----
+  // Todos opcionais e, por enquanto, sem valor: campo vazio = seção some.
+  tagline?: string; // até 180 caracteres; sem ela, a página usa description
+  period?: string; // ex.: "mar 2025 — jun 2025"
+  role?: string; // ex.: "Full-stack, solo"
+  status?: "Em produção" | "Em desenvolvimento" | "Arquivado";
+  demoUrl?: string;
+  results?: { value: string; label: string }[]; // até 3
+  problem?: string; // markdown curto (capítulo 01)
+  solution?: string; // capítulo 02
+  contribution?: string; // capítulo 03
+  learnings?: string; // capítulo 04
+  stack?: { group: string; items: string[] }[]; // sem ela: language + topics
+  screens?: {
+    src: string;
+    alt: string;
+    width: number;
+    height: number;
+    caption?: string;
+  }[]; // até 5
+}
+
+/** Slug da URL do projeto, a partir do name (ex.: "connect-responsibly"). */
+export function projectSlug(project: Project): string {
+  return project.name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 export const projects: Project[] = [

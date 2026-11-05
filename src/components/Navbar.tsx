@@ -26,7 +26,7 @@ export default function Navbar() {
   }
 
   // Menu aberto = modal (D20): trava o scroll da página, Esc fecha e o Tab
-  // fica preso entre a barra e os links do menu.
+  // fica preso entre o botão X e os links do menu.
   useEffect(() => {
     if (!menuOpen) return;
 
@@ -42,17 +42,18 @@ export default function Navbar() {
       if (element) element.inert = true;
     });
 
-    // Leva o foco para o primeiro link do menu
-    overlayRef.current?.querySelector("a")?.focus();
+    // Leva o foco para o primeiro link do menu. Espera um quadro: no
+    // instante em que a classe muda, a transição de visibility ainda está
+    // em "hidden" e o navegador recusa o foco (QA KB-04).
+    const focusFrame = requestAnimationFrame(() => {
+      overlayRef.current?.querySelector("a")?.focus();
+    });
 
-    /** Elementos que podem receber foco enquanto o menu está aberto (só os visíveis). */
+    /** O modal: o botão X (fechar) + os links do menu. O Tab fica entre eles. */
     function getFocusables(): HTMLElement[] {
-      const inHeader = headerRef.current?.querySelectorAll("a, button") ?? [];
-      const inMenu = overlayRef.current?.querySelectorAll("a") ?? [];
-      return [...inHeader, ...inMenu].filter(
-        (element): element is HTMLElement =>
-          element instanceof HTMLElement && element.offsetParent !== null,
-      );
+      const links = overlayRef.current?.querySelectorAll("a") ?? [];
+      const closeButton = menuButtonRef.current;
+      return [...(closeButton ? [closeButton] : []), ...links];
     }
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -77,6 +78,7 @@ export default function Navbar() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => {
+      cancelAnimationFrame(focusFrame);
       document.body.style.overflow = "";
       outside.forEach((element) => {
         if (element) element.inert = false;
@@ -177,8 +179,12 @@ export default function Navbar() {
         id="menu-mobile"
         aria-label="Principal"
         aria-hidden={!menuOpen}
-        className={`fixed inset-0 z-40 h-svh bg-ink/92 pt-nav backdrop-blur-[20px] backdrop-saturate-180 transition-[opacity,visibility] duration-200 tab:hidden ${
-          menuOpen ? "visible opacity-100" : "invisible opacity-0"
+        className={`fixed inset-0 z-40 h-svh bg-ink/92 pt-nav backdrop-blur-[20px] backdrop-saturate-180 tab:hidden ${
+          // Abrir: visibility muda na hora (o 1º link precisa poder receber
+          // foco já). Fechar: some só depois do fade de 200ms (QA KB-04).
+          menuOpen
+            ? "visible opacity-100 [transition:opacity_200ms]"
+            : "invisible opacity-0 [transition:opacity_200ms,visibility_0s_linear_200ms]"
         }`}
       >
         <Container>

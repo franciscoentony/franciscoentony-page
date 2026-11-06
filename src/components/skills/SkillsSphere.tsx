@@ -54,7 +54,10 @@ function readColorToken(name: string): string {
  */
 export default function SkillsSphere() {
   const pointer = usePointer();
-  const { settings } = useQuality();
+  const { settings, quality } = useQuality();
+  // Baixo e reduced motion: a esfera é 1 quadro parado e não gira, então
+  // não oferece "Arraste" nem o cursor de pegar (QA final, item 3)
+  const canDrag = quality !== "baixo";
 
   // Estado da rotação (fica em refs porque muda a cada quadro)
   const rotation = useRef({ x: 0.3, y: 0 });
@@ -228,15 +231,17 @@ export default function SkillsSphere() {
   return (
     <div
       aria-hidden="true"
-      data-cursor="drag"
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
+      data-cursor={canDrag ? "drag" : undefined}
+      onPointerDown={canDrag ? handlePointerDown : undefined}
+      onPointerMove={canDrag ? handlePointerMove : undefined}
+      onPointerUp={canDrag ? handlePointerUp : undefined}
+      onPointerCancel={canDrag ? handlePointerUp : undefined}
       onPointerLeave={() => {
         hoverPoint.current = null;
       }}
-      className="relative mt-10 h-[min(560px,70vw)] cursor-grab touch-pan-y select-none active:cursor-grabbing"
+      className={`relative mt-10 h-[min(560px,70vw)] touch-pan-y select-none ${
+        canDrag ? "cursor-grab active:cursor-grabbing" : ""
+      }`}
     >
       <canvas ref={canvasRef} className="absolute inset-0 size-full" />
     </div>

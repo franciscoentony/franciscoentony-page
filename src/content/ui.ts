@@ -48,7 +48,8 @@ export const sectionIds = {
 
 export const navbar = {
   logo: "entony",
-  logoLabel: "Francisco Entony, ir para o início",
+  /** Começa pelo texto visível ("F.Entony"), como pede o WCAG 2.5.3 (axe). */
+  logoLabel: "F.Entony, ir para o início",
   links: [
     { label: "Sobre", to: `/#${sectionIds.about}` },
     { label: "Habilidades", to: `/#${sectionIds.skills}` },

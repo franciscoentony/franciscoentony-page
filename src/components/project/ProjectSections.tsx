@@ -420,7 +420,9 @@ export function CloneLine({ project }: { project: Project }) {
   const command = `git clone ${project.url}.git`;
   return (
     <div className={`${wrap} mt-30 flex flex-wrap items-center gap-4`}>
-      <code className="max-w-full overflow-x-auto rounded-sm bg-code px-4.5 py-3.5 font-mono text-caption whitespace-nowrap text-prose">
+      {/* Quebra a linha em vez de rolar: uma área rolável precisaria de foco
+          de teclado (axe scrollable-region-focusable, a 375px) */}
+      <code className="max-w-full rounded-sm bg-code px-4.5 py-3.5 font-mono text-caption break-all whitespace-pre-wrap text-prose">
         <span aria-hidden="true" className="text-gold">
           ${" "}
         </span>

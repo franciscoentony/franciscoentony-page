@@ -74,17 +74,18 @@ export const hero = {
     gradient: "problemas reais",
   } as GradientTitle,
   primaryCta: "Ver projetos",
-  secondaryCta: "Fale comigo ›",
+  secondaryCta: "Fale comigo",
   scrollHint: "Role para explorar",
 };
 
 export const chapters: {
-  number: string;
+  /** Nome do capítulo, numa palavra (adendo v4, item 4). */
+  name: string;
   title: string;
   lead: TextPart[];
 }[] = [
   {
-    number: "01 — ORIGEM",
+    name: "Origem",
     title: "Tudo começou aos 8 anos",
     lead: [
       { text: "Uma fantasia de criança que virou " },
@@ -92,7 +93,7 @@ export const chapters: {
     ],
   },
   {
-    number: "02 — CURIOSIDADE",
+    name: "Curiosidade",
     title: "Biologia, física e astronomia.",
     lead: [
       { text: "A vontade de entender o universo " },
@@ -100,7 +101,7 @@ export const chapters: {
     ],
   },
   {
-    number: "03 — AGORA",
+    name: "Agora",
     title: `Hoje, aos ${age}, eu construo. E ensino.`,
     lead: [
       { text: "Full-stack no " },
@@ -135,17 +136,17 @@ export const player = {
     },
   ],
   card: {
-    header: "FICHA · LV.",
+    header: "Ficha · lv.",
     level: String(age),
     name: "Francisco Entony",
     className: "Classe: Dev Full-Stack · Natal, RN",
     photoAlt: "Foto de Francisco Entony",
     // Valores aprovados pelo Entony (D11).
     attributes: [
-      { value: 92, label: "FRONT" },
-      { value: 88, label: "BACK" },
-      { value: 74, label: "DADOS" },
-      { value: 99, label: "CURIO" },
+      { value: 92, label: "Front" },
+      { value: 88, label: "Back" },
+      { value: 74, label: "Dados" },
+      { value: 99, label: "Curio" },
     ],
   },
 };
@@ -190,8 +191,8 @@ export const skills = {
 export const projects = {
   eyebrow: "Missões",
   title: "O que eu construí.",
-  githubLink: "Ver tudo no GitHub ›",
-  cardGithubLink: "GitHub ›",
+  githubLink: "Ver tudo no GitHub",
+  cardGithubLink: "GitHub",
   /** D2: os 2 primeiros projetos de projects.ts são principais, o resto secundários. */
   mainMissionCount: 2,
   rarityMain: "★ Missão Principal",
@@ -239,9 +240,9 @@ export const experience = {
     { text: "A próxima pode ser com você.", bold: true },
   ] as TextPart[],
   nextPhase: {
-    when: "PRÓXIMA FASE",
+    when: "Próxima fase",
     title: "Bloqueada",
-    action: "Press start ›",
+    action: "Press start",
   },
 };
 
@@ -252,7 +253,7 @@ export const blog = {
   title: "Anotações sobre código, dados e aprendizado.",
   /** Lead da página /blog (texto que já existia no site). */
   lead: "Registros do que vou construindo e aprendendo — de projetos pessoais a bastidores dos sistemas que desenvolvo no IFRN.",
-  allPostsLink: "Todos os posts ›",
+  allPostsLink: "Todos os posts",
   /** Card-convite do teaser quando há menos de 3 posts (DS-14). */
   inviteTitle: "Mais registros no diário",
   loading: "Carregando posts...",
@@ -322,14 +323,8 @@ export const contact = {
 // ---------- Cursor custom ----------
 
 export const cursor = {
-  holo: "INSPECIONAR",
-  drag: "ARRASTE",
-};
-
-// ---------- Toast ----------
-
-export const toast = {
-  emailCopied: { badge: "+1", text: "E-mail copiado para o inventário" },
+  holo: "Inspecionar",
+  drag: "Arraste",
 };
 
 // ---------- Footer ----------
@@ -341,7 +336,7 @@ export const footer = {
   github: "GitHub",
   linkedin: "LinkedIn",
   blog: "Blog",
-  backToTop: "Topo ↑",
+  backToTop: "Topo",
 };
 
 // ---------- SEO (título da aba e meta description por rota) ----------

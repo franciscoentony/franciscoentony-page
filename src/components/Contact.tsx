@@ -1,34 +1,23 @@
-import { contact, links, sectionIds, toast } from "../content/ui";
-import { useToast } from "../hooks/useToast";
-import { afterNextPaint } from "../lib/motion";
+import { contact, links, sectionIds } from "../content/ui";
 import ContactField from "./contact/ContactField";
 import Button from "./ui/Button";
+import {
+  buttonBase,
+  buttonSizes,
+  buttonVariants,
+  primaryPadding,
+} from "./ui/buttonStyles";
 import Container from "./ui/Container";
+import CopyButton from "./ui/CopyButton";
 import Reveal from "./ui/Reveal";
-import { GradientText } from "./ui/RichText";
+import { Kicker, PlainTitle } from "./ui/RichText";
 
-/** Seção "Continue?" (Contato): campo ASCII + botão que copia o e-mail. */
+/**
+ * Seção "Continue?" (Contato): campo ASCII + botão que copia o e-mail.
+ * O botão se decodifica até "E-mail copiado" (item 13, sem toast); a
+ * largura mínima evita que ele mude de tamanho durante a troca.
+ */
 export default function Contact() {
-  const showToast = useToast();
-
-  function copyEmail() {
-    // A cópia começa na hora (o Safari exige que seja dentro do clique), mas
-    // o toast só aparece depois do paint: o botão responde primeiro (A10, INP)
-    const copying = navigator.clipboard
-      ? navigator.clipboard.writeText(links.email)
-      : Promise.reject(new Error("sem área de transferência"));
-
-    afterNextPaint(async () => {
-      try {
-        await copying;
-        showToast(toast.emailCopied);
-      } catch {
-        // Sem acesso à área de transferência: abre o app de e-mail
-        window.location.href = `mailto:${links.email}`;
-      }
-    });
-  }
-
   return (
     <section
       id={sectionIds.contact}
@@ -38,11 +27,9 @@ export default function Contact() {
 
       <Container className="relative">
         <Reveal>
-          <p className="text-eyebrow text-secondary">{contact.eyebrow}</p>
-        </Reveal>
-        <Reveal delay={1}>
-          <h2 className="mx-auto mt-3.5 mb-5 max-w-[12ch] text-h1">
-            <GradientText title={contact.title} />
+          <h2 className="mx-auto mb-5 max-w-[12ch] text-h1">
+            <Kicker text={contact.eyebrow} breakAfter />
+            <PlainTitle title={contact.title} />
           </h2>
         </Reveal>
         <Reveal delay={2}>
@@ -51,12 +38,14 @@ export default function Contact() {
         <Reveal delay={3}>
           {/* Abaixo de 860px: e-mail numa linha, GitHub e LinkedIn juntos na seguinte (DS-19) */}
           <div className="mt-7.5 flex flex-col items-center justify-center gap-3.5 tab:flex-row">
-            <Button
-              onClick={copyEmail}
-              ariaLabel={`${contact.copyEmailLabel}: ${links.email}`}
-            >
-              {links.email}
-            </Button>
+            <CopyButton
+              value={links.email}
+              idle={links.email}
+              label={`${contact.copyEmailLabel}: ${links.email}`}
+              done={contact.emailCopied}
+              failed={contact.copyFailed}
+              className={`${buttonBase} ${buttonVariants.primary} ${buttonSizes.md} ${primaryPadding.md} min-w-[250px] justify-center`}
+            />
             <div className="flex items-center gap-5 tab:gap-3.5">
               <Button variant="link" href={links.github} external>
                 {contact.githubLink}

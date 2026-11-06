@@ -5,7 +5,8 @@ import { experience as experienceCopy, sectionIds } from "../content/ui";
 import { experience } from "../data/experience";
 import { TIMELINE, clamp } from "../lib/motion";
 import Reveal from "./ui/Reveal";
-import { GradientText, RichText } from "./ui/RichText";
+import LockedText from "./ui/LockedText";
+import { Kicker, PlainTitle, RichText } from "./ui/RichText";
 import Section from "./ui/Section";
 
 /** Quadradinho da timeline. Acende (dourado) quando a fase passa da linha de 60% da tela. */
@@ -73,13 +74,9 @@ export default function Experience() {
       {/* Título (sticky só a partir de 860px) */}
       <div className="self-start tab:sticky tab:top-30">
         <Reveal>
-          <p className="text-eyebrow text-secondary">
-            {experienceCopy.eyebrow}
-          </p>
-        </Reveal>
-        <Reveal delay={1}>
-          <h2 className="mt-3 mb-4.5 text-h2">
-            <GradientText title={experienceCopy.title} />
+          <h2 className="mb-4.5 text-h2">
+            <Kicker text={experienceCopy.eyebrow} />
+            <PlainTitle title={experienceCopy.title} />
           </h2>
         </Reveal>
         <Reveal delay={2}>
@@ -111,7 +108,7 @@ export default function Experience() {
             className="relative pb-16"
           >
             <Checkpoint on={index < activeSteps} />
-            <p className="font-mono text-label-lg tracking-label text-secondary uppercase">
+            <p className="font-mono text-label-lg text-secondary">
               {item.dates}
             </p>
             <h3 className="mt-1.5 mb-0.5 text-title-lg">{item.role}</h3>
@@ -125,11 +122,12 @@ export default function Experience() {
         {/* 4ª fase: bloqueada (nunca acende) */}
         <li className="relative">
           <Checkpoint on={false} />
-          <p className="font-mono text-label-lg tracking-label text-secondary uppercase">
+          <p className="font-mono text-label-lg text-secondary">
             {experienceCopy.nextPhase.when}
           </p>
           <h3 className="mt-1.5 mb-0.5 text-title-lg text-secondary">
-            {experienceCopy.nextPhase.title}
+            {/* Ainda não desbloqueada = ainda não decodificada (item 11) */}
+            <LockedText text={experienceCopy.nextPhase.title} />
           </h3>
           <p className="text-sm text-secondary">
             {experienceCopy.nextPhase.action}

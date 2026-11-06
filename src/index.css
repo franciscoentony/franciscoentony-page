@@ -98,17 +98,12 @@
   --color-toast: #1c1c1f; /* fundo do toast */
   --color-line: rgba(255, 255, 255, 0.08); /* bordas de 1px e divisores */
   --color-line-strong: rgba(255, 255, 255, 0.18); /* borda no hover */
-  --color-line-holo: rgba(
-    255,
-    255,
-    255,
-    0.09
-  ); /* borda dos cards holográficos */
   --color-paper: #f5f5f7; /* texto principal */
   --color-nav: #d2d2d7; /* links da navbar */
   --color-prose: #d2d2d7; /* texto corrido dos posts (menos "duro" que paper) */
   --color-secondary: #86868b; /* texto secundário */
   --color-muted: #48484d; /* texto apagado (só decorativo, contraste baixo) */
+  --color-kicker: #6e6e73; /* 1º tom das manchetes (a palavra do jogo, adendo v4) */
   --color-accent: #8b6cff; /* violeta */
   --color-accent-soft: #c9bcff; /* lavanda: links */
   --color-gold: #ffd25e; /* dourado: logo, checkpoints, raridade */
@@ -212,6 +207,21 @@
   --text-reading-sm: 18px; /* texto corrido abaixo de 860px */
   --text-reading-sm--line-height: 1.7;
   --text-reading-sm--letter-spacing: -0.012em;
+  --text-tile: clamp(
+    20px,
+    1.9vw,
+    26px
+  ); /* título dos posts no diário da Home */
+  --text-tile--line-height: 1.2;
+  --text-tile--letter-spacing: -0.025em;
+  --text-tile--font-weight: 600;
+  --text-more: clamp(
+    22px,
+    2.2vw,
+    30px
+  ); /* "Mais registros no diário. Todos os posts" */
+  --text-more--letter-spacing: -0.025em;
+  --text-more--font-weight: 600;
   --text-caption: 14px; /* legendas das fotos */
   --text-caption--line-height: 1.5;
 
@@ -573,6 +583,15 @@
     rgba(255, 255, 255, 0) 45%
   );
   transition: opacity 0.4s;
+}
+
+/* Campo ASCII do contato: um vão atrás do texto (18%), para ler o título (item 14) */
+@utility field-clearing {
+  mask: radial-gradient(
+    ellipse 34% 30% at 50% 50%,
+    rgb(0 0 0 / 0.18) 40%,
+    #000 100%
+  );
 }
 
 /* Lente na foto da ficha: um furo de 74px na posição do mouse (--px, --py) */

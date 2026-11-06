@@ -1,9 +1,16 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import ExternalArrow from "./ExternalArrow";
+import {
+  buttonBase as base,
+  buttonSizes as sizes,
+  buttonVariants as variants,
+  primaryPadding,
+} from "./buttonStyles";
 
 interface ButtonProps {
   children: ReactNode;
-  /** "primary" = pill branca; "link" = texto lavanda com underline no hover. */
+  /** "primary" = pill branca; "link" = texto branco com underline no hover. */
   variant?: "primary" | "link";
   /** "sm" = versão pequena (ex.: CTA da navbar). */
   size?: "md" | "sm";
@@ -11,32 +18,12 @@ interface ButtonProps {
   to?: string;
   /** Link externo ou âncora comum (ex.: "https://github.com/..."). */
   href?: string;
-  /** Abre o href em nova aba. */
+  /** Abre o href em nova aba (o link de texto ganha a seta ↗ desenhada). */
   external?: boolean;
   onClick?: () => void;
   className?: string;
   ariaLabel?: string;
 }
-
-const base =
-  "inline-flex items-center gap-1.5 rounded-full font-medium transition-[color,background-color,box-shadow,scale] duration-300";
-
-const variants = {
-  primary:
-    "bg-paper text-ink hover:scale-[1.03] hover:shadow-ring-soft cursor-pointer",
-  link: "text-accent-soft hover:underline underline-offset-4 cursor-pointer",
-};
-
-const sizes = {
-  md: "text-sm py-2.5",
-  sm: "text-xs py-[5px]",
-};
-
-// Padding horizontal do botão primário (o "link" usa sempre px-1.5).
-const primaryPadding = {
-  md: "px-5",
-  sm: "px-[13px]",
-};
 
 /**
  * Botão do site. Vira <Link>, <a> ou <button> dependendo das props:
@@ -82,6 +69,7 @@ export default function Button({
         rel={external ? "noopener noreferrer" : undefined}
       >
         {children}
+        {external && variant === "link" && <ExternalArrow />}
       </a>
     );
   }

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { links, projects as projectsCopy } from "../../content/ui";
 import { projectSlug, type Project } from "../../data/projects";
 import { getProjectShape } from "../../lib/asciiShapes";
+import ExternalArrow from "../ui/ExternalArrow";
 import HoloCard from "../ui/HoloCard";
 import ProjectThumb from "./ProjectThumb";
 
@@ -53,7 +54,8 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           {project.description}
         </p>
 
-        <div className="mt-auto flex justify-between gap-3 font-mono text-label text-secondary">
+        {/* Tecnologias em sans (item 8); "GitHub ↗" em texto */}
+        <div className="mt-auto flex justify-between gap-3 text-small text-secondary">
           <span>{project.topics.join(" · ")}</span>
           <a
             href={project.url}
@@ -63,6 +65,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
             className="relative z-10 shrink-0 text-paper hover:underline"
           >
             {projectsCopy.cardGithubLink}
+            <ExternalArrow />
             <span className="sr-only">
               {" "}
               {project.name} {links.newTabLabel}

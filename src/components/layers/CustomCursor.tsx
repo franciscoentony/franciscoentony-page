@@ -426,7 +426,7 @@ function CursorLayer() {
         className={`pointer-events-none fixed top-0 left-0 z-100 grid place-items-center rounded-full border transition-[width,height,background-color,border-color,opacity] duration-450 ${ringStyles[mode]} ${ringOpacity}`}
       >
         <span
-          className={`font-mono text-label-2xs tracking-label-widest whitespace-nowrap text-white transition-all duration-350 ${
+          className={`text-xs whitespace-nowrap text-white transition-all duration-350 ${
             label ? "scale-100 opacity-100" : "scale-80 opacity-0"
           }`}
         >

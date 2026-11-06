@@ -128,7 +128,7 @@ export default function ContactField() {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="absolute inset-0 size-full"
+      className="field-clearing absolute inset-0 size-full"
     />
   );
 }

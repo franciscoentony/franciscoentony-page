@@ -44,6 +44,17 @@ export default function Footer() {
             <li>
               <a href="#top" className={linkClass}>
                 {footer.backToTop}
+                {/* Seta para cima desenhada (item 15) */}
+                <svg
+                  viewBox="0 0 10 10"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  aria-hidden="true"
+                  className="ml-1 inline-block size-[0.6em] align-[0.05em]"
+                >
+                  <path d="M5 8.5v-7M2 4.5l3-3 3 3" />
+                </svg>
               </a>
             </li>
           </ul>

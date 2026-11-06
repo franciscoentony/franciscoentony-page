@@ -198,7 +198,7 @@ export default function Portrait({ cardActive }: PortraitProps) {
   return (
     <div
       ref={boxRef}
-      className="relative my-4 flex-1 overflow-hidden rounded-portrait border border-line bg-void"
+      className="relative my-4 flex-1 overflow-hidden rounded-portrait bg-void"
     >
       <canvas
         ref={canvasRef}

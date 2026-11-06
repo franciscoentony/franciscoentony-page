@@ -13,6 +13,7 @@ interface CopyButtonProps {
   done: string;
   /** Rótulo se a cópia falhar ("Não deu para copiar"). */
   failed: string;
+  /** Classes do botão. Padrão: texto que clareia no hover. */
   className?: string;
 }
 
@@ -31,7 +32,7 @@ export default function CopyButton({
   label,
   done,
   failed,
-  className = "",
+  className = "transition-colors duration-300 hover:text-paper",
 }: CopyButtonProps) {
   const labelRef = useRef<HTMLSpanElement>(null);
   const liveRef = useRef<HTMLSpanElement>(null);
@@ -83,7 +84,7 @@ export default function CopyButton({
         type="button"
         aria-label={label ?? idle}
         onClick={handleClick}
-        className={`transition-colors duration-300 hover:text-paper ${className}`}
+        className={className}
       >
         {/* tabular-nums não ajuda aqui; o rótulo muda de largura e tudo bem */}
         <span ref={labelRef}>{idle}</span>

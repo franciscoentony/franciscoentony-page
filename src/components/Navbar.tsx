@@ -474,7 +474,7 @@ export default function Navbar() {
             label={contact.copyEmailLabel}
             done={contact.emailCopied}
             failed={contact.copyFailed}
-            className="text-white"
+            className="text-white transition-opacity duration-300 hover:opacity-80"
           />
           {[
             { label: contact.githubLink, href: links.github },

@@ -14,7 +14,8 @@ export default function CharacterCard() {
       innerClassName="flex flex-col p-gutter"
       onActiveChange={setActive}
     >
-      <div className="flex items-baseline justify-between font-mono text-label tracking-label-md text-secondary">
+      {/* Rótulos em sans e caixa normal (item 6); os números seguem em Doto */}
+      <div className="flex items-baseline justify-between text-xs text-secondary">
         <span>{card.header}</span>
         <b className="font-dot text-level text-gold">{card.level}</b>
       </div>
@@ -28,7 +29,7 @@ export default function CharacterCard() {
         {card.attributes.map((attribute) => (
           <div
             key={attribute.label}
-            className="flex flex-col-reverse font-mono text-label-xs tracking-label text-secondary"
+            className="flex flex-col-reverse text-xs text-secondary"
           >
             <dt>{attribute.label}</dt>
             <dd className="font-dot text-xl font-black tracking-normal text-paper">

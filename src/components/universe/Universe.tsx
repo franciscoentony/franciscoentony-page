@@ -38,14 +38,14 @@ export default function Universe() {
 // ---------- Partes reutilizadas nas duas versões ----------
 
 /**
- * Eyebrow, h1 e CTAs do hero.
+ * h1, CTAs e a assinatura do hero. A assinatura é o antigo eyebrow do
+ * Entony (mesmo texto), agora abaixo dos CTAs: o h1 fala primeiro (item 2).
  * ctaRef: na versão animada, o scroll marca os CTAs como "inert" quando o
  * hero some (não recebem foco nem clique). O h1 continua acessível.
  */
 function HeroCopy({ ctaRef }: { ctaRef?: RefObject<HTMLDivElement | null> }) {
   return (
     <>
-      <p className="mb-3.5 text-eyebrow text-secondary">{hero.eyebrow}</p>
       <h1 className="mx-auto text-h1 max-[400px]:text-h1-compact tab:max-w-[14ch]">
         <GradientText title={hero.title} />
       </h1>
@@ -58,12 +58,13 @@ function HeroCopy({ ctaRef }: { ctaRef?: RefObject<HTMLDivElement | null> }) {
           {hero.secondaryCta}
         </Button>
       </div>
+      <p className="mt-5.5 text-caption text-secondary">{hero.eyebrow}</p>
     </>
   );
 }
 
 /**
- * Número, título e subtítulo de um capítulo.
+ * Nome ("Origem"), título e subtítulo de um capítulo.
  * align: "side" = alinhado à esquerda a partir de 860px (C1 e C2 na versão
  * animada); "left"/"right" = blocos da versão reduced motion; "center" = C3.
  */
@@ -87,8 +88,8 @@ function ChapterCopy({
 
   return (
     <>
-      <p className="mb-4.5 font-dot text-chapter text-accent-soft">
-        {chapter.number}
+      <p className="mb-4.5 text-body-sm font-medium text-secondary">
+        {chapter.name}
       </p>
       <h2 className={`max-w-[16ch] text-h2 ${margin}`}>{chapter.title}</h2>
       <p
@@ -230,7 +231,7 @@ function UniverseAnimated() {
           ref={hintRef}
           aria-hidden="true"
           data-on="true"
-          className="transition-opacity duration-700 data-[on=false]:opacity-0 absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5 font-mono text-label tracking-label-wide text-secondary uppercase text-shadow-chapter"
+          className="transition-opacity duration-700 data-[on=false]:opacity-0 absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5 text-xs text-secondary text-shadow-hint"
         >
           {hero.scrollHint}
           <span className="h-9 w-px animate-drip bg-linear-to-b from-secondary to-transparent" />
@@ -239,7 +240,7 @@ function UniverseAnimated() {
         {/* Capítulos: começam invisíveis; o scroll controla a opacidade */}
         {chapters.map((chapter, index) => (
           <div
-            key={chapter.number}
+            key={chapter.name}
             ref={(element) => {
               chapterRefs.current[index] = element;
             }}
@@ -278,7 +279,7 @@ function UniverseStatic() {
             center: "text-center",
           }[align];
           return (
-            <div key={chapter.number} className={textAlign}>
+            <div key={chapter.name} className={textAlign}>
               <ChapterCopy index={index} align={align} />
             </div>
           );

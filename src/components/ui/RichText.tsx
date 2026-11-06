@@ -26,3 +26,35 @@ export function GradientText({ title }: { title: GradientTitle }) {
     </>
   );
 }
+
+/**
+ * A palavra do jogo como 1º tom da manchete (adendo v4, item 1): o antigo
+ * eyebrow ("Player 1") entra no começo do h2, num cinza mais escuro.
+ * Mesmo texto; ganha ponto final se não tiver pontuação ("Player 1.").
+ * `breakAfter` quebra a linha depois dele (ex.: "Continue?").
+ */
+export function Kicker({
+  text,
+  breakAfter = false,
+}: {
+  text: string;
+  breakAfter?: boolean;
+}) {
+  const withPunctuation = /[.?!]$/.test(text) ? text : `${text}.`;
+  return (
+    <>
+      <span className="text-kicker">{withPunctuation}</span>
+      {breakAfter ? <br /> : " "}
+    </>
+  );
+}
+
+/** Título que antes tinha o final em gradiente, agora num tom só (item 3). */
+export function PlainTitle({ title }: { title: GradientTitle }) {
+  return (
+    <>
+      {title.start}
+      {title.gradient}
+    </>
+  );
+}

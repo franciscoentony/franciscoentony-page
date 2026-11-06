@@ -2,7 +2,7 @@ import { player, sectionIds } from "../content/ui";
 import CharacterCard from "./about/CharacterCard";
 import Counter from "./ui/Counter";
 import Reveal from "./ui/Reveal";
-import { GradientText } from "./ui/RichText";
+import { Kicker, PlainTitle } from "./ui/RichText";
 import Section from "./ui/Section";
 import WordReveal from "./ui/WordReveal";
 
@@ -15,11 +15,9 @@ export default function About() {
     >
       <div>
         <Reveal>
-          <p className="text-eyebrow text-secondary">{player.eyebrow}</p>
-        </Reveal>
-        <Reveal delay={1}>
-          <h2 className="mt-3 mb-gutter text-h2">
-            <GradientText title={player.title} />
+          <h2 className="mb-gutter text-h2">
+            <Kicker text={player.eyebrow} />
+            <PlainTitle title={player.title} />
           </h2>
         </Reveal>
         <Reveal delay={2}>
@@ -32,7 +30,7 @@ export default function About() {
               <Counter
                 value={stat.value}
                 suffix={stat.suffix}
-                className="block font-dot text-stat text-gradient"
+                className="block font-dot text-stat text-paper"
               />
               <p className="mt-2.5 text-small text-secondary">{stat.label}</p>
             </Reveal>

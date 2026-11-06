@@ -6,6 +6,7 @@ import ProjectCard from "./projects/ProjectCard";
 import Button from "./ui/Button";
 import Container from "./ui/Container";
 import Reveal from "./ui/Reveal";
+import { Kicker } from "./ui/RichText";
 
 /**
  * Seção "Missões" (Projetos): carrossel horizontal com scroll-snap e dots.
@@ -69,12 +70,10 @@ export default function Projects() {
       <Container className="mb-10 flex flex-wrap items-end justify-between gap-6">
         <div>
           <Reveal>
-            <p className="text-eyebrow text-secondary">
-              {projectsCopy.eyebrow}
-            </p>
-          </Reveal>
-          <Reveal delay={1}>
-            <h2 className="mt-3 text-h2">{projectsCopy.title}</h2>
+            <h2 className="text-h2">
+              <Kicker text={projectsCopy.eyebrow} />
+              {projectsCopy.title}
+            </h2>
           </Reveal>
         </div>
         <Reveal delay={2}>
@@ -110,7 +109,8 @@ export default function Projects() {
         ))}
       </ul>
 
-      {/* Dots: atalho visual para o mouse (no teclado, use as setas) */}
+      {/* Segmentos de um filete (item 9): atalho visual para o mouse (no
+          teclado, use as setas). O ativo se enche de gold → lavanda. */}
       <div aria-hidden="true" className="relative flex justify-center gap-2">
         {projects.map((project, index) => (
           <button
@@ -118,8 +118,10 @@ export default function Projects() {
             type="button"
             tabIndex={-1}
             onClick={() => goTo(index)}
-            className={`h-2 rounded-full transition-all duration-400 ${
-              index === activeIndex ? "w-6 bg-paper" : "w-2 bg-muted"
+            className={`relative h-[13px] w-8 cursor-pointer after:absolute after:inset-x-0 after:top-1.5 after:h-px after:transition-[background-color,box-shadow] after:duration-400 after:content-[''] ${
+              index === activeIndex
+                ? "after:bg-linear-to-r after:from-gold after:to-accent-soft after:shadow-glow-gold"
+                : "after:bg-line-strong"
             }`}
           />
         ))}

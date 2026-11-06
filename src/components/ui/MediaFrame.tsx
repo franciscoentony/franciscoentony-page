@@ -10,6 +10,8 @@ interface MediaFrameProps {
   height?: number;
   sizes?: string;
   className?: string;
+  /** Classes extras da <img> (ex.: zoom no hover do card). */
+  imgClassName?: string;
 }
 
 /**
@@ -24,6 +26,7 @@ export default function MediaFrame({
   height,
   sizes,
   className = "",
+  imgClassName = "",
 }: MediaFrameProps) {
   const frameRef = useRef<HTMLSpanElement>(null);
 
@@ -45,6 +48,7 @@ export default function MediaFrame({
         width={width}
         height={height}
         sizes={sizes}
+        className={imgClassName}
         loading="lazy"
         decoding="async"
       />

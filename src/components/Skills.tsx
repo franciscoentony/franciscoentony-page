@@ -3,7 +3,7 @@ import { skills } from "../data/skills";
 import { useQuality } from "../hooks/useQuality";
 import SkillsSphere from "./skills/SkillsSphere";
 import Reveal from "./ui/Reveal";
-import { GradientText } from "./ui/RichText";
+import { Kicker, PlainTitle } from "./ui/RichText";
 import Section from "./ui/Section";
 
 /** Seção "Inventário" (Habilidades): esfera 3D de tags + 4 colunas de skills.ts. */
@@ -14,11 +14,9 @@ export default function Skills() {
     <Section id={sectionIds.skills}>
       <div className="mx-auto max-w-[720px] text-center">
         <Reveal>
-          <p className="text-eyebrow text-secondary">{skillsCopy.eyebrow}</p>
-        </Reveal>
-        <Reveal delay={1}>
-          <h2 className="mt-3 mb-4.5 text-h2">
-            <GradientText title={skillsCopy.title} />
+          <h2 className="mb-4.5 text-h2">
+            <Kicker text={skillsCopy.eyebrow} />
+            <PlainTitle title={skillsCopy.title} />
           </h2>
         </Reveal>
         <Reveal delay={2}>

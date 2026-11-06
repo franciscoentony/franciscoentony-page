@@ -1,7 +1,6 @@
 import { blog } from "../../content/ui";
 import type { Post } from "../../data/posts";
 import type { PostsStatus } from "../../hooks/usePosts";
-import Button from "../ui/Button";
 import Reveal from "../ui/Reveal";
 import PostCard from "./PostCard";
 
@@ -15,8 +14,6 @@ interface PostGridProps {
    * só com 5 posts ou mais passa a 3 colunas a partir de 860px.
    */
   pageLayout?: boolean;
-  /** Teaser da Home: completa a 3ª posição com um card-convite (DS-14). */
-  showInvite?: boolean;
 }
 
 /** Grade de posts (3 colunas; 1 abaixo de 860px) com os estados de loading, erro e vazio. */
@@ -25,7 +22,6 @@ export default function PostGrid({
   posts,
   headingLevel,
   showTags,
-  showInvite = false,
   pageLayout = false,
 }: PostGridProps) {
   // Teaser: 1 → 2 (640px) → 3 colunas (860px). /blog com menos de 5 posts: fica em 2.
@@ -75,23 +71,6 @@ export default function PostGrid({
           </Reveal>
         </li>
       ))}
-
-      {/* Menos de 3 posts no teaser: convite para o blog na posição que sobra */}
-      {showInvite && posts.length < 3 && (
-        <li>
-          <Reveal
-            delay={((posts.length % 3) + 1) as 1 | 2 | 3}
-            className="h-full"
-          >
-            <div className="flex h-full min-h-[250px] flex-col justify-between gap-3 rounded-lg border border-dashed border-line-strong p-6.5">
-              <p className="text-title-sm text-secondary">{blog.inviteTitle}</p>
-              <Button variant="link" to="/blog" className="-ml-1.5 self-start">
-                {blog.allPostsLink}
-              </Button>
-            </div>
-          </Reveal>
-        </li>
-      )}
     </ul>
   );
 }

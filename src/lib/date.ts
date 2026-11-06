@@ -35,3 +35,15 @@ export function readMinutes(readTime: string): number | null {
   const minutes = Number(/\d+/.exec(readTime)?.[0]);
   return minutes > 0 ? minutes : null;
 }
+
+/** Data por extenso sem o dia da semana: "2026-06-06" → "6 de junho de 2026". */
+export function formatMediumDate(iso: string): string {
+  const date = new Date(`${iso.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return iso;
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}

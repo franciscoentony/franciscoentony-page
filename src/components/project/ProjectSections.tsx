@@ -431,7 +431,7 @@ export function CloneLine({ project }: { project: Project }) {
         idle={projectPage.copy}
         done={projectPage.copied}
         failed={projectPage.copyFailed}
-        className="text-body-sm text-prose"
+        className="text-body-sm text-prose transition-colors duration-300 hover:text-paper"
       />
     </div>
   );

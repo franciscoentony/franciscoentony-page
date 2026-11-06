@@ -34,6 +34,8 @@ async function canvasDraws(page: Page) {
         fixed: cs.position === "fixed",
         inViewport: r.bottom > 0 && r.top < innerHeight && r.width > 0,
         ratio: c.clientWidth ? c.width / c.clientWidth : 0,
+        // canvas entregue a um Worker (OffscreenCanvas): não dá para instrumentar na main thread
+        worker: (() => { try { c.getContext("2d"); c.getContext("webgl"); return false; } catch { return true; } })(),
       };
     }),
   );
@@ -91,6 +93,8 @@ test.describe("prefers-reduced-motion: reduce (comportamento do HANDOFF §4, D8)
         const out: string[] = [];
         document.querySelectorAll("h1,h2,h3,h4,p,li,a,button,span,time").forEach((el) => {
           if (!el.textContent?.trim() || el.closest('[aria-hidden="true"]')) return;
+          // não renderizado (ex.: menu mobile fechado, atributo hidden / display:none): ninguém vê
+          if (!(el as HTMLElement).checkVisibility()) return;
           let o = 1;
           let t = false;
           for (let p: Element | null = el; p; p = p.parentElement) {
@@ -161,6 +165,27 @@ test.describe("prefers-reduced-motion: reduce (comportamento do HANDOFF §4, D8)
   });
 });
 
+test.describe("Objetos arrastáveis do hero (RM)", () => {
+  test.use({ reducedMotion: "reduce" });
+  test("[RM-06] Home: objetos do hero parados e sem áreas de arrasto @redesign", async ({ page }, testInfo) => {
+    test.skip(!["w1280", "w375"].includes(testInfo.project.name), "1280 e 375");
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await settle(page);
+    await page.waitForTimeout(1000);
+    const grabs = await page.locator('#top [data-cursor="drag"].rounded-full').count();
+    expect.soft(grabs, "com reduced-motion não pode haver áreas de pegar/arrastar no hero").toBe(0);
+    // tentativa de arrasto no centro do hero: nada pode "pegar" (html.grabbing) nem mover objetos
+    const v = page.viewportSize()!;
+    await page.mouse.move(v.width * 0.7, v.height * 0.5);
+    await page.mouse.down();
+    await page.mouse.move(v.width * 0.3, v.height * 0.3, { steps: 12 });
+    const grabbing = await page.evaluate(() => document.documentElement.classList.contains("grabbing"));
+    await page.mouse.up();
+    await attachJson(testInfo, "hero-arrasto", { grabs, grabbing });
+    expect.soft(grabbing, "html.grabbing durante o arrasto: objeto foi pego com reduced-motion").toBe(false);
+  });
+});
+
 test.describe("Performance dos canvases (D9)", () => {
   test("[PF-01] canvas fora da viewport fica pausado; visível anima @redesign", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "w1440", "1440");
@@ -175,7 +200,9 @@ test.describe("Performance dos canvases (D9)", () => {
     await page.waitForTimeout(1000);
     const topo = await canvasDraws(page);
     const animandoNoTopo = topo.filter((c) => c.inViewport && c.draws > inicio[c.i].draws);
-    expect.soft(animandoNoTopo.length, "sanidade: algum canvas visível deveria animar sem reduced-motion").toBeGreaterThan(0);
+    // planeta e estrelas rodam em Worker (A8) e não são contáveis aqui: a sanidade só vale se houver canvas da main thread visível
+    const visiveisMain = topo.filter((c) => c.inViewport && !c.worker && !c.fixed); // fixed da main thread = trilha do cursor, só desenha com o mouse em movimento
+    if (visiveisMain.length > 0) expect.soft(animandoNoTopo.length, "sanidade: algum canvas visível deveria animar sem reduced-motion").toBeGreaterThan(0);
 
     // vai para o rodapé e mede quem continua desenhando sem estar visível
     await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" as ScrollBehavior }));

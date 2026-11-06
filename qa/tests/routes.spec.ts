@@ -113,6 +113,17 @@ test("[RT-04] slug inexistente mostra estado de 'não encontrado' sem quebrar @d
   expect.soft(con.issues, formatIssues(con.issues)).toEqual([]);
 });
 
+test("[RT-04b] /projetos/<slug inexistente> mostra 'não encontrado' sem quebrar @dod", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "w1280", "uma largura basta");
+  const con = watchConsole(page);
+  await page.goto("/projetos/projeto-que-nao-existe-qa", { waitUntil: "domcontentloaded" });
+  await settle(page);
+  await expect(page.locator("h1").first()).toBeVisible();
+  await expect(page.locator("body")).toContainText(/não encontrado|404/i);
+  await page.screenshot({ path: shotPath(testInfo, "projeto-404") });
+  expect.soft(con.issues, formatIssues(con.issues)).toEqual([]);
+});
+
 test("[RT-05] 404.html existe e é a SPA (fallback do GitHub Pages) @dod", async ({ request }, testInfo) => {
   test.skip(testInfo.project.name !== "w1280", "uma largura basta");
   // Em local o vite preview não usa 404.html; buscamos o arquivo diretamente.

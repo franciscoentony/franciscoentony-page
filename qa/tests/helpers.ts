@@ -34,6 +34,12 @@ export async function routes(): Promise<RouteDef[]> {
     { id: "home", path: "/", label: "Home" },
     { id: "blog", path: "/blog", label: "Blog" },
     { id: "post", path: `/blog/${slug}`, label: `Post (${slug})` },
+    // páginas v3 de projeto (rotas estáticas; slugs derivados de projectSlug() em src/data/projects.ts)
+    ...["connect", "petca", "franciscoentony-page", "fullstack-filmes"].map((p) => ({
+      id: `projeto-${p}`,
+      path: `/projetos/${p}`,
+      label: `Projeto (${p})`,
+    })),
   ];
 }
 

@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { contact, links, navbar, sectionIds } from "../content/ui";
 import { useIsOverUniverse } from "../hooks/useIsOverUniverse";
+import { useSectionClick } from "../hooks/useSectionClick";
 import { useQuality } from "../hooks/useQuality";
 import { NAVBAR, clamp } from "../lib/motion";
 import CopyButton from "./ui/CopyButton";
@@ -64,6 +65,8 @@ export default function Navbar() {
   const { pathname } = useLocation();
   const isHome = pathname === "/";
   const { settings } = useQuality();
+  // Itens de seção rolam até a seção sem # na URL (o "Blog" é rota normal)
+  const sectionClick = useSectionClick();
   // Sobre o Universe (só céu escuro atrás) o vidro dispensa o blur (A5)
   const overUniverse = useIsOverUniverse();
 
@@ -286,7 +289,10 @@ export default function Navbar() {
           {/* Logo do Entony: "F." em accent com um leve brilho */}
           <Link
             to="/#top"
-            onClick={closeMenu}
+            onClick={(event) => {
+              closeMenu();
+              sectionClick(event, "/#top");
+            }}
             aria-label={navbar.logoLabel}
             className={`flex items-center gap-1 text-lg font-bold tracking-[-0.025em] transition-opacity duration-300 ${
               isCompact ? "tab:pointer-events-none tab:opacity-0" : ""
@@ -313,6 +319,7 @@ export default function Navbar() {
                   <li key={checkpoint.label} className="flex items-center">
                     <Link
                       to={checkpoint.to}
+                      onClick={(event) => sectionClick(event, checkpoint.to)}
                       aria-current={
                         state === "current" ? "location" : undefined
                       }
@@ -447,7 +454,10 @@ export default function Navbar() {
                 />
                 <Link
                   to={checkpoint.to}
-                  onClick={closeMenu}
+                  onClick={(event) => {
+                    closeMenu();
+                    sectionClick(event, checkpoint.to);
+                  }}
                   aria-current={index === current ? "location" : undefined}
                   // Entrada em escada: cada item 40ms depois do anterior
                   style={{

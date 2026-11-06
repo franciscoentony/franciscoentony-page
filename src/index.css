@@ -904,6 +904,14 @@ h2 {
 }
 
 /* Foco visível em tudo que é navegável por teclado (D8) */
+/* Seções focadas por código (links de seção sem #, lib/sectionNav.ts):
+   o foco vai para a seção inteira só para o leitor de tela e o Tab
+   continuarem dali; um contorno em volta da seção não ajuda ninguém */
+section[tabindex="-1"]:focus,
+div#top[tabindex="-1"]:focus {
+  outline: none;
+}
+
 /* Segurando um objeto do hero: o cursor do sistema vira "grabbing". Só no
    html (sem "*": um seletor universal pesa em todo recálculo de estilo);
    com o cursor foguete ativo, o do sistema já fica escondido. */

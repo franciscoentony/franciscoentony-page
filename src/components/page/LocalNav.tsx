@@ -7,6 +7,7 @@ import {
 } from "react";
 import { Link } from "react-router-dom";
 import { useQuality } from "../../hooks/useQuality";
+import { useSectionClick } from "../../hooks/useSectionClick";
 import { clamp } from "../../lib/motion";
 
 interface LocalNavProps {
@@ -46,6 +47,8 @@ export default function LocalNav({
   const { settings } = useQuality();
   const [pastTitle, setPastTitle] = useState(false);
   const barRef = useRef<HTMLSpanElement>(null);
+  // "Projetos" leva a /#projetos: vai para a Home e rola, sem # na URL
+  const sectionClick = useSectionClick();
 
   // Um listener de scroll (passivo) cuida do título e do filete.
   // O filete é escrito direto no estilo (só transform, sem re-render).
@@ -91,6 +94,7 @@ export default function LocalNav({
       >
         <Link
           to={sectionTo}
+          onClick={(event) => sectionClick(event, sectionTo)}
           className="inline-flex min-w-0 items-baseline gap-2.5 text-local-nav text-paper"
         >
           {section}

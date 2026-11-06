@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { useSectionClick } from "../../hooks/useSectionClick";
 import ExternalArrow from "./ExternalArrow";
 import {
   buttonBase as base,
@@ -42,6 +43,8 @@ export default function Button({
   className = "",
   ariaLabel,
 }: ButtonProps) {
+  // Links de seção da Home ("/#contato") rolam sem # na URL
+  const sectionClick = useSectionClick();
   const padding = variant === "primary" ? primaryPadding[size] : "px-1.5";
   const classes = `${base} ${variants[variant]} ${sizes[size]} ${padding} ${className}`;
 
@@ -49,7 +52,10 @@ export default function Button({
     return (
       <Link
         to={to}
-        onClick={onClick}
+        onClick={(event) => {
+          onClick?.();
+          sectionClick(event, to);
+        }}
         className={classes}
         aria-label={ariaLabel}
       >

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { footer, links } from "../content/ui";
+import { useSectionClick } from "../hooks/useSectionClick";
 import Container from "./ui/Container";
 
 // inline-block + py-1.5: área de toque de pelo menos 24px de altura (DF-18, WCAG 2.5.8)
@@ -7,6 +8,8 @@ const linkClass =
   "inline-block py-1.5 transition-[color] duration-200 hover:text-paper";
 
 export default function Footer() {
+  // "Topo" rola para o início da página atual sem # na URL
+  const sectionClick = useSectionClick();
   return (
     <footer className="border-t border-line pt-4 pb-8.5 text-xs text-secondary">
       <Container className="flex flex-wrap items-center justify-between gap-x-4">
@@ -42,7 +45,11 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <a href="#top" className={linkClass}>
+              <a
+                href="#top"
+                onClick={(event) => sectionClick(event, "#top")}
+                className={linkClass}
+              >
                 {footer.backToTop}
                 {/* Seta para cima desenhada (item 15) */}
                 <svg

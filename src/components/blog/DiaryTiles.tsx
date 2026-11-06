@@ -92,7 +92,9 @@ export default function DiaryTiles({
         to="/blog"
         className="mt-14 inline-block text-more decoration-accent-soft/60 underline-offset-[0.18em] hover:underline"
       >
-        <span className="text-kicker">{blog.inviteTitle}.</span>{" "}
+        {/* secondary, não kicker: em 22–30px semibold ainda não é "texto
+            grande" para o AA e o #6e6e73 dá 4.1:1 (D17) */}
+        <span className="text-secondary">{blog.inviteTitle}.</span>{" "}
         {blog.allPostsLink}
       </Link>
     </>

@@ -59,6 +59,8 @@ export const navbar = {
   cta: { label: "Contato", to: `/#${sectionIds.contact}` },
   menuOpenLabel: "Abrir menu",
   menuCloseLabel: "Fechar menu",
+  /** Nome da folha do menu no celular (role="dialog"). */
+  menuLabel: "Menu",
 };
 
 // ---------- Hero / Universe ----------
@@ -219,7 +221,7 @@ export const projectPage = {
   copied: "Copiado",
   copyFailed: "Não deu para copiar",
   next: "Próximo projeto.",
-  // PENDENTE de aprovação do Entony (D3): slug que não existe
+  // Slug que não existe (aprovado pelo Entony)
   notFoundTitle: "Projeto não encontrado.",
   notFoundText: "O link pode estar quebrado ou o projeto mudou de nome.",
 };
@@ -309,9 +311,12 @@ export const contact = {
   eyebrow: "Continue?",
   title: { start: "Bora trocar ", gradient: "uma ideia?" } as GradientTitle,
   lead: "Seja pra falar de projetos, oportunidades ou só sobre tecnologia.",
-  githubLink: "GitHub ›",
-  linkedinLink: "LinkedIn ›",
+  githubLink: "GitHub",
+  linkedinLink: "LinkedIn",
   copyEmailLabel: "Copiar e-mail",
+  /** O botão do e-mail se decodifica até este texto (sem toast, item 13). */
+  emailCopied: "E-mail copiado",
+  copyFailed: "Não deu para copiar",
 };
 
 // ---------- Cursor custom ----------

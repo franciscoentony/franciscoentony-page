@@ -7,6 +7,8 @@ interface CopyButtonProps {
   value: string | (() => string);
   /** Rótulo parado ("Copiar link"). Também é o nome acessível do botão. */
   idle: string;
+  /** Nome acessível, quando o rótulo não diz a ação (ex.: o próprio e-mail). */
+  label?: string;
   /** Rótulo depois de copiar ("Link copiado"). */
   done: string;
   /** Rótulo se a cópia falhar ("Não deu para copiar"). */
@@ -26,6 +28,7 @@ const HOLD_MS = 2200;
 export default function CopyButton({
   value,
   idle,
+  label,
   done,
   failed,
   className = "",
@@ -78,7 +81,7 @@ export default function CopyButton({
     <>
       <button
         type="button"
-        aria-label={idle}
+        aria-label={label ?? idle}
         onClick={handleClick}
         className={`transition-colors duration-300 hover:text-paper ${className}`}
       >

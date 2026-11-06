@@ -6,7 +6,6 @@ import {
   type RefObject,
 } from "react";
 import { Link } from "react-router-dom";
-import { useHideOnScroll } from "../../hooks/useHideOnScroll";
 import { useQuality } from "../../hooks/useQuality";
 import { clamp } from "../../lib/motion";
 
@@ -30,7 +29,8 @@ const TITLE_GONE_AT = 100;
 
 /**
  * Local nav das páginas de post e projeto (adendo v3), como na Apple:
- * - fixa abaixo da navbar; quando a navbar some ao descer, ela sobe para o topo;
+ * - fixa abaixo do header; quando o header encolhe para a trilha de 10px
+ *   (html[data-header=compact], só a partir de 860px), ela sobe junto;
  * - o nome da seção é o "voltar";
  * - depois que o h1 sai da tela, o título aparece ao lado (cabeçalho corrente);
  * - o filete de baixo (1px) se enche de dourado → lavanda conforme a leitura.
@@ -43,7 +43,6 @@ export default function LocalNav({
   readRef,
   children,
 }: LocalNavProps) {
-  const navHidden = useHideOnScroll();
   const { settings } = useQuality();
   const [pastTitle, setPastTitle] = useState(false);
   const barRef = useRef<HTMLSpanElement>(null);
@@ -62,7 +61,9 @@ export default function LocalNav({
         const progress = clamp(
           -rect.top / Math.max(1, rect.height - window.innerHeight),
         );
-        barRef.current.style.transform = `scaleX(${progress})`;
+        // A propriedade `scale` (não transform): a classe scale-x-0 do Tailwind v4
+        // usa `scale`, que se multiplicaria com um transform e zeraria a trilha
+        barRef.current.style.scale = `${progress} 1`;
       }
     }
     update();
@@ -82,7 +83,7 @@ export default function LocalNav({
         settings.navbarBlur
           ? "bg-ink/72 backdrop-blur-[20px] backdrop-saturate-180"
           : "bg-ink/92"
-      } ${navHidden ? "-translate-y-nav" : "translate-y-0"}`}
+      } tab:in-data-[header=compact]:-translate-y-[calc(var(--spacing-nav)-var(--spacing-nav-compact))]`}
     >
       <nav
         aria-label={section}

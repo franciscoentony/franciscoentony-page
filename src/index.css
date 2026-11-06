@@ -117,6 +117,18 @@
   --color-holo-from: #16131f; /* gradiente dos cards holográficos */
   --color-holo-to: #0b0a10;
   --color-checkpoint: #1b1b1f; /* checkpoint apagado da timeline */
+  --color-trail: rgba(
+    255,
+    255,
+    255,
+    0.14
+  ); /* trilhas do mapa de missão (header) */
+  --color-trail-strong: rgba(
+    255,
+    255,
+    255,
+    0.22
+  ); /* trilha no header compacto */
   --color-cursor-fill: rgba(
     10,
     8,
@@ -127,6 +139,9 @@
   /* Sombras de texto */
   --text-shadow-chapter: 0 0 40px #000000, 0 0 80px #000000;
   --text-shadow-glow-gold: 0 0 18px rgba(255, 210, 94, 0.6);
+  --text-shadow-glow-accent: 0 0 18px rgba(139, 108, 255, 0.55); /* o "F." do logo */
+  --text-shadow-hint:
+    0 0 12px #000, 0 0 24px #000; /* dica de scroll sobre o planeta */
 
   /* Fontes */
   --font-display:
@@ -237,7 +252,7 @@
   --text-small: 13px; /* legendas, toast, classe da ficha */
   --text-small--line-height: 1.4;
   --text-menu: 12.5px; /* links da navbar */
-  --text-menu-overlay: clamp(28px, 8vw, 32px); /* links do menu mobile (D20) */
+  --text-menu-overlay: clamp(28px, 8vw, 34px); /* links do menu mobile (D20) */
   --text-menu-overlay--letter-spacing: -0.03em;
   --text-menu-overlay--font-weight: 600;
   --text-tag: 15px; /* tags da esfera */
@@ -287,7 +302,8 @@
 
   /* Espaçamentos */
   --spacing-section: clamp(110px, 16vh, 180px); /* py-section */
-  --spacing-nav: 48px; /* h-nav */
+  --spacing-nav: 52px; /* h-nav: 52px no celular, 60px a partir de 860px (veja :root abaixo) */
+  --spacing-nav-compact: 10px; /* header compacto: só a trilha do mapa */
   --spacing-lnav: 52px; /* local nav das páginas de projeto e post */
   --spacing-hero-top: clamp(90px, 15vh, 150px); /* topo da headline do hero */
   --spacing-gutter: 22px; /* padding dos cards, gap do carrossel e do footer */
@@ -835,6 +851,13 @@ html.has-custom-cursor * {
  * O fundo fica no <html> (e não no <body>) para que o canvas de estrelas,
  * que usa -z-10, apareça por cima do fundo e por baixo do conteúdo.
  */
+/* Altura do header (mapa de missão, adendo v4): 60px a partir de 860px */
+@media (width >= 53.75rem) {
+  :root {
+    --spacing-nav: 60px;
+  }
+}
+
 html {
   background-color: var(--color-ink);
   color: var(--color-paper);

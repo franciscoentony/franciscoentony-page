@@ -92,8 +92,8 @@ interface CanvasAnimationOptions {
   worker?: CanvasWorkerOptions;
   /**
    * Se o `draw` devolver `false` ("nada a fazer"), o canvas sai do ticker e
-   * só volta no próximo movimento/toque do ponteiro. Usado pelo cursor
-   * custom parado (P5 I-B).
+   * só volta no próximo evento do ponteiro (mover, apertar, soltar ou
+   * entrar em outro elemento). Usado pelo cursor custom parado (P5 I-B, I-7).
    */
   sleepUntilPointer?: boolean;
 }
@@ -238,16 +238,23 @@ export function useCanvasAnimation(
     // Dormindo: fora do ticker até o próximo movimento do ponteiro
     let sleeping = false;
 
+    // Acorda com qualquer mudança do ponteiro: mover, apertar, SOLTAR (senão
+    // o cursor dormia na escala de "pressionado") e passar para outro
+    // elemento sem mexer o mouse (o modo do cursor muda no pointerover, I-7)
     function sleep() {
       sleeping = true;
       updateSubscription();
       window.addEventListener("pointermove", wake, { passive: true });
       window.addEventListener("pointerdown", wake);
+      window.addEventListener("pointerup", wake);
+      document.addEventListener("pointerover", wake);
     }
 
     function wake() {
       window.removeEventListener("pointermove", wake);
       window.removeEventListener("pointerdown", wake);
+      window.removeEventListener("pointerup", wake);
+      document.removeEventListener("pointerover", wake);
       sleeping = false;
       updateSubscription();
     }
@@ -398,6 +405,8 @@ export function useCanvasAnimation(
       unsubscribe?.();
       window.removeEventListener("pointermove", wake);
       window.removeEventListener("pointerdown", wake);
+      window.removeEventListener("pointerup", wake);
+      document.removeEventListener("pointerover", wake);
       worker?.terminate();
       if (worker) workerOptionsRef.current?.onPost?.(null);
       visibilityObserver.disconnect();

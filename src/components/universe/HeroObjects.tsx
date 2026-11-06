@@ -9,6 +9,8 @@ const NUDGE_DELAY_MS = 3200;
 /** Folga da caixa do texto: 24px dos lados, 16px em cima e embaixo. */
 const TEXT_PAD_X = 24;
 const TEXT_PAD_Y = 16;
+/** A área de pegar só se move quando o objeto anda mais que isto (px). */
+const GRAB_SLACK = 12;
 
 /**
  * Mede a caixa do texto do hero (h1 + CTAs + assinatura) nas coordenadas
@@ -84,19 +86,41 @@ export default function HeroObjects({
     return () => observer.disconnect();
   }, [link, heroRef]);
 
-  // As áreas acompanham os objetos (escrito direto no estilo, sem re-render)
+  // As áreas acompanham os objetos (escrito direto no estilo, sem re-render).
+  // São invisíveis e maiores que o objeto, então só se movem quando ele
+  // anda de verdade (mais de 12px): em repouso o objeto só flutua uns
+  // pixels e nada é escrito (mover uma área custa recomposição de camadas).
+  // Segurando, todo quadro.
+  const holdingRef = useRef(false);
   useEffect(() => {
     if (isStatic) return;
+    const written = grabRefs.current.map(() => ({
+      x: NaN,
+      y: NaN,
+      size: "",
+      pe: "",
+    }));
     link.setPositionsListener((positions) => {
       grabRefs.current.forEach((grab, index) => {
         if (!grab) return;
         const x = positions[index * 4];
         const y = positions[index * 4 + 1];
         const r = positions[index * 4 + 2];
-        const canGrab = positions[index * 4 + 3] === 1;
-        grab.style.transform = `translate(${x - r}px, ${y - r}px)`;
-        grab.style.width = grab.style.height = `${r * 2}px`;
-        grab.style.pointerEvents = canGrab ? "auto" : "none";
+        const last = written[index];
+        const moved =
+          Math.abs(x - last.x) > GRAB_SLACK ||
+          Math.abs(y - last.y) > GRAB_SLACK;
+        if (moved || holdingRef.current || Number.isNaN(last.x)) {
+          last.x = x;
+          last.y = y;
+          grab.style.transform = `translate(${Math.round(x - r)}px, ${Math.round(y - r)}px)`;
+        }
+        const size = `${Math.round(r * 2)}px`;
+        if (last.size !== size) {
+          grab.style.width = grab.style.height = last.size = size;
+        }
+        const pointer = positions[index * 4 + 3] === 1 ? "auto" : "none";
+        if (last.pe !== pointer) grab.style.pointerEvents = last.pe = pointer;
       });
     });
     return () => link.setPositionsListener(null);
@@ -126,6 +150,7 @@ export default function HeroObjects({
 
     function grab(index: number, x: number, y: number) {
       holding = true;
+      holdingRef.current = true;
       root.classList.add("grabbing");
       link.send({ op: "grab", index, x, y, t: performance.now() });
     }
@@ -184,6 +209,7 @@ export default function HeroObjects({
       }
       if (!holding) return;
       holding = false;
+      holdingRef.current = false;
       root.classList.remove("grabbing");
       link.send({ op: "release" });
     }

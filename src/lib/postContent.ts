@@ -162,15 +162,29 @@ export function getPostPhoto(
   contentHtml: string,
 ): PostCover | null {
   if (coverSrc) return { src: coverSrc, alt: "" };
-  const doc = new DOMParser().parseFromString(contentHtml, "text/html");
-  const img = doc.querySelector("img");
-  const src = img?.getAttribute("src");
-  if (!img || !src) return null;
+  // Só a 1ª <img> interessa: lê os atributos dela por regex, sem montar o
+  // HTML inteiro (DOMParser), que custa caro na Home (teaser do diário)
+  const tag = /<img\b[^>]*>/i.exec(contentHtml)?.[0];
+  if (!tag) return null;
+  const attr = (name: string) =>
+    new RegExp(`\\s${name}="([^"]*)"`, "i").exec(tag)?.[1];
+  const src = attr("src");
+  if (!src) return null;
   return {
     src,
-    srcSet: img.getAttribute("srcset") ?? undefined,
-    alt: img.getAttribute("alt") ?? "",
-    width: Number(img.getAttribute("width")) || undefined,
-    height: Number(img.getAttribute("height")) || undefined,
+    srcSet: attr("srcset"),
+    alt: decodeAttribute(attr("alt") ?? ""),
+    width: Number(attr("width")) || undefined,
+    height: Number(attr("height")) || undefined,
   };
+}
+
+/** Entidades comuns dentro de atributos HTML (&amp;, &quot;, &#39;...). */
+function decodeAttribute(text: string) {
+  return text
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&#x27;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&");
 }

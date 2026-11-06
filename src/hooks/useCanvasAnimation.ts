@@ -71,6 +71,13 @@ export interface CanvasWorkerOptions {
    * Devolva null para não enviar este quadro (nada mudou).
    */
   frameData: (frame: Omit<CanvasFrame, "ctx">) => unknown;
+  /** Opcional: recebe a resposta "drawn" do worker (ex.: posições). */
+  onDrawn?: (message: { type: "drawn"; [key: string]: unknown }) => void;
+  /**
+   * Opcional: recebe uma função para mandar mensagens ao worker (ou null
+   * quando não há worker, ex.: caiu para a página ou desmontou).
+   */
+  onPost?: (post: ((message: unknown) => void) | null) => void;
 }
 
 interface CanvasAnimationOptions {
@@ -309,6 +316,7 @@ export function useCanvasAnimation(
 
         // O worker terminou um quadro: libera e manda o pendente, se houver
         if (event.data.type === "drawn") {
+          workerOptionsRef.current?.onDrawn?.(event.data);
           workerBusy = false;
           if (pendingTime !== null) {
             const time = pendingTime;
@@ -331,6 +339,10 @@ export function useCanvasAnimation(
           [offscreen],
         );
         modeReady = true;
+        const activeWorker = worker!;
+        workerOptionsRef.current?.onPost?.((message) =>
+          activeWorker.postMessage(message),
+        );
         scheduleStart();
       };
       // Erro ao carregar o worker antes da transferência: volta para a página
@@ -387,6 +399,7 @@ export function useCanvasAnimation(
       window.removeEventListener("pointermove", wake);
       window.removeEventListener("pointerdown", wake);
       worker?.terminate();
+      if (worker) workerOptionsRef.current?.onPost?.(null);
       visibilityObserver.disconnect();
       nearObserver.disconnect();
       resizeObserver.disconnect();

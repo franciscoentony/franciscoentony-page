@@ -904,6 +904,13 @@ h2 {
 }
 
 /* Foco visível em tudo que é navegável por teclado (D8) */
+/* Segurando um objeto do hero: o cursor do sistema vira "grabbing"
+   (quando o cursor foguete está ativo, o do sistema já fica escondido) */
+.grabbing,
+.grabbing * {
+  cursor: grabbing !important;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-accent-soft);
   outline-offset: 3px;

@@ -24,6 +24,25 @@ export interface PlanetOptions {
   cellScale?: number;
 }
 
+/**
+ * O que o planeta desenhou neste quadro (centro, raio, grade de células e
+ * luz). Os objetos do hero usam estes valores para cair na MESMA grade e
+ * receber a MESMA luz (SPEC-HERO-OBJETOS).
+ */
+export interface PlanetScene {
+  cx: number;
+  cy: number;
+  /** Raio do planeta, sem o crescimento da dissolução. */
+  radius: number;
+  font: string;
+  fontSize: number;
+  cellWidth: number;
+  cellHeight: number;
+  /** Luz normalizada (z = 0.75 antes de normalizar). */
+  light: { x: number; y: number; z: number };
+  hueBase: number;
+}
+
 /** Posição atual da luz (segue o mouse devagar). Guardada entre os quadros. */
 export interface PlanetLight {
   x: number;
@@ -75,7 +94,7 @@ export function drawPlanet(
   pointer: PointerPosition,
   light: PlanetLight,
   { hueBands = 6, cellScale = 1, dpr }: PlanetOptions = {},
-) {
+): PlanetScene {
   ctx.clearRect(0, 0, width, height);
 
   // Células maiores no nível Médio (fator 1.3: 13px, ou 10px abaixo de 700px)
@@ -229,4 +248,16 @@ export function drawPlanet(
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, width, height);
   ctx.globalCompositeOperation = "source-over";
+
+  return {
+    cx,
+    cy,
+    radius: position.radius,
+    font,
+    fontSize,
+    cellWidth,
+    cellHeight,
+    light: { x: Lx, y: Ly, z: Lz },
+    hueBase,
+  };
 }

@@ -13,6 +13,8 @@ import {
 import Button from "../ui/Button";
 import Container from "../ui/Container";
 import { GradientText, RichText } from "../ui/RichText";
+import { createHeroObjectsLink } from "../../lib/heroObjectsLink";
+import HeroObjects from "./HeroObjects";
 import PlanetCanvas from "./PlanetCanvas";
 
 /**
@@ -46,19 +48,27 @@ export default function Universe() {
 function HeroCopy({ ctaRef }: { ctaRef?: RefObject<HTMLDivElement | null> }) {
   return (
     <>
-      <h1 className="mx-auto text-h1 max-[400px]:text-h1-compact tab:max-w-[14ch]">
+      {/* data-hero-*: a caixa do texto que os objetos do hero evitam.
+          relative z-3: o h1 e os CTAs ficam acima das áreas de pegar */}
+      <h1
+        data-hero-text
+        className="pointer-events-auto relative z-3 mx-auto text-h1 max-[400px]:text-h1-compact tab:max-w-[14ch]"
+      >
         <GradientText title={hero.title} />
       </h1>
       <div
         ref={ctaRef}
-        className="mt-6.5 flex items-center justify-center gap-3.5"
+        data-hero-cta
+        className="pointer-events-auto relative z-3 mt-6.5 flex items-center justify-center gap-3.5"
       >
         <Button to={`/#${sectionIds.projects}`}>{hero.primaryCta}</Button>
         <Button variant="link" to={`/#${sectionIds.contact}`}>
           {hero.secondaryCta}
         </Button>
       </div>
-      <p className="mt-5.5 text-caption text-secondary">{hero.eyebrow}</p>
+      <p data-hero-text className="mt-5.5 text-caption text-secondary">
+        {hero.eyebrow}
+      </p>
     </>
   );
 }
@@ -135,6 +145,9 @@ function updateTrigger(
 function UniverseAnimated() {
   const sectionRef = useRef<HTMLElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+  // Objetos do hero: ponte com a simulação (no worker do planeta)
+  const [objectsLink] = useState(createHeroObjectsLink);
+  const isStatic = useQuality().quality === "baixo";
   const ctaRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
   const chapterRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -214,14 +227,15 @@ function UniverseAnimated() {
   return (
     <section ref={sectionRef} id="universe" className="relative h-[520vh]">
       <div className="sticky top-0 h-svh overflow-hidden">
-        <PlanetCanvas progressRef={progressRef} />
+        <PlanetCanvas progressRef={progressRef} objects={objectsLink} />
+        <HeroObjects link={objectsLink} heroRef={heroRef} isStatic={isStatic} />
 
         {/* Headline + CTAs (estilos de scroll aplicados via ref) */}
         <div
           ref={heroRef}
           data-on="true"
           // Ao sumir, sobe 60px (como antes)
-          className="text-trigger absolute inset-x-0 top-hero-top px-6 text-center [--trigger-shift:-60px] data-[on=false]:pointer-events-none"
+          className="text-trigger pointer-events-none absolute inset-x-0 top-hero-top px-6 text-center [--trigger-shift:-60px] data-[on=false]:*:pointer-events-none"
         >
           <HeroCopy ctaRef={ctaRef} />
         </div>
@@ -258,13 +272,19 @@ function UniverseAnimated() {
 // ---------- Versão com reduced motion ----------
 
 function UniverseStatic() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  // Objetos do hero: no Baixo/RM, 1 quadro parado em repouso (sem arrasto)
+  const [objectsLink] = useState(createHeroObjectsLink);
   return (
     <section id="universe">
       {/* Hero com o planeta parado atrás */}
       <div className="relative flex min-h-svh items-start overflow-hidden pt-hero-top text-center">
-        <PlanetCanvas />
+        <PlanetCanvas objects={objectsLink} />
+        <HeroObjects link={objectsLink} heroRef={heroRef} isStatic />
         <Container className="relative">
-          <HeroCopy />
+          <div ref={heroRef}>
+            <HeroCopy />
+          </div>
         </Container>
       </div>
 

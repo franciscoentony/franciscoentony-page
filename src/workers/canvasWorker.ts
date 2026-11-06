@@ -12,7 +12,19 @@
  *   init    → recebe o canvas transferido e o tipo ("stars" | "planet")
  *   resize  → novo tamanho do canvas
  *   frame   → desenha um quadro e responde "drawn"
+ *   objects → ponteiro nos objetos do hero (grab/move/release/nudge)
+ *
+ * Objetos do hero (SPEC-HERO-OBJETOS): desenhados no mesmo canvas, logo
+ * depois do planeta, com a física aqui dentro (fonte única da verdade).
+ * O "drawn" leva as posições ([x, y, r, pegável] × 3) para a página
+ * posicionar as áreas de pegar.
  */
+import {
+  HeroObjects,
+  type HeroObjectsFrame,
+  type HeroObjectsInput,
+  type TextBox,
+} from "../lib/heroObjects";
 import { drawPlanet, type PlanetLight } from "../lib/planet";
 import { drawStars, type StarsFrame, type StarsState } from "../lib/stars";
 
@@ -27,6 +39,12 @@ export interface PlanetFrame {
   pointer: { x: number; y: number; nx: number; ny: number };
   hueBands: number;
   cellScale: number;
+  /** Objetos do hero (só no hero da Home). */
+  objects?: {
+    isStatic: boolean;
+    trailLength: number;
+    textBox: TextBox | null;
+  };
 }
 
 // "self" aqui é o escopo do worker (usamos o tipo Worker para ter postMessage)
@@ -39,6 +57,7 @@ let dpr = 1;
 
 const starsState: StarsState = { stars: [], key: "" };
 const planetLight: PlanetLight = { x: -0.5, y: -0.5 };
+const heroObjects = new HeroObjects();
 
 /** Carrega a Geist Mono dentro do worker (as fontes da página não chegam aqui). */
 async function loadFont(fontUrl: string) {
@@ -83,14 +102,21 @@ scope.onmessage = async (event: MessageEvent) => {
     return;
   }
 
+  if (message.type === "objects") {
+    heroObjects.input(message.input as HeroObjectsInput);
+    return;
+  }
+
   if (message.type === "frame") {
-    drawFrame(message.data);
-    // Avisa a página que terminou (contrapressão, P5 S-A)
-    scope.postMessage({ type: "drawn" });
+    const objects = drawFrame(message.data);
+    // Avisa a página que terminou (contrapressão, P5 S-A) e, com os
+    // objetos do hero, manda as posições deles
+    scope.postMessage({ type: "drawn", objects });
   }
 };
 
-function drawFrame(data: StarsFrame | PlanetFrame) {
+/** Desenha e devolve as posições dos objetos do hero (se houver). */
+function drawFrame(data: StarsFrame | PlanetFrame): number[] | undefined {
   if (!ctx) return;
 
   if (kind === "stars") {
@@ -104,7 +130,7 @@ function drawFrame(data: StarsFrame | PlanetFrame) {
     ctx.clearRect(0, 0, frame.width, frame.height);
     return;
   }
-  drawPlanet(
+  const scene = drawPlanet(
     ctx,
     frame.width,
     frame.height,
@@ -114,4 +140,18 @@ function drawFrame(data: StarsFrame | PlanetFrame) {
     planetLight,
     { hueBands: frame.hueBands, cellScale: frame.cellScale, dpr },
   );
+
+  if (!frame.objects) return;
+  const objectsFrame: HeroObjectsFrame = {
+    width: frame.width,
+    height: frame.height,
+    time: frame.time,
+    progress: frame.progress,
+    hueBands: frame.hueBands,
+    dpr,
+    ...frame.objects,
+  };
+  heroObjects.step(objectsFrame, scene);
+  heroObjects.draw(ctx, objectsFrame, scene);
+  return heroObjects.snapshot(frame.objects.isStatic);
 }

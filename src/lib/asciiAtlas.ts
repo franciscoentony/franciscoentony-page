@@ -53,6 +53,11 @@ export interface AtlasOptions {
   lightness: (bright: number) => number;
   /** Densidade de pixels (no worker não existe window: quem chama informa). */
   dpr?: number;
+  /**
+   * Faixa de matizes [mín, máx] em graus. Padrão: 230° a 370° (violeta →
+   * rosa). Os objetos do hero usam um atlas dourado à parte (ex.: [36, 54]).
+   */
+  hueRange?: [number, number];
 }
 
 export interface AsciiAtlas {
@@ -65,15 +70,20 @@ export interface AsciiAtlas {
   sourceHeight: number;
   hueBands: number;
   saturations: number[];
+  hueRange: [number, number];
 }
 
 // Atlases já criados, reaproveitados entre quadros e entre componentes
 const cache = new Map<string, AsciiAtlas>();
 
 /** Índice da faixa de matiz (0..hueBands-1) para um matiz em graus. */
-export function getHueBand(hue: number, hueBands: number): number {
-  const bandWidth = (HUE_MAX - HUE_MIN) / hueBands;
-  const band = Math.floor((hue - HUE_MIN) / bandWidth);
+export function getHueBand(
+  hue: number,
+  hueBands: number,
+  [hueMin, hueMax]: [number, number] = [HUE_MIN, HUE_MAX],
+): number {
+  const bandWidth = (hueMax - hueMin) / hueBands;
+  const band = Math.floor((hue - hueMin) / bandWidth);
   return Math.max(0, Math.min(hueBands - 1, band));
 }
 
@@ -90,8 +100,10 @@ export function getLevel(bright: number): number {
 export function getAsciiAtlas(options: AtlasOptions): AsciiAtlas {
   const dpr =
     options.dpr ?? Math.min(globalThis.devicePixelRatio || 1, MAX_DPR);
+  const hueRange = options.hueRange ?? [HUE_MIN, HUE_MAX];
   const key = [
     options.font,
+    hueRange.join("-"),
     options.hueBands,
     options.saturations.join("/"),
     // a função de luminosidade entra na chave pelos valores que ela gera
@@ -123,11 +135,11 @@ export function getAsciiAtlas(options: AtlasOptions): AsciiAtlas {
   ctx.font = options.font;
   ctx.textBaseline = "top";
 
-  const bandWidth = (HUE_MAX - HUE_MIN) / options.hueBands;
+  const bandWidth = (hueRange[1] - hueRange[0]) / options.hueBands;
 
   for (let band = 0; band < options.hueBands; band++) {
     // Cor do centro da faixa (igual ao protótipo de níveis do designer)
-    const hue = HUE_MIN + (band + 0.5) * bandWidth;
+    const hue = hueRange[0] + (band + 0.5) * bandWidth;
 
     options.saturations.forEach((saturation, satIndex) => {
       const row = band * options.saturations.length + satIndex;
@@ -151,6 +163,7 @@ export function getAsciiAtlas(options: AtlasOptions): AsciiAtlas {
     sourceWidth,
     sourceHeight,
     hueBands: options.hueBands,
+    hueRange,
     saturations: options.saturations,
   };
   cache.set(key, atlas);
@@ -241,7 +254,7 @@ export function drawAsciiGrid(
       const level = Math.max(sharedCell.minLevel, getLevel(sharedCell.bright));
       if (level === 0 || sharedCell.alpha <= 0) continue; // espaço: nada a desenhar
 
-      const band = getHueBand(sharedCell.hue, atlas.hueBands);
+      const band = getHueBand(sharedCell.hue, atlas.hueBands, atlas.hueRange);
       const atlasRow = band * satCount + sharedCell.saturation;
 
       ctx.globalAlpha = Math.min(1, sharedCell.alpha);
@@ -260,4 +273,36 @@ export function drawAsciiGrid(
   }
 
   ctx.globalAlpha = 1;
+}
+
+/**
+ * Desenha UM glifo do atlas em (x, y), o canto da célula. Para quem escolhe
+ * o atlas célula a célula (os objetos do hero misturam o atlas do planeta
+ * com o dourado). `level` é o índice na rampa (1..11).
+ */
+export function drawGlyph(
+  ctx: Canvas2D,
+  atlas: AsciiAtlas,
+  level: number,
+  hue: number,
+  saturation: number,
+  x: number,
+  y: number,
+  alpha: number,
+) {
+  if (level <= 0 || alpha <= 0) return;
+  const band = getHueBand(hue, atlas.hueBands, atlas.hueRange);
+  const atlasRow = band * atlas.saturations.length + saturation;
+  ctx.globalAlpha = Math.min(1, alpha);
+  ctx.drawImage(
+    atlas.canvas,
+    level * atlas.sourceWidth,
+    atlasRow * atlas.sourceHeight,
+    atlas.sourceWidth,
+    atlas.sourceHeight,
+    x - 1,
+    y,
+    atlas.tileWidth,
+    atlas.tileHeight,
+  );
 }

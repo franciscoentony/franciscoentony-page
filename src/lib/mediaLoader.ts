@@ -39,6 +39,13 @@ function whenDecoded(img: HTMLImageElement): Promise<void> {
   return img.decode ? img.decode().catch(() => undefined) : Promise.resolve();
 }
 
+/** A imagem terminou sem pixels: o carregamento falhou. */
+function hasFailed(img: HTMLImageElement) {
+  return (
+    img.complete && img.naturalWidth === 0 && Boolean(img.getAttribute("src"))
+  );
+}
+
 /**
  * Começa a acompanhar uma moldura. Devolve a função que para (ao desmontar).
  */
@@ -52,6 +59,14 @@ export function watchMediaFrame(frame: HTMLElement): () => void {
   if (img.complete && img.naturalWidth > 0) {
     frame.dataset.instant = "";
     setState(frame, "loaded");
+    return () => {};
+  }
+
+  // Já falhou antes de chegarmos aqui (ex.: 404 em cache): não haverá mais
+  // "load" nem "error", então vai direto para o estado de erro (I-4)
+  if (hasFailed(img)) {
+    if (img.alt) frame.dataset.alt = img.alt;
+    setState(frame, "error");
     return () => {};
   }
 
@@ -77,6 +92,8 @@ export function watchMediaFrame(frame: HTMLElement): () => void {
     if (img.complete && img.naturalWidth > 0) {
       frame.dataset.instant = "";
       setState(frame, "loaded");
+    } else if (hasFailed(img)) {
+      handleError();
     } else if (frame.dataset.state !== "loaded") {
       setState(frame, "loading");
     }

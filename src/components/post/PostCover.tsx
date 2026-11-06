@@ -70,7 +70,10 @@ export default function PostCover({ cover }: { cover: Cover }) {
     }
 
     if (img.complete && img.naturalWidth > 0) handleLoad();
-    else {
+    else if (img.complete && img.getAttribute("src")) {
+      // Já falhou antes do efeito (ex.: 404 em cache): vai para o erro (I-4)
+      handleError();
+    } else {
       img.addEventListener("load", handleLoad, { once: true });
       img.addEventListener("error", handleError, { once: true });
     }

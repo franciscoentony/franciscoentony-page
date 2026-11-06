@@ -345,9 +345,9 @@ export const footer = {
 // como os previews de link). Se mudar aqui, mude lá também.
 
 export const seo = {
-  homeTitle: "Francisco Entony · Desenvolvedor Full-Stack",
+  homeTitle: "Francisco Entony · Engenheiro de Software",
   homeDescription:
-    "Francisco Entony, desenvolvedor full-stack em Natal, RN. Construo sistemas que resolvem problemas reais. Projetos, experiência e blog.",
+    "Francisco Entony, engenheiro de software em Natal, RN. Construo sistemas que resolvem problemas reais. Projetos, experiência e blog.",
   blogTitle: "Blog · Francisco Entony",
   /** Vai depois do título do post na aba (ex.: "Meu post · Francisco Entony"). */
   titleSuffix: " · Francisco Entony",

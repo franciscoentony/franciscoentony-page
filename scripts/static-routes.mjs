@@ -101,7 +101,12 @@ function coverPreload(post) {
     return `<link rel="preload" as="image" fetchpriority="high" href="${escapeHtml(toSite(post.cover))}" />`;
   }
 
-  const img = /<img\b[^>]*>/i.exec(post.content ?? "")?.[0];
+  // Sem `cover`, a capa só existe se o corpo COMEÇA com uma imagem (a mesma
+  // regra de src/lib/postContent.ts). Senão a 1ª imagem fica no corpo, lazy,
+  // e o preload viraria aviso no console (I-5)
+  const content = post.content ?? "";
+  if (!/^\s*<p>\s*<span\s+class="media-frame/.test(content)) return "";
+  const img = /<img\b[^>]*>/i.exec(content)?.[0];
   if (!img) return "";
   const attr = (name) => new RegExp(`${name}="([^"]*)"`).exec(img)?.[1];
   const src = attr("src");
@@ -144,12 +149,12 @@ function createRoute(
 }
 
 // Preload do índice de posts: o navegador já começa a baixá-lo junto com o
-// HTML, em vez de esperar o JS da página pedir (A9)
-// Junto, o tile do skeleton das imagens (9 KB): sem ele, em rede lenta, o
-// skeleton fica vazio enquanto a foto carrega (SPEC-SKELETON-IMAGENS).
+// HTML, em vez de esperar o JS da página pedir (A9).
+// O tile do skeleton NÃO tem preload (I-5): com as fotos em cache ele nem é
+// usado, e o preload virava aviso no console ("not used within a few
+// seconds"). Em rede lenta, ele chega logo depois do CSS.
 const postsPreload =
-  '<link rel="preload" as="fetch" href="/blog-data/index.json" crossorigin="anonymous" />\n    ' +
-  '<link rel="preload" as="image" href="/ui/skeleton-ascii.webp" />';
+  '<link rel="preload" as="fetch" href="/blog-data/index.json" crossorigin="anonymous" />';
 
 // /blog (textos iguais a seo.blogTitle e blog.lead em src/content/ui.ts)
 createRoute(

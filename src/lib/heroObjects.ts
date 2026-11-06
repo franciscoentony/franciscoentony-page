@@ -223,11 +223,14 @@ export interface HeroObjectsFrame {
 export type HeroObjectsInput =
   | { op: "grab"; index: number; x: number; y: number; t: number }
   | { op: "move"; x: number; y: number; t: number }
-  | { op: "release" }
+  | { op: "release"; t: number }
   | { op: "nudge" };
 
 /** 4 números por objeto: x, y, raio e 1 se dá para pegar (senão 0). */
 export const SNAPSHOT_SIZE = 12;
+
+/** Ponteiro parado há mais que isto (ms): a velocidade do arremesso zera (I-6). */
+const STILL_MS = 60;
 
 /** Faixa do atlas dourado (visor, luzes, cabeça do rastro). */
 const GOLD_HUES: [number, number] = [36, 54];
@@ -386,6 +389,10 @@ export class HeroObjects {
     if (message.op === "release") {
       const object = this.held;
       if (!object) return;
+      // Segurou parado antes de soltar: não arremessa (I-6)
+      if (message.t - this.lastPointer.t > STILL_MS) {
+        this.pointerVelocity = { x: 0, y: 0 };
+      }
       // Solta com a velocidade do ponteiro, limitada a 30px/quadro
       const speed = Math.hypot(this.pointerVelocity.x, this.pointerVelocity.y);
       const cap = speed > 30 ? 30 / speed : 1;
@@ -448,6 +455,10 @@ export class HeroObjects {
       if (this.isHidden(object)) continue;
 
       if (object.held) {
+        // Ponteiro parado: a velocidade zera (não colide como se andasse)
+        if (time - this.lastPointer.t > STILL_MS) {
+          this.pointerVelocity = { x: 0, y: 0 };
+        }
         object.x += (this.target.x - object.x) * 0.5;
         object.y += (this.target.y - object.y) * 0.5;
         object.vx = this.pointerVelocity.x;

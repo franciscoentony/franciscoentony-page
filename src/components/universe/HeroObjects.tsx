@@ -211,7 +211,7 @@ export default function HeroObjects({
       holding = false;
       holdingRef.current = false;
       root.classList.remove("grabbing");
-      link.send({ op: "release" });
+      link.send({ op: "release", t: performance.now() });
     }
 
     // Depois de pegar no toque, o dedo arrasta o objeto e não rola a página

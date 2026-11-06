@@ -1,52 +1,46 @@
-const facts = [
-  {
-    k: "Experiência",
-    v: "Mais de 1 ano contribuindo para projetos reais da rede do IFRN",
-  },
-  {
-    k: "Formação",
-    v: "Tecnólogo em Análise e Desenvolvimento de Sistemas (IFRN)",
-  },
-  {
-    k: "Base técnica",
-    v: "Técnico em Informática para Internet (IMD/UFRN)",
-  },
-];
+import { player, sectionIds } from "../content/ui";
+import CharacterCard from "./about/CharacterCard";
+import Counter from "./ui/Counter";
+import Reveal from "./ui/Reveal";
+import { Kicker, PlainTitle } from "./ui/RichText";
+import Section from "./ui/Section";
+import WordReveal from "./ui/WordReveal";
 
+/** Seção "Player 1" (Sobre): texto + stats à esquerda, ficha holográfica à direita. */
 export default function About() {
   return (
-    <section id="sobre" className="mx-auto max-w-220 px-7 py-24">
-      <span className="mb-4 block text-center text-[13px] uppercase tracking-[0.08em] text-muted">
-        Sobre
-      </span>
-      <div className="grid gap-14 text-left sm:grid-cols-[1.3fr_1fr]">
-        <div className="space-y-4">
-          <p className="text-[15px] text-secondary">
-            Apaixonado por tecnologia desde os 8 anos, o que começou como
-            fantasia de criança se transformou no meu propósito de vida.
-            Inspirado pela biologia, física e astronomia, transformei essa
-            curiosidade em uma jornada acadêmica e profissional.
-          </p>
-          <p className="text-[15px] text-secondary">
-            Hoje, aos 19 anos, curso Tecnologia em Análise e Desenvolvimento de
-            Sistemas no IFRN e oriento futuros cientistas da computação —
-            ministro minicursos para jovens que desejam ingressar na área.
-          </p>
-        </div>
-        <div className="flex flex-col">
-          {facts.map((f, i) => (
-            <div
-              key={f.k}
-              className={`py-4 ${i !== facts.length - 1 ? "border-b border-line" : ""} ${
-                i === 0 ? "pt-0" : ""
-              }`}
-            >
-              <span className="mb-1 block text-xs text-muted">{f.k}</span>
-              <span className="text-sm text-paper">{f.v}</span>
-            </div>
+    <Section
+      id={sectionIds.about}
+      containerClassName="grid items-center gap-12 tab:grid-cols-[1.05fr_.95fr] tab:gap-16"
+    >
+      <div>
+        <Reveal>
+          <h2 className="mb-gutter text-h2">
+            <Kicker text={player.eyebrow} />
+            <PlainTitle title={player.title} />
+          </h2>
+        </Reveal>
+        <Reveal delay={2}>
+          <WordReveal text={player.lead} className="text-lead" />
+        </Reveal>
+
+        <div className="mt-12 grid grid-cols-3 gap-4 border-t border-line pt-7 tab:gap-7">
+          {player.stats.map((stat, index) => (
+            <Reveal key={stat.label} delay={(index + 1) as 1 | 2 | 3}>
+              <Counter
+                value={stat.value}
+                suffix={stat.suffix}
+                className="block font-dot text-stat text-paper"
+              />
+              <p className="mt-2.5 text-small text-secondary">{stat.label}</p>
+            </Reveal>
           ))}
         </div>
       </div>
-    </section>
+
+      <Reveal delay={2}>
+        <CharacterCard />
+      </Reveal>
+    </Section>
   );
 }

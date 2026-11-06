@@ -1,0 +1,88 @@
+import { useRef, type RefObject } from "react";
+import {
+  useCanvasAnimation,
+  type CanvasFrame,
+} from "../../hooks/useCanvasAnimation";
+import { shapes, type ShapeName } from "../../lib/asciiShapes";
+import { clamp, lerp } from "../../lib/motion";
+import { drawAsciiGrid, getAsciiAtlas } from "../../lib/asciiAtlas";
+import { useQuality } from "../../hooks/useQuality";
+
+interface ProjectThumbProps {
+  shape: ShapeName;
+  /** true enquanto o mouse está sobre o card: a forma "esquenta" e mexe mais. */
+  activeRef: RefObject<boolean>;
+}
+
+/** Ícone do projeto desenhado em ASCII (58% de cima do card). */
+export default function ProjectThumb({ shape, activeRef }: ProjectThumbProps) {
+  const heat = useRef(0);
+  // Parâmetros do nível de qualidade (células 1.3× maiores no Médio/Baixo)
+  const { settings } = useQuality();
+
+  function draw({ ctx, width, height, time, isStatic }: CanvasFrame) {
+    ctx.clearRect(0, 0, width, height);
+    heat.current = lerp(heat.current, activeRef.current ? 1 : 0, 0.08);
+    const t = isStatic ? 0 : time;
+    const distanceTo = shapes[shape];
+
+    const cellWidth = 6 * settings.cellScale;
+    const cellHeight = 10 * settings.cellScale;
+    const fontSize = Math.round(9 * settings.cellScale);
+    const cols = Math.ceil(width / cellWidth);
+    const rows = Math.ceil(height / cellHeight);
+    const scale = Math.min(width, height) * 0.62;
+
+    const atlas = getAsciiAtlas({
+      font: `600 ${fontSize}px "Geist Mono", monospace`,
+      fontSize,
+      hueBands: settings.hueBands,
+      saturations: [90],
+      lightness: (bright) => 55 + bright * 35,
+    });
+
+    drawAsciiGrid(ctx, atlas, {
+      cols,
+      rows,
+      cellWidth,
+      cellHeight,
+      cell: (i, j, out) => {
+        const x = (i * cellWidth - width / 2) / scale;
+        const y = (j * cellHeight - height / 2) / scale;
+        const wobble =
+          Math.sin(t * 0.003 + i * 0.3 + j * 0.2) *
+          0.03 *
+          (1 + heat.current * 3);
+        const d = distanceTo(x + wobble, y);
+
+        // Dentro da forma: claro. Fora: um "brilho" fraco que pulsa.
+        const bright =
+          d < 0
+            ? clamp(0.55 - d * 1.2)
+            : clamp(0.25 - d * 0.9) *
+              (0.4 +
+                0.6 *
+                  Math.sin(t * 0.002 + i * 0.7) *
+                  Math.cos(j * 0.9 + t * 0.001));
+        if (bright < 0.08) return false;
+
+        out.bright = bright;
+        out.hue = 255 + x * 40 + heat.current * 60 * Math.sin(t * 0.002 + j);
+        out.alpha = 0.25 + bright * 0.75;
+        return true;
+      },
+    });
+  }
+
+  const canvasRef = useCanvasAnimation(draw, {
+    frameInterval: settings.asciiInterval,
+  });
+
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="block h-[220px] w-full shrink-0 border-b border-line tab:h-[58%]"
+    />
+  );
+}

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Projeto · Francisco Entony</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@500;600&family=Doto:wght@800;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<style>
+/* hero: o nome em escala de produto; o desenho ASCII solto, sem moldura */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;min-height:min(calc(100svh - 100px),820px);padding-block:48px}
+h1{font-size:clamp(44px,5.6vw,80px);line-height:1;letter-spacing:-.04em;font-weight:600;hyphens:manual}
+.rank{margin-top:16px;font-family:var(--dot);font-weight:800;font-size:18px;color:var(--gold);display:flex;align-items:center;gap:10px}
+.rank svg{width:14px;height:14px}
+.rank.s{color:var(--lav)}
+.tagline{margin-top:24px;max-width:26em;font-size:clamp(19px,1.9vw,24px);line-height:1.4;letter-spacing:-.018em;color:var(--secondary);text-wrap:pretty}
+.facts{margin-top:40px;display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:12px 48px}
+.facts dd{font-size:19px;letter-spacing:-.015em;color:var(--text)}
+.facts dt{order:2;font-size:14px;color:var(--secondary);margin-top:2px}
+.facts div{display:flex;flex-direction:column}
+.cta{margin-top:40px;display:flex;align-items:center;gap:28px;flex-wrap:wrap;font-size:17px}
+.cta .pill{background:var(--text);color:#000;border-radius:980px;padding:11px 22px;font-weight:500;transition:transform .4s var(--ease)}
+.cta .pill:hover{transform:scale(1.03)}
+.cta a:not(.pill):hover{text-decoration:underline;text-decoration-color:rgba(201,188,255,.6)}
+.emblem{display:block;width:100%;height:clamp(320px,44vw,560px)}
+/* o desenho sangra até a borda direita da janela */
+@media (min-width:860px){.hero .art{margin-right:calc((100vw - min(1080px,100vw - 48px)) / -2)}}
+
+/* resultados: números Doto que se decodificam a partir da rampa ASCII */
+/* resultados: uma frase em escala de manchete; os números em Doto, dentro do texto */
+.results{margin-top:120px;font-size:clamp(28px,3.4vw,44px);line-height:1.2;letter-spacing:-.03em;font-weight:600;color:var(--secondary);text-wrap:balance}
+.results span{display:block;max-width:24ch}
+.results b{font-family:var(--dot);font-weight:900;color:var(--text);font-size:1.25em;line-height:1;letter-spacing:0}
+
+/* capítulos: o título acompanha o texto e acende quando ele está sendo lido */
+.chapters{margin-top:120px}
+.chap{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:64px;padding-block:56px}
+.chap h2{position:sticky;top:calc(var(--nav) + var(--lnav) + 40px);align-self:start;font-size:clamp(26px,2.6vw,34px);line-height:1.15;letter-spacing:-.03em;font-weight:600;color:var(--secondary);transition:color .6s var(--ease)}
+.chap.on h2{color:var(--text)}
+
+/* ficha técnica: pontos-guia, como um sumário impresso (e como ASCII) */
+.specs{margin-top:120px}
+.specs h2,.shots h2{font-size:clamp(26px,2.6vw,34px);letter-spacing:-.03em;font-weight:600}
+.specs dl{margin-top:28px;max-width:720px}
+.specs div{display:flex;align-items:baseline;gap:12px;padding-block:12px;font-size:17px}
+.specs dt{color:var(--text);white-space:nowrap}
+.specs div::after{content:"";order:2;flex:1;min-width:24px;height:1px;border-bottom:2px dotted rgba(255,255,255,.22);transform:translateY(-4px)}
+.specs dd{order:3;color:var(--prose);text-align:right}
+
+/* telas */
+.shots{margin-top:40px}
+.shots figure{margin:28px 0 0}
+/* telas seguidas formam um par com alturas iguais (mesma regra das fotos do post) */
+.shots .pair figure{margin:0;flex:var(--r) 1 0;min-width:0}
+@media (max-width:639px){.shots .pair{flex-direction:column;gap:28px}}
+
+/* código-fonte: a linha que um dev realmente usa */
+.clone{margin-top:120px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.clone code{font-family:var(--mono);font-size:14px;color:var(--prose);padding:14px 18px;border-radius:12px;background:#0c0c10;overflow-x:auto;max-width:100%;white-space:nowrap}
+.clone code::before{content:"$ ";color:var(--gold)}
+.clone button{font-size:15px;color:var(--prose)}
+.clone button:hover{color:var(--text)}
+
+.onward .emblem{height:clamp(260px,32vw,420px)}
+/* manchete e emblema lado a lado: o desenho não flutua sozinho */
+@media (min-width:860px){.onward.proj{display:grid;grid-template-columns:1.25fr .75fr;align-items:center;gap:32px}}
+
+@media (max-width:859px){
+  .hero{grid-template-columns:1fr;min-height:0;padding-top:24px}
+  .hero .art{order:-1}.emblem{height:300px}
+  .facts{grid-template-columns:1fr 1fr;gap:16px 32px}
+  .chap{grid-template-columns:1fr;gap:16px;padding-block:32px}
+  .chap h2{position:static;color:var(--text)}
+}
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<nav class="top" aria-label="Site"><div class="wrap">
+  <a class="logo" href="#"><i></i>entony</a>
+  <div class="links"><a href="#">Sobre</a><a href="#">Habilidades</a><a href="#" aria-current="page">Projetos</a><a href="#">Experiência</a><a href="#">Blog</a></div>
+  <a class="btn-nav" href="#">Contato</a>
+</div></nav>
+<div class="lnav" role="navigation" aria-label="Projeto"><div class="wrap">
+  <a class="here" href="#">Projetos <span aria-hidden="true" id="lnName"></span></a>
+  <div class="acts" id="lnActs"></div>
+</div><div class="rule" aria-hidden="true"><i></i></div></div>
+<main id="app" data-read></main>
+<footer><div class="wrap"><span>© 2026 Francisco Entony</span><div class="f"><a href="#">GitHub</a><a href="#">LinkedIn</a><a href="#">Blog</a><a href="#">Topo ↑</a></div></div></footer>
+
+<script src="base.js"></script>
+<script>
+(() => {
+const P = V3, { q, STATIC, FINE, TIER, clamp, RAMP } = P;
+const ARROW = '<svg class="arrow" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M2.5 7.5 7.5 2.5M3.5 2.5h4v4"/></svg>';
+
+/* campos de hoje (projects.ts) + campos da v1 com conteúdo de EXEMPLO (marcado com .ex) */
+const P_ = [
+ {name:'petca', shape:'paw', language:'JavaScript', topics:['react-native','drf','pytest'], url:'https://github.com/franciscoentony/petca', description:'Conecta cidadãos que avistam animais em situação de rua a ONGs de resgate.',
+  ex:{ tagline:'Um aplicativo para quem vê um animal na rua e não sabe para quem ligar.', period:'2025', role:'Full-stack', status:'Em desenvolvimento',
+   results:[['3','ONGs testando a versão beta'],['120','animais registrados no teste'],['1','semana de piloto em Canguaretama']],
+   chapters:[['O problema','Toda semana alguém posta a foto de um cachorro machucado no grupo da cidade, e a conversa morre em “alguém sabe quem resgata?”.'],['A solução','Um app que transforma a foto em um chamado: local, estado do animal e a ONG mais próxima avisada no celular.'],['O que eu fiz','A API em Django REST, o app em React Native e os testes com pytest. Sozinho, com conversas toda semana com duas ONGs.'],['O que aprendi','Que a parte difícil não era o código: era fazer a ONG confiar no chamado.']],
+   specs:[['Linguagem','JavaScript'],['App','React Native'],['API','Django REST Framework'],['Testes','pytest']] }},
+ {name:'connect-responsibly', shape:'gift', language:'Python', topics:['django','mysql'], url:'https://github.com/franciscoentony/connect-responsibily', description:'Conecta doadores a donatários, facilitando a chegada de doações à pessoa certa.'},
+ {name:'franciscoentony-page', shape:'planet', language:'TypeScript', topics:['vite','go','hugo'], url:'https://github.com/franciscoentony/franciscoentony-page', description:'Página pessoal com projetos, palestras e aulas ministradas, com blog próprio.', demo:'https://franciscoentony.com',
+  ex:{ tagline:'O site que você está lendo: um universo ASCII com um planeta no meio.', period:'2024 — hoje', role:'Design e código', status:'No ar',
+   results:[['2','posts publicados no blog'],['3','níveis de qualidade de animação'],['0','dependências de animação']],
+   chapters:[['O problema','O portfólio antigo era uma lista de cards. Dizia o que eu fiz, não quem eu sou.'],['A solução','Um universo jogável: um planeta em ASCII, uma ficha de personagem e missões no lugar de projetos.'],['O que eu fiz','React 19, Vite e Tailwind na interface; Hugo gerando o blog em JSON; tudo publicado no GitHub Pages.'],['O que aprendi','A deixar o efeito em um lugar só. O resto da página precisa respirar.']],
+   specs:[['Linguagem','TypeScript'],['Interface','React 19, Vite, Tailwind'],['Blog','Hugo, gerado em JSON'],['Hospedagem','GitHub Pages']],
+   shots:[['img/print-home.jpg','1440/900','A Home, com o planeta ASCII no centro.'],['img/print-blog.jpg','1440/900','O blog lê o JSON do Hugo.'],['img/print-mobile.jpg','375/812','No celular o planeta fica menor e mais lento, de propósito.']] }},
+ {name:'fullstack-filmes', shape:'film', language:'JavaScript', topics:['node','mongodb','jwt'], url:'https://github.com/franciscoentony/fullstack-filmes', description:'Autenticação, CRUD, permissões e rotas privadas em uma aplicação completa.'},
+];
+const i = Math.max(0, P_.findIndex(p => p.name === (q.get('p') || 'franciscoentony-page'))), p = P_[i], nx = P_[(i + 1) % P_.length], x = p.ex || {};
+const main = i < 2; // D2
+document.title = `${p.name} · Francisco Entony`;
+document.getElementById('lnName').textContent = p.name;
+document.getElementById('lnActs').innerHTML = `<a href="${p.url}" target="_blank" rel="noopener">GitHub${ARROW}</a>${p.demo ? `<a class="pill" href="${p.demo}" target="_blank" rel="noopener">Ver no ar</a>` : ''}`;
+const E = s => `<span class="ex">${s}</span>`;
+const specs = x.specs || [['Linguagem', p.language], ['Ferramentas', p.topics.join(', ')]];
+
+document.getElementById('app').innerHTML = `
+<section class="wrap hero">
+  <div>
+    <h1 data-title>${p.name.replace('-', '-<wbr>')}</h1>
+    <p class="rank ${main ? '' : 's'}">${main ? '<svg viewBox="0 0 14 14" aria-hidden="true"><path fill="currentColor" d="M7 .8l1.8 4 4.4.4-3.3 2.9 1 4.3L7 10.1l-3.9 2.3 1-4.3L.8 5.2l4.4-.4z"/></svg>Missão principal' : '<svg viewBox="0 0 14 14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.4" d="M7 1.5 12.5 7 7 12.5 1.5 7z"/></svg>Missão secundária'}</p>
+    <p class="tagline">${x.tagline ? E(x.tagline) : p.description}</p>
+    ${x.period ? `<dl class="facts ex"><div><dt>Período</dt><dd>${x.period}</dd></div><div><dt>Papel</dt><dd>${x.role}</dd></div><div><dt>Status</dt><dd>${x.status}</dd></div></dl>` : ''}
+    <div class="cta">${p.demo ? `<a class="pill" href="${p.demo}" target="_blank" rel="noopener">Ver no ar</a>` : ''}<a href="${p.url}" target="_blank" rel="noopener">GitHub${ARROW}</a></div>
+  </div>
+  <div class="art"><canvas class="emblem" data-shape="${p.shape}" data-live aria-hidden="true"></canvas></div>
+</section>
+
+${x.shots ? `<section class="wrap shots" aria-labelledby="shotsT"><h2 id="shotsT">Telas</h2>${(() => { const fig = ([s, r, c]) => `<figure style="--r:${eval(r)}"><span class="media" data-media style="--ratio:${r}"><span class="media-skel" aria-hidden="true"></span><img data-src="${s}" alt="${c}" loading="lazy"></span><figcaption class="ex">${c}</figcaption></figure>`; const [first, ...rest] = x.shots; return fig(first) + (rest.length ? `<div class="pair" style="margin-top:28px">${rest.map(fig).join('')}</div>` : ''); })()}</section>` : ''}
+${x.results ? `<p class="wrap results ex"><span>${x.results.map(([n, l]) => `<b>${n}</b> ${l}`).join(', ').replace(/, ([^,]*)$/, ' e $1')}.</span></p>` : ''}
+
+${x.chapters ? `<section class="wrap chapters ex">${x.chapters.map(([h, t]) => `<div class="chap"><h2>${h}</h2><div class="prose"><p>${t}</p></div></div>`).join('')}</section>` : ''}
+
+<section class="wrap specs" aria-labelledby="specsT"><h2 id="specsT">Ficha técnica</h2>
+  <dl class="${x.specs ? 'ex' : ''}">${specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl></section>
+
+
+
+<div class="wrap clone"><code>git clone ${p.url}.git</code><button type="button" data-clone>Copiar</button></div>
+
+<div class="wrap"><a class="onward proj" href="?p=${nx.name}${q.has('quality') ? '&quality=' + TIER : ''}" aria-label="Próximo projeto: ${nx.name}">
+  <p class="line" aria-hidden="true"><span class="dim">Próximo projeto.</span> <span class="t">${nx.name}.</span></p>
+  <canvas class="emblem" data-shape="${nx.shape}" aria-hidden="true"></canvas></a></div>`;
+
+/* ---- desenho ASCII (SDF dos cards da Home); a luz segue o ponteiro ---- */
+const shapes = {
+  paw:(x,y)=>{ const c=(a,b,r)=>Math.hypot(x-a,y-b)-r; return Math.min(c(0,.18,.28), c(-.42,-.2,.13), c(-.15,-.42,.13), c(.15,-.42,.13), c(.42,-.2,.13)); },
+  gift:(x,y)=>{ const box=Math.max(Math.abs(x)-.42, Math.abs(y-.12)-.34); const lid=Math.max(Math.abs(x)-.5, Math.abs(y+.3)-.1); const bow=Math.min(Math.hypot(x+.15,y+.5)-.13, Math.hypot(x-.15,y+.5)-.13); return Math.min(box,lid,bow); },
+  planet:(x,y)=>{ const s=Math.hypot(x,y)-.38; const rx=x, ry=(y+x*.25)/.28; const r=Math.abs(Math.hypot(rx,ry)-.68)-.06; return Math.min(s, Math.max(r, -(s-.06)*(ry<0?1:-1e3))); },
+  film:(x,y)=>{ const o=Math.hypot(x,y)-.5; let h=1; for(let k=0;k<5;k++){const a=k/5*Math.PI*2; h=Math.min(h, Math.hypot(x-Math.cos(a)*.27,y-Math.sin(a)*.27)-.1);} return Math.max(o, -h, -(Math.hypot(x,y)-.05)); }
+};
+const CELL = TIER === 'alto' ? 1 : 1.3, FRAME = TIER === 'alto' ? 33 : 50;
+const arts = [...document.querySelectorAll('canvas[data-shape]')].map(c => ({ c, f: shapes[c.dataset.shape], live: c.hasAttribute('data-live'), m: { x: -9, y: -9 }, vis: false }));
+const io = new IntersectionObserver(es => es.forEach(e => { const a = arts.find(a => a.c === e.target); if (a) { a.vis = e.isIntersecting; if (a.vis && !a.live) draw(a, 0); } }), { rootMargin: '100px' });
+function init(a){ Object.assign(a, P.fit(a.c)); a.fs = 10 * CELL; a.x.font = `600 ${a.fs}px "Geist Mono", monospace`; a.x.textBaseline = 'top'; }
+function draw(a, t){
+  const { x: ctx, w, h, f } = a; ctx.clearRect(0, 0, w, h); const cw = a.fs * .62, ch = a.fs * 1.12, sc = Math.min(h * .8, w * .66);
+  for (let j = 0; j * ch < h; j++) for (let k = 0; k * cw < w; k++) {
+    const X = (k * cw - w / 2) / sc, Y = (j * ch - h / 2) / sc, wob = a.live ? Math.sin(t * .003 + k * .3 + j * .2) * .03 : 0;
+    const d = f(X + wob, Y); let b = d < 0 ? clamp(.55 - d * 1.2) : clamp(.22 - d * .9) * (.4 + .6 * Math.sin(t * .002 + k * .7) * Math.cos(j * .9 + t * .001));
+    if (b > .05) b = clamp(b + Math.max(0, .32 - Math.hypot((k * cw / w - a.m.x) * w / h, j * ch / h - a.m.y)) * .9);
+    if (b < .08) continue;
+    ctx.fillStyle = `hsla(${255 + X * 40},90%,${55 + b * 35}%,${.25 + b * .75})`; ctx.fillText(RAMP[Math.round(b * (RAMP.length - 1))], k * cw, j * ch);
+  }
+}
+if (!STATIC && FINE) arts.forEach(a => { const host = a.live ? a.c : a.c.closest('a');
+  host.addEventListener('pointermove', e => { const r = a.c.getBoundingClientRect(); a.m.x = (e.clientX - r.left) / r.width; a.m.y = (e.clientY - r.top) / r.height; if (!a.live) { cancelAnimationFrame(a.raf); a.raf = requestAnimationFrame(() => draw(a, 0)); } });
+  host.addEventListener('pointerleave', () => { a.m.x = a.m.y = -9; if (!a.live) draw(a, 0); }); });
+let last = 0;
+P.onFrame(t => { if (t - last < FRAME) return; last = t; for (const a of arts) if (a.live && a.vis) draw(a, t); });
+document.fonts.ready.then(() => { arts.forEach(a => { init(a); io.observe(a.c); }); if (STATIC) arts.forEach(a => draw(a, 0)); });
+let rs; addEventListener('resize', () => { clearTimeout(rs); rs = setTimeout(() => arts.forEach(a => { init(a); draw(a, 0); }), 150); });
+
+/* ---- números: decodificam da rampa ASCII ao entrar na tela ---- */
+
+
+/* ---- capítulo ativo: o título acende enquanto o texto é lido ---- */
+const chaps = [...document.querySelectorAll('.chap')];
+const lightChap = () => { let best = null, bd = 1e9; for (const c of chaps) { const r = c.getBoundingClientRect(); const d = Math.abs(r.top + r.height / 2 - innerHeight / 2); if (d < bd) { bd = d; best = c; } } chaps.forEach(c => c.classList.toggle('on', c === best && bd < innerHeight * .6)); };
+if (chaps.length) { addEventListener('scroll', lightChap, { passive: true }); lightChap(); }
+
+/* ---- copiar o git clone ---- */
+const cb = document.querySelector('[data-clone]');
+cb.addEventListener('click', () => P.copy(cb, document.querySelector('.clone code').textContent, 'Copiado', 'Copiar'));
+
+P.media(); P.start(); P.proto();
+})();
+</script>
+</body>
+</html>

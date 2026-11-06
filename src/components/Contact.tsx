@@ -1,56 +1,64 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
+import { contact, links, sectionIds } from "../content/ui";
+import ContactField from "./contact/ContactField";
+import Button from "./ui/Button";
+import {
+  buttonBase,
+  buttonSizes,
+  buttonVariants,
+  primaryPadding,
+} from "./ui/buttonStyles";
+import Container from "./ui/Container";
+import CopyButton from "./ui/CopyButton";
+import Reveal from "./ui/Reveal";
+import { Kicker, PlainTitle } from "./ui/RichText";
 
+/**
+ * Seção "Continue?" (Contato): campo ASCII + botão que copia o e-mail.
+ * O botão se decodifica até "E-mail copiado" (item 13, sem toast); a
+ * largura mínima evita que ele mude de tamanho durante a troca.
+ */
 export default function Contact() {
   return (
-    <section id="contato" className="mx-auto max-w-220 px-7 py-24">
-      <div className="mb-12 text-center">
-        <span className="mb-4 block text-[13px] uppercase tracking-[0.08em] text-muted">
-          Contato
-        </span>
-        <h2 className="mb-3 text-3xl font-bold">Bora trocar uma ideia?</h2>
-        <p className="mx-auto max-w-110 text-[15px] text-secondary">
-          Seja pra falar de projetos, oportunidades ou só trocar uma ideia sobre
-          tecnologia.
-        </p>
-      </div>
+    <section
+      id={sectionIds.contact}
+      className="relative grid min-h-svh place-items-center overflow-hidden text-center"
+    >
+      <ContactField />
 
-      <div className="grid grid-cols-1 gap-3.5 text-left sm:grid-cols-2">
-        <div className="rounded-md border border-line bg-raised px-6 py-5">
-          <span className="mb-2 block text-xs text-muted">Email</span>
-          <div className="text-[17px] font-semibold">
-            franciscoentonydev<span className="text-accent">@</span>gmail.com
-          </div>
-        </div>
-        <div className="rounded-md border border-line bg-raised px-6 py-5">
-          <span className="mb-2 block text-xs text-muted">Instagram</span>
-          <div className="text-[17px] font-semibold">
-            instagram.com/franciscoentony
-          </div>
-        </div>
-        <div className="rounded-md border border-line bg-raised px-6 py-5">
-          <span className="mb-2 block text-xs text-muted">GitHub</span>
-          <div className="text-[17px] font-semibold">
-            github.com/franciscoentony
-          </div>
-        </div>
-        <div className="rounded-md border border-line bg-raised px-6 py-5">
-          <span className="mb-2 block text-xs text-muted">LinkedIn</span>
-          <div className="text-[17px] font-semibold">in/franciscoentony</div>
-        </div>
-        <a
-          href="mailto:franciscoentonydev@gmail.com"
-          className="flex items-center justify-between rounded-md border border-line bg-raised px-6 py-5 sm:col-span-2"
-        >
-          <span className="text-lg font-semibold">Enviar mensagem direta</span>
-          <span className="flex h-9.5 w-9.5 shrink-0 items-center justify-center rounded-full bg-accent">
-            <FontAwesomeIcon
-              icon={faArrowUpRightFromSquare}
-              className="h-4 w-4 text-white"
+      <Container className="relative">
+        <Reveal>
+          <h2 className="mx-auto mb-5 max-w-[12ch] text-h1">
+            <Kicker text={contact.eyebrow} breakAfter />
+            <PlainTitle title={contact.title} />
+          </h2>
+        </Reveal>
+        <Reveal delay={2}>
+          <p className="text-lead text-secondary">{contact.lead}</p>
+        </Reveal>
+        <Reveal delay={3}>
+          {/* Abaixo de 860px: e-mail numa linha, GitHub e LinkedIn juntos na seguinte (DS-19) */}
+          <div className="mt-7.5 flex flex-col items-center justify-center gap-3.5 tab:flex-row">
+            <CopyButton
+              value={links.email}
+              idle={links.email}
+              label={`${contact.copyEmailLabel}: ${links.email}`}
+              done={contact.emailCopied}
+              failed={contact.copyFailed}
+              className={`${buttonBase} ${buttonVariants.primary} ${buttonSizes.md} ${primaryPadding.md} min-w-[250px] justify-center`}
             />
-          </span>
-        </a>
-      </div>
+            <div className="flex items-center gap-5 tab:gap-3.5">
+              <Button variant="link" href={links.github} external>
+                {contact.githubLink}
+                <span className="sr-only">{links.newTabLabel}</span>
+              </Button>
+              <Button variant="link" href={links.linkedin} external>
+                {contact.linkedinLink}
+                <span className="sr-only">{links.newTabLabel}</span>
+              </Button>
+            </div>
+          </div>
+        </Reveal>
+      </Container>
     </section>
   );
 }

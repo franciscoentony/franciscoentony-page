@@ -1,0 +1,355 @@
+/*
+ * Copy de interface do redesign v3 (decisão D3).
+ *
+ * Tudo que é texto NOVO de componente (headline, capítulos, títulos de seção,
+ * rótulos, toast...) fica aqui, num lugar só, para o Entony aprovar.
+ * O conteúdo "de verdade" (experiências, projetos, skills, posts) continua
+ * em src/data/ e NÃO deve ser copiado para cá.
+ *
+ * Status: AGUARDANDO APROVAÇÃO DO ENTONY (o merge na main depende disso).
+ */
+
+import { projects as projectList } from "../data/projects";
+
+/** Um pedaço de texto. Com bold: true aparece em destaque (cor paper, peso 500). */
+export interface TextPart {
+  text: string;
+  bold?: boolean;
+}
+
+/** Título com o final em gradiente (ex.: "Construo sistemas que resolvem" + "problemas reais."). */
+export interface GradientTitle {
+  start: string;
+  gradient: string;
+}
+
+// ---------- Links e ids ----------
+
+export const links = {
+  email: "franciscoentonydev@gmail.com",
+  github: "https://github.com/franciscoentony",
+  linkedin: "https://www.linkedin.com/in/franciscoentony", // confirmado pelo Entony (D11)
+  /** Texto só para leitor de tela em links que abrem em nova aba. */
+  newTabLabel: "(abre em nova aba)",
+};
+
+/** Ids das seções da Home (usados pela navbar e pelos links "#..."). */
+export const sectionIds = {
+  top: "top",
+  about: "sobre",
+  skills: "habilidades",
+  projects: "projetos",
+  experience: "experiencia",
+  blog: "blog",
+  contact: "contato",
+};
+
+// ---------- Navbar ----------
+
+export const navbar = {
+  logo: "entony",
+  /** Começa pelo texto visível ("F.Entony"), como pede o WCAG 2.5.3 (axe). */
+  logoLabel: "F.Entony, ir para o início",
+  links: [
+    { label: "Sobre", to: `/#${sectionIds.about}` },
+    { label: "Habilidades", to: `/#${sectionIds.skills}` },
+    { label: "Projetos", to: `/#${sectionIds.projects}` },
+    { label: "Experiência", to: `/#${sectionIds.experience}` },
+    { label: "Blog", to: "/blog" },
+  ],
+  cta: { label: "Contato", to: `/#${sectionIds.contact}` },
+  menuOpenLabel: "Abrir menu",
+  menuCloseLabel: "Fechar menu",
+  /** Nome da folha do menu no celular (role="dialog"). */
+  menuLabel: "Menu",
+};
+
+// ---------- Hero / Universe ----------
+
+const age = new Date().getFullYear() - 2006;
+
+export const hero = {
+  eyebrow: "Francisco Entony · Engenheiro de Software",
+  title: {
+    start: "Construo sistemas que resolvem ",
+    gradient: "problemas reais",
+  } as GradientTitle,
+  primaryCta: "Ver projetos",
+  secondaryCta: "Fale comigo",
+  scrollHint: "Role para explorar",
+};
+
+export const chapters: {
+  /** Nome do capítulo, numa palavra (adendo v4, item 4). */
+  name: string;
+  title: string;
+  lead: TextPart[];
+}[] = [
+  {
+    name: "Origem",
+    title: "Tudo começou aos 8 anos",
+    lead: [
+      { text: "Uma fantasia de criança que virou " },
+      { text: "propósito de vida.", bold: true },
+    ],
+  },
+  {
+    name: "Curiosidade",
+    title: "Biologia, física e astronomia.",
+    lead: [
+      { text: "A vontade de entender o universo " },
+      { text: "virou código.", bold: true },
+    ],
+  },
+  {
+    name: "Agora",
+    title: `Hoje, aos ${age}, eu construo. E ensino.`,
+    lead: [
+      { text: "Full-stack no " },
+      { text: "Grupo Strategi", bold: true },
+      { text: " e no " },
+      { text: "NIC · IFRN", bold: true },
+      { text: ", orientando quem está começando." },
+    ],
+  },
+];
+
+// ---------- Player 1 (Sobre) ----------
+
+export const player = {
+  eyebrow: "Player 1",
+  title: {
+    start: "Um dev que trata cada sistema como ",
+    gradient: "uma nova fase.",
+  } as GradientTitle,
+  lead: "Sou o Entony. Ajudo a conectar pessoas e organizações através de software bem construído, do front ao back-end. Curso Análise e Desenvolvimento de Sistemas no IFRN e ministro minicursos para jovens que querem entrar na área.",
+  stats: [
+    {
+      value: age,
+      suffix: "",
+      label: `anos de idade, ${age - 8} deles programando no imaginário`,
+    },
+    { value: 30, suffix: "+", label: "alunos orientados em Java e Python" },
+    {
+      value: projectList.length,
+      suffix: "",
+      label: "missões publicadas no GitHub",
+    },
+  ],
+  card: {
+    header: "Ficha · lv.",
+    level: String(age),
+    name: "Francisco Entony",
+    className: "Classe: Dev Full-Stack · Natal, RN",
+    photoAlt: "Foto de Francisco Entony",
+    // Valores aprovados pelo Entony (D11).
+    attributes: [
+      { value: 92, label: "Front" },
+      { value: 88, label: "Back" },
+      { value: 74, label: "Dados" },
+      { value: 99, label: "Curio" },
+    ],
+  },
+};
+
+// ---------- Habilidades ----------
+
+export const skills = {
+  eyebrow: "Inventário",
+  title: { start: "O que eu trago ", gradient: "pra mesa." } as GradientTitle,
+  lead: "As ferramentas do dia a dia, independente do tamanho do projeto.",
+  /** Dica em destaque no fim do lead. Some com reduced motion (a esfera fica parada). */
+  dragHint: "Arraste para girar.",
+  /** Tags da esfera 3D (derivadas das descrições de src/data/skills.ts). */
+  sphereTags: [
+    "React",
+    "TypeScript",
+    "Next.js",
+    "Vite",
+    "Tailwind",
+    "Node.js",
+    "Express",
+    "Python",
+    "Django REST",
+    "Java",
+    "PostgreSQL",
+    "MySQL",
+    "MongoDB",
+    "SQL Server",
+    "SQLite",
+    "Git",
+    "GitHub",
+    "Docker",
+    "MVC",
+    "REST APIs",
+    "React Native",
+    "pytest",
+  ],
+};
+
+// ---------- Projetos ----------
+
+export const projects = {
+  eyebrow: "Missões",
+  title: "O que eu construí.",
+  githubLink: "Ver tudo no GitHub",
+  cardGithubLink: "GitHub",
+  /** D2: os 2 primeiros projetos de projects.ts são principais, o resto secundários. */
+  mainMissionCount: 2,
+  rarityMain: "★ Missão Principal",
+  raritySide: "◇ Missão Secundária",
+  carouselLabel: "Projetos (use as setas para navegar)",
+};
+
+// ---------- Página do projeto (/projetos/:slug) ----------
+// Adendo v3: copy aprovada pelo Entony (D25). "Linguagem", "Ferramentas" e
+// "Não deu para copiar" vêm do protótipo v3.
+
+export const projectPage = {
+  /** Nome da seção na local nav (é o link de volta). */
+  section: "Projetos",
+  github: "GitHub",
+  demo: "Ver no ar",
+  /** Selo de missão (D2), em caixa normal; o ícone é SVG. */
+  rankMain: "Missão principal",
+  rankSide: "Missão secundária",
+  facts: { period: "Período", role: "Papel", status: "Status" },
+  specsTitle: "Ficha técnica",
+  /** Ficha técnica sem `specs`: os campos que já existem. */
+  specsLanguage: "Linguagem",
+  specsTools: "Ferramentas",
+  screensTitle: "Telas",
+  copy: "Copiar",
+  copied: "Copiado",
+  copyFailed: "Não deu para copiar",
+  next: "Próximo projeto.",
+  // Slug que não existe (aprovado pelo Entony)
+  notFoundTitle: "Projeto não encontrado.",
+  notFoundText: "O link pode estar quebrado ou o projeto mudou de nome.",
+};
+
+// ---------- Experiência / Campanha ----------
+
+export const experience = {
+  eyebrow: "Campanha",
+  title: {
+    start: "Onde já botei a mão ",
+    gradient: "no código.",
+  } as GradientTitle,
+  lead: [
+    { text: "Cada fase desbloqueou uma habilidade nova. " },
+    { text: "A próxima pode ser com você.", bold: true },
+  ] as TextPart[],
+  nextPhase: {
+    when: "Próxima fase",
+    title: "Bloqueada",
+    action: "Press start",
+  },
+};
+
+// ---------- Blog ----------
+
+export const blog = {
+  eyebrow: "Diário de bordo",
+  title: "Anotações sobre código, dados e aprendizado.",
+  /** Lead da página /blog (texto que já existia no site). */
+  lead: "Registros do que vou construindo e aprendendo — de projetos pessoais a bastidores dos sistemas que desenvolvo no IFRN.",
+  allPostsLink: "Todos os posts",
+  /** Card-convite do teaser quando há menos de 3 posts (DS-14). */
+  inviteTitle: "Mais registros no diário",
+  loading: "Carregando posts...",
+  error: "Não foi possível carregar os posts agora.",
+  empty: "Nenhum post publicado ainda.",
+  tagsLabel: "Tags",
+  /** Texto para leitor de tela na pill "+N" (ex.: "+2 mais tags") (D23). */
+  moreTagsLabel: "mais tags",
+  // Página do post (/blog/:slug)
+  loadingPost: "Carregando post...",
+  notFoundTitle: "Post não encontrado.",
+  notFoundText: "O link pode estar quebrado ou o post foi movido.",
+  coverAltPrefix: "Capa do post:",
+  /**
+   * Detalhe do post, adendo v3 (copy aprovada pelo Entony, D25).
+   * "Não deu para copiar" é o texto de falha do protótipo v3.
+   */
+  post: {
+    /** Nome da seção na local nav (é o link de volta). */
+    section: "Blog",
+    copyLink: "Copiar link",
+    linkCopied: "Link copiado",
+    copyFailed: "Não deu para copiar",
+    linkedIn: "LinkedIn",
+    whatsApp: "WhatsApp",
+    /** "3 minutos de leitura" (substitui "3 min de leitura"). */
+    readTime: (minutes: number) =>
+      `${minutes} ${minutes === 1 ? "minuto" : "minutos"} de leitura`,
+    /** "Arquivado em Palestras, Google I/O e IFRN." */
+    filedUnder: (tags: string) => `Arquivado em ${tags}.`,
+    next: "Próximo post.",
+    prev: "Post anterior.",
+    /** Nome que assina o post (ao lado do retrato em ASCII). */
+    author: "Francisco Entony",
+  },
+  /** Meses abreviados para as datas dos cards (ex.: "06 jun 2026"). */
+  monthsShort: [
+    "jan",
+    "fev",
+    "mar",
+    "abr",
+    "mai",
+    "jun",
+    "jul",
+    "ago",
+    "set",
+    "out",
+    "nov",
+    "dez",
+  ],
+};
+
+// ---------- Contato ----------
+
+export const contact = {
+  eyebrow: "Continue?",
+  title: { start: "Bora trocar ", gradient: "uma ideia?" } as GradientTitle,
+  lead: "Seja pra falar de projetos, oportunidades ou só sobre tecnologia.",
+  githubLink: "GitHub",
+  linkedinLink: "LinkedIn",
+  copyEmailLabel: "Copiar e-mail",
+  /** O botão do e-mail se decodifica até este texto (sem toast, item 13). */
+  emailCopied: "E-mail copiado",
+  copyFailed: "Não deu para copiar",
+};
+
+// ---------- Cursor custom ----------
+
+export const cursor = {
+  holo: "Inspecionar",
+  drag: "Arraste",
+};
+
+// ---------- Footer ----------
+
+const footerDate = new Date();
+
+export const footer = {
+  copyright: `© ${footerDate.getFullYear()} Francisco Entony`,
+  github: "GitHub",
+  linkedin: "LinkedIn",
+  blog: "Blog",
+  backToTop: "Topo",
+};
+
+// ---------- SEO (título da aba e meta description por rota) ----------
+// Os valores da Home também estão fixos no index.html (para quem não roda JS,
+// como os previews de link). Se mudar aqui, mude lá também.
+
+export const seo = {
+  homeTitle: "Francisco Entony · Desenvolvedor Full-Stack",
+  homeDescription:
+    "Francisco Entony, desenvolvedor full-stack em Natal, RN. Construo sistemas que resolvem problemas reais. Projetos, experiência e blog.",
+  blogTitle: "Blog · Francisco Entony",
+  /** Vai depois do título do post na aba (ex.: "Meu post · Francisco Entony"). */
+  titleSuffix: " · Francisco Entony",
+  notFoundTitle: "Post não encontrado · Francisco Entony",
+};

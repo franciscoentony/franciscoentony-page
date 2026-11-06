@@ -2,13 +2,67 @@
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/assets/icon.png" />    
+    <link rel="icon" type="image/png" href="/src/assets/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Francisco Entony</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">
+    <title>Francisco Entony · Desenvolvedor Full-Stack</title>
 
+    <!--
+      SEO e previews de link. Mantenha igual ao "seo" de src/content/ui.ts.
+      As páginas do blog recebem título/descrição próprios no build
+      (scripts/static-routes.mjs) e no navegador (hook usePageMeta).
+    -->
+    <meta
+      name="description"
+      content="Francisco Entony, desenvolvedor full-stack em Canguaretama, RN. Construo sistemas que resolvem problemas reais. Projetos, experiência e blog."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Francisco Entony" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:url" content="https://franciscoentony.com/" />
+    <meta
+      property="og:title"
+      content="Francisco Entony · Desenvolvedor Full-Stack"
+    />
+    <meta
+      property="og:description"
+      content="Francisco Entony, desenvolvedor full-stack em Canguaretama, RN. Construo sistemas que resolvem problemas reais. Projetos, experiência e blog."
+    />
+    <meta
+      property="og:image"
+      content="https://franciscoentony.com/home/og-foto-entony.jpg"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Foto de Francisco Entony" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Francisco Entony · Desenvolvedor Full-Stack"
+    />
+    <meta
+      name="twitter:description"
+      content="Francisco Entony, desenvolvedor full-stack em Canguaretama, RN. Construo sistemas que resolvem problemas reais. Projetos, experiência e blog."
+    />
+    <meta
+      name="twitter:image"
+      content="https://franciscoentony.com/home/og-foto-entony.jpg"
+    />
+
+    <!-- Fontes auto-hospedadas (public/fonts): preload das usadas acima da dobra -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/geist-latin.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/geist-mono-latin.woff2"
+      crossorigin
+    />
   </head>
   <body>
     <div id="root"></div>

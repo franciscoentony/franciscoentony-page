@@ -1,0 +1,48 @@
+{{- /*
+  Render hook das imagens dos posts (PERF-PLAN A9 + SPEC-SKELETON-IMAGENS).
+  - width/height vêm de data/post-images.json (gerado por
+    scripts/post-images.py).
+  - Com dimensões conhecidas, a imagem vai dentro de uma moldura
+    (.media-frame) com a proporção reservada (--ratio: L/A, CLS 0) e o
+    skeleton ASCII (.media-skel) por baixo. O estado (loading/loaded/error)
+    é ligado no navegador por src/lib/mediaLoader.ts. É <span> porque o
+    Markdown coloca a imagem dentro de um <p>.
+  - Verticais: a moldura ganha post-image-portrait (altura limitada, DF-7).
+  - --r (largura/altura em decimal) é o peso da foto num par lado a lado
+    (as duas ficam com a mesma altura).
+  - Legenda opcional = o título da imagem no Markdown, ![alt](src "legenda"),
+    exposta em data-caption para a página do post usar (adendo B).
+  - srcset com a versão de 800px (-800w.jpg) para celulares.
+  - A 1ª imagem do post carrega com prioridade (é o LCP); as outras são lazy.
+  Imagem que não estiver no JSON sai sozinha, sem moldura (rode o script).
+*/ -}}
+{{- $info := index hugo.Data "post-images" .Destination -}}
+{{- $isFirst := eq .Ordinal 0 -}}
+{{- with $info -}}
+<span
+  class="media-frame{{ if gt .height .width }} post-image-portrait{{ end }}"
+  style="--ratio: {{ .width }}/{{ .height }}; --r: {{ printf "%.3f" (div (float .width) .height) }}"
+  {{- with $.Title }} data-caption="{{ . }}"{{ end }}
+><span class="media-skel" aria-hidden="true"></span>
+{{- end -}}
+<img
+  src="{{ .Destination | safeURL }}"
+  alt="{{ .PlainText }}"
+  {{- with .Title }} title="{{ . }}"{{ end }}
+  {{- with $info }}
+  width="{{ .width }}"
+  height="{{ .height }}"
+  {{- with .small }}
+  srcset="{{ .src | safeURL }} {{ .width }}w, {{ $.Destination | safeURL }} {{ $info.width }}w"
+  sizes="(min-width: 860px) 640px, calc(100vw - 48px)"
+  {{- end }}
+  {{- end }}
+  {{- if $isFirst }}
+  loading="eager"
+  fetchpriority="high"
+  {{- else }}
+  loading="lazy"
+  {{- end }}
+  decoding="async"
+>
+{{- with $info }}</span>{{ end -}}

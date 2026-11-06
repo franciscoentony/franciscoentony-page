@@ -1,138 +1,240 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faCodeCommit } from "@fortawesome/free-solid-svg-icons";
-import Navbar from "../components/Navbar";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
+import LocalNav from "../components/page/LocalNav";
+import PostCover from "../components/post/PostCover";
+import PostOnward from "../components/post/PostOnward";
+import PostSignature from "../components/post/PostSignature";
+import ShareLine from "../components/post/ShareLine";
+import CopyButton from "../components/ui/CopyButton";
+import { blog, seo } from "../content/ui";
+import type { Post } from "../data/posts";
+import { usePageMeta } from "../hooks/usePageMeta";
 import {
   fetchPosts,
+  getAdjacentPosts,
+  getCachedPosts,
+  postUrl,
   resolveAssetPath,
   resolveContentHtml,
-  formatDate,
 } from "../lib/blog";
-import type { Post } from "../data/posts";
+import { formatLongDate, readMinutes } from "../lib/date";
+import { watchMediaFrame } from "../lib/mediaLoader";
+import {
+  preparePostContent,
+  type PostCover as Cover,
+} from "../lib/postContent";
+import {
+  decodeHtmlEntities,
+  isSummaryRepeated,
+  toMetaDescription,
+} from "../lib/text";
 
+/** Largura do cabeçalho do post: 880px, com 24px de respiro no celular. */
+const headColumn = "mx-auto w-[min(880px,calc(100%-48px))]";
+/** Coluna de leitura (640px), a mesma do texto do corpo. */
+const readingColumn = "mx-auto w-[min(640px,calc(100%-48px))]";
+
+/**
+ * Página de um post: /blog/:slug (adendo v3,
+ * docs/redesign/HANDOFF-ADENDO-V3-PROJETO-POST.md).
+ *
+ * De cima para baixo: local nav ("Blog" é o voltar) → dataline por extenso →
+ * título → abertura → capa sangrando → corpo → assinatura em ASCII →
+ * compartilhar → "Próximo post." / "Post anterior.".
+ */
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
-  const [post, setPost] = useState<Post | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Se os posts já estão em cache, a página começa pronta (sem "Carregando...")
+  const [posts, setPosts] = useState<Post[] | null>(getCachedPosts);
+  // Guarda de qual slug é a lista carregada. Enquanto não for o atual, está carregando.
+  const [loadedSlug, setLoadedSlug] = useState<string | undefined>(
+    getCachedPosts() ? slug : undefined,
+  );
+  const loading = loadedSlug !== slug;
+  const post = posts?.find((p) => p.slug === slug) ?? null;
+  const { prev, next } =
+    posts && slug ? getAdjacentPosts(posts, slug) : { prev: null, next: null };
+
+  const articleRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Corpo preparado: a imagem de abertura sobe para a capa, as fotos viram
+  // pares e as legendas viram <figcaption> (src/lib/postContent.ts)
+  const prepared = useMemo(
+    () =>
+      post
+        ? preparePostContent(
+            resolveContentHtml(post.content),
+            Boolean(post.cover),
+          )
+        : null,
+    [post],
+  );
+
+  const title = post ? decodeHtmlEntities(post.title) : "";
+
+  // Capa: o campo `cover` ou a imagem de abertura do corpo
+  let cover: Cover | null = null;
+  if (post?.cover) {
+    cover = {
+      src: resolveAssetPath(post.cover),
+      alt: `${blog.coverAltPrefix} ${title}`,
+      caption: post.coverCaption,
+    };
+  } else if (prepared?.openingImage) {
+    cover = {
+      ...prepared.openingImage,
+      caption: post?.coverCaption || prepared.openingImage.caption,
+    };
+  }
+
+  // Skeleton das imagens do corpo: depois de injetar o HTML do Hugo, liga
+  // cada moldura (.media-frame) ao carregamento da sua imagem
+  useEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+    const frames = content.querySelectorAll<HTMLElement>(".media-frame");
+    const stops = Array.from(frames).map(watchMediaFrame);
+    return () => stops.forEach((stop) => stop());
+  }, [prepared, loading]);
+
+  // Título da aba: o do post (ou "Post não encontrado")
+  let pageTitle = seo.blogTitle;
+  if (!loading && post) pageTitle = title + seo.titleSuffix;
+  if (!loading && !post) pageTitle = seo.notFoundTitle;
+  usePageMeta(
+    pageTitle,
+    post ? toMetaDescription(post.summary || post.excerpt) : undefined,
+  );
 
   useEffect(() => {
-    setLoading(true);
+    // Se o slug mudar antes do fetch terminar, ignoramos a resposta antiga
+    let ignore = false;
+
     fetchPosts()
-      .then((data) => setPost(data.find((p) => p.slug === slug) ?? null))
-      .catch((err) => {
-        console.error("Erro ao carregar o post:", err);
-        setPost(null);
+      .then((data) => {
+        if (!ignore) setPosts(data);
       })
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (ignore) return;
+        console.error("Erro ao carregar o post:", err);
+        setPosts(null);
+      })
+      .finally(() => {
+        if (!ignore) setLoadedSlug(slug);
+      });
+
+    return () => {
+      ignore = true;
+    };
   }, [slug]);
 
-  if (loading) {
-    return (
-      <div id="top">
-        <Navbar />
-        <section className="flex min-h-screen items-center justify-center px-7">
-          <p className="animate-pulse text-sm text-muted">Carregando post...</p>
-        </section>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!post) {
-    return (
-      <div id="top">
-        <Navbar />
-        <section className="mx-auto max-w-170 px-7 pt-44 pb-24 text-center">
-          <span className="mb-4 block text-[13px] uppercase tracking-[0.08em] text-muted">
-            404
-          </span>
-          <h1 className="mb-4 text-3xl font-bold">Post não encontrado.</h1>
-          <p className="mb-8 text-secondary">
-            O link pode estar quebrado ou o post foi movido.
-          </p>
-          <Link
-            to="/blog"
-            className="inline-flex items-center gap-2 text-sm text-accent hover:underline"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} className="h-3.5 w-3.5" />
-            Voltar pro blog
-          </Link>
-        </section>
-        <Footer />
-      </div>
-    );
-  }
+  const minutes = post ? readMinutes(post.readTime) : null;
+  const showIntro =
+    post?.summary && !isSummaryRepeated(post.summary, post.content);
 
   return (
     <div id="top">
       <Navbar />
-      <article className="mx-auto max-w-170 px-7 pt-44 pb-28">
-        <Link
-          to="/blog"
-          className="mb-10 inline-flex items-center gap-2 text-sm text-secondary transition-colors hover:text-paper"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} className="h-3.5 w-3.5" />
-          Voltar pro blog
-        </Link>
-
-        <div className="mb-5 flex flex-wrap items-center gap-2.5 font-mono text-xs text-muted">
-          <FontAwesomeIcon icon={faCodeCommit} className="h-3.5 w-3.5" />
-          <span>{post.hash}</span>
-          <span>·</span>
-          <time>{formatDate(post.date)}</time>
-          <span>·</span>
-          <span>{post.readTime}</span>
-        </div>
-
-        <h1 className="mb-4 text-3xl font-bold leading-[1.15] sm:text-4xl">
-          {post.title}
-        </h1>
-
-        {post.summary && (
-          <p className="mb-6 text-[17px] text-secondary">{post.summary}</p>
+      <LocalNav
+        section={blog.post.section}
+        sectionTo="/blog"
+        title={post ? title : undefined}
+        titleRef={titleRef}
+        readRef={articleRef}
+      >
+        {post && (
+          <CopyButton
+            value={postUrl}
+            idle={blog.post.copyLink}
+            done={blog.post.linkCopied}
+            failed={blog.post.copyFailed}
+          />
         )}
+      </LocalNav>
 
-        {post.tags?.length > 0 && (
-          <div className="mb-10 flex flex-wrap gap-1.5">
-            {post.tags.map((t) => (
-              <span
-                key={t}
-                className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs text-accent"
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {post.cover && (
-          <div className="mb-10 h-64 w-full overflow-hidden rounded-lg border border-line sm:h-96">
-            <img
-              src={resolveAssetPath(post.cover)}
-              alt={`Capa do post: ${post.title}`}
-              className="h-full w-full object-cover"
-            />
-          </div>
-        )}
-
-        <div
-          className="prose prose-invert max-w-none border-t border-line pt-10 text-[15px] leading-relaxed text-secondary prose-headings:font-display gap-8 flex flex-col prose-headings:text-paper prose-a:text-accent prose-strong:text-paper prose-code:text-accent prose-img:rounded-lg! prose-img:border! prose-img:border-line!"
-          dangerouslySetInnerHTML={{ __html: resolveContentHtml(post.content) }}
-        />
-
-        <div className="mt-16 border-t border-line pt-8">
-          <Link
-            to="/blog"
-            className="inline-flex items-center gap-2 text-sm text-accent hover:underline"
+      <main className="min-h-svh pt-[calc(var(--spacing-nav)+var(--spacing-lnav))]">
+        {loading && (
+          <p
+            role="status"
+            className={`${headColumn} pt-14 text-secondary tab:pt-22`}
           >
-            <FontAwesomeIcon icon={faArrowLeft} className="h-3.5 w-3.5" />
-            Voltar pro blog
-          </Link>
-        </div>
-      </article>
-      <Footer />
+            {blog.loadingPost}
+          </p>
+        )}
+
+        {/* Post inexistente: o "Blog" da local nav é o caminho de volta */}
+        {!loading && !post && (
+          <div className={`${headColumn} pt-14 tab:pt-22`}>
+            <h1 className="text-page-title text-balance">
+              {blog.notFoundTitle}
+            </h1>
+            <p className="mt-6 max-w-[34em] text-intro text-secondary">
+              {blog.notFoundText}
+            </p>
+          </div>
+        )}
+
+        {!loading && post && prepared && (
+          <>
+            <article ref={articleRef}>
+              <header className={`${headColumn} pt-14 tab:pt-22`}>
+                {/* Dataline por extenso, como num jornal (sem hash e sem mono) */}
+                <p className="text-body-sm text-secondary">
+                  <time dateTime={post.date.slice(0, 10)}>
+                    {formatLongDate(post.date)}
+                  </time>
+                  {minutes && (
+                    <>
+                      {" · "}
+                      <span className="whitespace-nowrap">
+                        {blog.post.readTime(minutes)}
+                      </span>
+                    </>
+                  )}
+                </p>
+
+                <h1
+                  ref={titleRef}
+                  className="mt-4.5 text-page-title text-balance"
+                >
+                  {title}
+                </h1>
+
+                {/* A abertura só aparece se o corpo não começar com o mesmo texto (DF-5) */}
+                {showIntro && (
+                  <p className="mt-6 max-w-[34em] text-intro text-pretty text-secondary">
+                    {decodeHtmlEntities(post.summary)}
+                  </p>
+                )}
+              </header>
+
+              {cover && <PostCover cover={cover} />}
+
+              {/* Corpo do post (HTML do Hugo), estilizado por .post-body em index.css */}
+              <div
+                ref={contentRef}
+                className={`post-body ${cover ? "mt-18" : "mt-14"}`}
+                dangerouslySetInnerHTML={{ __html: prepared.bodyHtml }}
+              />
+
+              <div className={readingColumn}>
+                <PostSignature tags={post.tags ?? []} />
+                <ShareLine title={title} />
+              </div>
+            </article>
+
+            <PostOnward next={next} prev={prev} />
+          </>
+        )}
+      </main>
+
+      <div className="mt-30">
+        <Footer />
+      </div>
     </div>
   );
 }

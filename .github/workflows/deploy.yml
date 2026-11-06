@@ -26,13 +26,14 @@ jobs:
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: 'latest'
+          # Mesma versão usada localmente (P5 I-C): "latest" podia quebrar o build sem aviso
+          hugo-version: '0.161.1'
           extended: true
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.3.14
 
       - name: Install Dependencies
         run: bun install

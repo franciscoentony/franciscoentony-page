@@ -5,17 +5,64 @@ function getBase(): string {
   return import.meta.env.BASE_URL.replace(/\/$/, "");
 }
 
-/** Busca o índice de posts gerado pelo Hugo. */
-export async function fetchPosts(): Promise<Post[]> {
-  const res = await fetch(`${getBase()}/blog-data/index.json`);
-  if (!res.ok) throw new Error(`Falha ao carregar posts (${res.status})`);
-  return res.json();
+/*
+ * Cache dos posts: o index.json é buscado UMA vez por visita.
+ * - postsPromise: evita dois fetch ao mesmo tempo (Home e /blog, por exemplo).
+ * - postsCache: os dados já carregados, para as páginas renderizarem na hora
+ *   (sem "Carregando...") ao voltar para /blog. Assim o navegador consegue
+ *   restaurar a rolagem inteira no botão Voltar (R2, I-2).
+ */
+let postsPromise: Promise<Post[]> | null = null;
+let postsCache: Post[] | null = null;
+
+/** Busca o índice de posts gerado pelo Hugo (com cache). */
+export function fetchPosts(): Promise<Post[]> {
+  if (!postsPromise) {
+    postsPromise = fetch(`${getBase()}/blog-data/index.json`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Falha ao carregar posts (${res.status})`);
+        return res.json() as Promise<Post[]>;
+      })
+      .then((posts) => {
+        postsCache = posts;
+        return posts;
+      })
+      .catch((error) => {
+        // Se falhar, limpa o cache para a próxima tentativa buscar de novo
+        postsPromise = null;
+        throw error;
+      });
+  }
+  return postsPromise;
+}
+
+/** Posts já carregados nesta visita, ou null se ainda não foram buscados. */
+export function getCachedPosts(): Post[] | null {
+  return postsCache;
 }
 
 /** Busca um post específico pelo slug. */
 export async function fetchPost(slug: string): Promise<Post | null> {
   const posts = await fetchPosts();
   return posts.find((p) => p.slug === slug) ?? null;
+}
+
+/**
+ * Vizinhos de um post na lista (o index.json vem do mais novo para o mais
+ * antigo): `next` = o registro mais antigo, `prev` = o mais novo. null quando
+ * não existe (ex.: o primeiro post não tem `next`). Usado no "Continue no
+ * diário" do detalhe do post (adendo B).
+ */
+export function getAdjacentPosts(
+  posts: Post[],
+  slug: string,
+): { prev: Post | null; next: Post | null } {
+  const index = posts.findIndex((p) => p.slug === slug);
+  if (index === -1) return { prev: null, next: null };
+  return {
+    prev: posts[index - 1] ?? null,
+    next: posts[index + 1] ?? null,
+  };
 }
 
 /** Reescreve o caminho de uma imagem de capa pra apontar pra pasta gerada pelo Hugo. */
@@ -30,38 +77,22 @@ export function resolveContentHtml(html: string): string {
   if (!html) return "";
   const base = getBase();
 
-  let out = html
+  const out = html
     .replace(/src="\/blog\/images\//g, `src="${base}/blog-data/images/`)
     .replace(/src="\/blog-data\/images\//g, `src="${base}/blog-data/images/`)
     .replace(/src="\/blog\//g, `src="${base}/blog-data/`)
-    .replace(/src="\/blog-data\//g, `src="${base}/blog-data/`);
+    .replace(/src="\/blog-data\//g, `src="${base}/blog-data/`)
+    // srcset (versões de 800px do render hook do Hugo, A9): várias URLs
+    .replace(/srcset="[^"]*"/g, (srcset) =>
+      srcset.replace(/\/blog\/images\//g, `${base}/blog-data/images/`),
+    );
 
-  // Aplica o arredondamento direto como inline style no <img>. Isso evita
-  // depender da cascata do CSS — se o tema do Hugo carregar alguma folha de
-  // estilo depois do Tailwind com regra pra <img>, ela venceria mesmo com
-  // "!important" nas classes do prose. Inline style sempre tem prioridade.
-  const imgStyle =
-    "border-radius:0.75rem;border:1px solid #1E1E22;display:block;";
-  out = out.replace(/<img\b([^>]*)>/gi, (match, attrs) => {
-    if (/style\s*=\s*"/i.test(attrs)) {
-      return match.replace(
-        /style\s*=\s*"([^"]*)"/i,
-        (_m: string, existing: string) => `style="${existing};${imgStyle}"`,
-      );
-    }
-    return `<img${attrs} style="${imgStyle}">`;
-  });
-
+  // O visual das imagens (raio, borda) vem da classe post-body em
+  // src/index.css (D14), não mais de estilo inline.
   return out;
 }
 
-/** Formata uma data ISO (front matter do Hugo) no padrão pt-BR. */
-export function formatDate(iso: string): string {
-  const date = new Date(iso);
-  if (isNaN(date.getTime())) return iso;
-  return date.toLocaleDateString("pt-BR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+/** Endereço da página atual, sem âncora (o que vai no "Copiar link"). */
+export function postUrl(): string {
+  return window.location.origin + window.location.pathname;
 }

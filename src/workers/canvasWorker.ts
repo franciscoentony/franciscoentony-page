@@ -108,10 +108,15 @@ scope.onmessage = async (event: MessageEvent) => {
   }
 
   if (message.type === "frame") {
-    const objects = drawFrame(message.data);
-    // Avisa a página que terminou (contrapressão, P5 S-A) e, com os
-    // objetos do hero, manda as posições deles
-    scope.postMessage({ type: "drawn", objects });
+    let objects: number[] | undefined;
+    try {
+      objects = drawFrame(message.data);
+    } finally {
+      // Avisa a página que terminou (contrapressão, P5 S-A), mesmo se o
+      // desenho der erro: senão a página espera para sempre e o planeta
+      // congela (I-3). Com os objetos do hero, vão as posições deles.
+      scope.postMessage({ type: "drawn", objects });
+    }
   }
 };
 

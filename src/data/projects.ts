@@ -46,6 +46,24 @@ export const projects: Project[] = [
     languageColor: "#F1E05A",
     topics: ["React.JS", "Next.JS", "Docker", "PostgreSQL"],
     url: "https://github.com/franciscoentony/connect",
+    // Dados abaixo extraídos do README e do repositório público (nov/2026).
+    tagline:
+      "Um sistema de gerenciamento de doações que conecta doadores a campanhas de arrecadação, com ONGs servindo como ponte.",
+    period: "ago 2026 — out 2026",
+    status: "No ar",
+    demoUrl: "https://connect-ecru-one.vercel.app",
+    chapters: [
+      {
+        title: "Sobre o projeto",
+        text: "Com o objetivo de eliminar o receio de pessoas para doar itens aos necessitados, o Connect é destinado a doadores, ou possíveis doadores, que querem tornar a vida de pessoas carentes melhor.",
+      },
+    ],
+    specs: [
+      { label: "Front-end", value: "Next.js, React, Tailwind CSS, HeroUI" },
+      { label: "Back-end", value: "Node.js, Express, JWT" },
+      { label: "Banco de dados", value: "PostgreSQL" },
+      { label: "Infraestrutura", value: "Docker, Cloudflare, Vercel" },
+    ],
   },
   {
     name: "petca",
@@ -55,6 +73,7 @@ export const projects: Project[] = [
     languageColor: "#F1E05A",
     topics: ["react-native", "drf", "pytest"],
     url: "https://github.com/franciscoentony/petca",
+    period: "jun 2026 — jul 2026",
   },
   {
     name: "franciscoentony-page",
@@ -64,6 +83,15 @@ export const projects: Project[] = [
     languageColor: "#3178C6",
     topics: ["vite", "go", "hugo"],
     url: "https://github.com/franciscoentony/franciscoentony-page",
+    period: "dez 2025 — atual",
+    status: "No ar",
+    demoUrl: "https://franciscoentony.com",
+    specs: [
+      { label: "Front-end", value: "React 19, TypeScript, Tailwind CSS v4" },
+      { label: "Build", value: "Vite, Bun" },
+      { label: "Blog", value: "Hugo (Markdown → JSON)" },
+      { label: "Deploy", value: "GitHub Pages, GitHub Actions" },
+    ],
   },
   {
     name: "fullstack-filmes",
@@ -73,5 +101,12 @@ export const projects: Project[] = [
     languageColor: "#F1E05A",
     topics: ["node", "mongodb", "jwt"],
     url: "https://github.com/franciscoentony/fullstack-filmes",
+    period: "mar 2026",
+    specs: [
+      { label: "Front-end", value: "React (Vite)" },
+      { label: "Back-end", value: "Node.js, Express" },
+      { label: "Banco de dados", value: "MongoDB" },
+      { label: "Autenticação", value: "JWT" },
+    ],
   },
 ];

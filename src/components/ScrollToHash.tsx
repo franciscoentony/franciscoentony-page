@@ -47,11 +47,13 @@ export default function ScrollToHash() {
       navigationType === "POP" && !location.hash
         ? savedPositions.get(location.key)
         : undefined;
-    // Seção pedida por um link de outra página (só na ida, não no Voltar)
+    // Seção pedida por um link de outra página (veja useSectionClick). No
+    // Voltar/Avançar ela vale só como reserva, quando não há posição salva
+    // (ex.: a página do projeto foi recarregada e a memória se perdeu, I-1)
     const stateSection =
-      navigationType === "POP"
-        ? undefined
-        : (location.state as SectionState | null)?.section;
+      savedY === undefined
+        ? (location.state as SectionState | null)?.section
+        : undefined;
 
     // Espera a página nova estar montada, incluindo as seções da Home que
     // chegam um pouco depois (React.lazy): tenta por até ~2s.
@@ -86,8 +88,9 @@ export default function ScrollToHash() {
         return;
       }
 
-      // POP sem posição salva (ex.: recarregou a página): não mexe
-      if (navigationType === "POP") return;
+      // Primeira carga da aba (sem histórico do router): não mexe. Num
+      // Voltar/Avançar sem posição salva nem seção, vai ao topo (I-1)
+      if (navigationType === "POP" && location.key === "default") return;
 
       // "instant": sem herdar o scroll-behavior: smooth do <html> (QA I3)
       window.scrollTo({ top: 0, behavior: "instant" });

@@ -95,7 +95,6 @@
   --color-ink: #000000; /* fundo da página */
   --color-raised: #0a0a0c; /* fundo alternativo (cards de post) */
   --color-card: #111114; /* superfície */
-  --color-toast: #1c1c1f; /* fundo do toast */
   --color-line: rgba(255, 255, 255, 0.08); /* bordas de 1px e divisores */
   --color-line-strong: rgba(255, 255, 255, 0.18); /* borda no hover */
   --color-paper: #f5f5f7; /* texto principal */
@@ -259,7 +258,7 @@
 
   /* Textos menores */
   --text-body-sm: 15px; /* descrição das fases */
-  --text-small: 13px; /* legendas, toast, classe da ficha */
+  --text-small: 13px; /* legendas, classe da ficha */
   --text-small--line-height: 1.4;
   --text-menu: 12.5px; /* links da navbar */
   --text-menu-overlay: clamp(28px, 8vw, 34px); /* links do menu mobile (D20) */

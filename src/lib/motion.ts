@@ -60,12 +60,6 @@ export const NAVBAR = {
   hideAfter: 200, // px rolados antes de esconder ao descer
 };
 
-// ---------- Toast ----------
-
-export const TOAST = {
-  duration: 2200, // ms visível
-};
-
 // ---------- Contadores ----------
 
 export const COUNTER = {

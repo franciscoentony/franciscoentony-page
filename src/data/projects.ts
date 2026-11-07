@@ -83,9 +83,60 @@ export const projects: Project[] = [
     languageColor: "#3178C6",
     topics: ["vite", "go", "hugo"],
     url: "https://github.com/franciscoentony/franciscoentony-page",
+    // Textos da frame "Versão que eu queria dos projetos" (Figma 108:5),
+    // aprovados pelo Entony em 06/11/2026.
+    tagline:
+      "O site que você está lendo: um universo ASCII com um planeta no meio.",
     period: "dez 2025 — atual",
+    role: "Design e código",
     status: "No ar",
     demoUrl: "https://franciscoentony.com",
+    results: [
+      { value: "2", label: "posts publicados no blog" },
+      { value: "3", label: "níveis de qualidade de animação" },
+      { value: "0", label: "dependências de animação" },
+    ],
+    chapters: [
+      {
+        title: "O problema",
+        text: "O portfólio antigo era uma lista de cards. Dizia o que eu fiz, não quem eu sou.",
+      },
+      {
+        title: "A solução",
+        text: "Um universo jogável: um planeta em ASCII, uma ficha de personagem e missões no lugar de projetos.",
+      },
+      {
+        title: "O que eu fiz",
+        text: "React 19, Vite e Tailwind na interface; Hugo gerando o blog em JSON; tudo publicado no GitHub Pages.",
+      },
+      {
+        title: "O que aprendi",
+        text: "A deixar o efeito em um lugar só. O resto da página precisa respirar.",
+      },
+    ],
+    screens: [
+      {
+        src: "/projetos/franciscoentony-page/home.jpg",
+        alt: "A Home do site, com o título “Construo sistemas que resolvem problemas reais” e o planeta ASCII.",
+        width: 1440,
+        height: 900,
+        caption: "A Home, com o planeta ASCII no centro.",
+      },
+      {
+        src: "/projetos/franciscoentony-page/blog.jpg",
+        alt: "A página do blog, com a lista de posts.",
+        width: 1440,
+        height: 900,
+        caption: "O blog lê o JSON do Hugo.",
+      },
+      {
+        src: "/projetos/franciscoentony-page/mobile.jpg",
+        alt: "A Home no celular, com o astronauta e o planeta ASCII.",
+        width: 780,
+        height: 1688,
+        caption: "No celular o planeta fica menor e mais lento, de propósito.",
+      },
+    ],
     specs: [
       { label: "Front-end", value: "React 19, TypeScript, Tailwind CSS v4" },
       { label: "Build", value: "Vite, Bun" },

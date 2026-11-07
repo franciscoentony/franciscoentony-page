@@ -276,7 +276,9 @@ export default function Navbar() {
           showGlass ? `border-line ${glassClass}` : "border-transparent"
         } ${
           isCompact
-            ? "tab:h-nav-compact tab:border-transparent tab:bg-transparent tab:backdrop-blur-none"
+            ? // Compacto: só a altura muda. O vidro continua, para o conteúdo
+              // nunca aparecer embolado com os marcadores da trilha
+              "tab:h-nav-compact"
             : ""
         }`}
         data-compact={isCompact || undefined}

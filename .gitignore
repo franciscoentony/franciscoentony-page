@@ -25,3 +25,10 @@ public/blog/
 *.njsproj
 *.sln
 *.sw?
+
+# Ferramentas locais de design/agentes (impeccable): ficam só na máquina
+.claude/
+.github/agents/
+.github/hooks/
+.github/skills/
+.impeccable/

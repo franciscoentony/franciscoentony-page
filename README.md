@@ -78,6 +78,15 @@ bun run dev:hugo     # num terminal
 bun run dev:react    # em outro; abra http://localhost:5173/blog
 ```
 
+**Ver o post enquanto escreve (recomendado):** a prévia mais fiel é o próprio site rodando, aberto ao lado do editor.
+
+1. Com os dois comandos acima rodando, abra o `.md` do post no VS Code.
+2. Pressione `⌘⇧P` (`Ctrl+Shift+P` no Windows/Linux), escolha **Simple Browser: Show** e digite `http://localhost:5173/blog/meu-post/`.
+3. Arraste essa aba para o lado do editor.
+4. A cada vez que você salvar, o Hugo recompila o post em cerca de 1 segundo. Recarregue a aba para ver como vai ficar no site.
+
+> O preview de Markdown do VS Code e o Obsidian servem para escrever, mas não mostram o post como no site. As imagens aparecem quebradas, porque o caminho `/blog/images/...` só existe dentro do site. O cabeçalho `+++` aparece como texto. E não há capa, pares de fotos nem a tipografia.
+
 Quando estiver tudo certo:
 
 1. Rode `bun run build`. Isso atualiza `public/blog-data/`, que vai junto no commit.
